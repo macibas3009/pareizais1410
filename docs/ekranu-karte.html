@@ -1,0 +1,223 @@
+<!doctype html>
+<!-- Ekrānu kartes avots. Attēlu docs/ekranu-karte.png atjauno ar: make ekranu-karte -->
+<html lang="lv">
+<head>
+<meta charset="utf-8">
+<title>CRM ekrānu karte</title>
+<style>
+  :root {
+    --lake-900: #0a2f3e; --lake-700: #11566b; --lake-500: #1f8aa6; --lake-100: #e3f1f4;
+    --sand: #faf7f1; --line: #8aa7b0; --ink: #17262e; --muted: #5d6f78;
+    --done: #1e6b4a; --done-bg: #e5f4ec; --part: #8a5a00; --part-bg: #fff3d6; --todo: #5d6f78; --todo-bg: #f1f3f4;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--sand); color: var(--ink); font-family: "DejaVu Sans", "Liberation Sans", Arial, sans-serif; }
+  .page { position: relative; width: 1680px; padding: 36px 44px 40px; }
+
+  header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 26px; }
+  h1 { margin: 0; font-size: 30px; color: var(--lake-900); }
+  .subtitle { margin: 4px 0 0; color: var(--muted); font-size: 15px; }
+  .legend { display: flex; gap: 16px; font-size: 14px; align-items: center; }
+  .legend span { display: inline-flex; align-items: center; gap: 6px; }
+
+  .box {
+    position: relative; z-index: 1;
+    background: #fff; border: 2px solid var(--line); border-radius: 10px;
+    padding: 10px 12px 9px; font-size: 14px; line-height: 1.3;
+  }
+  .box .t { font-weight: 700; font-size: 15px; }
+  .box .u { font-family: "DejaVu Sans Mono", monospace; font-size: 12px; color: var(--muted); margin-top: 2px; }
+  .box .d { font-size: 12.5px; color: var(--muted); margin-top: 3px; }
+  .box.done { border-color: var(--done); background: var(--done-bg); }
+  .box.part { border-color: #c98a00; background: var(--part-bg); }
+  .box.todo { border-color: #b9c3c7; border-style: dashed; background: #fff; }
+  .badge { position: absolute; top: -10px; right: 10px; font-size: 10.5px; font-weight: 700; letter-spacing: .04em;
+           padding: 2px 7px; border-radius: 999px; color: #fff; }
+  .done .badge { background: var(--done); }
+  .part .badge { background: #b07800; }
+  .todo .badge { background: #8c999e; }
+  .id { display: inline-block; font-size: 11px; font-weight: 700; color: var(--lake-700); background: var(--lake-100);
+        border-radius: 5px; padding: 1px 6px; margin-left: 6px; vertical-align: 1px; }
+  .ai { color: #6b3fa0; background: #efe7f8; }
+
+  /* Ieeja */
+  .entry { display: flex; justify-content: center; gap: 120px; margin-bottom: 46px; }
+  .entry .box { width: 300px; }
+  .hub { display: flex; justify-content: center; margin-bottom: 52px; }
+  .hub .box { width: 620px; text-align: center; padding: 14px; border-width: 3px; }
+  .hub .box .t { font-size: 19px; }
+
+  /* Joslas pēc lomas */
+  .lanes { display: grid; grid-template-columns: 300px 1fr 330px; gap: 28px; align-items: start; }
+  .lane { background: rgba(255,255,255,.55); border: 1px solid #dfe6e8; border-radius: 14px; padding: 16px 16px 18px; }
+  .lane-head { font-weight: 700; font-size: 16px; color: #fff; background: var(--lake-700); border-radius: 8px;
+               padding: 8px 12px; margin-bottom: 18px; text-align: center; }
+  .lane-head small { display: block; font-weight: 400; font-size: 12px; opacity: .85; }
+
+  .tree, .tree ul { list-style: none; margin: 0; padding: 0; }
+  .tree ul { margin-left: 22px; padding-left: 18px; border-left: 2px solid var(--line); }
+  .tree li { position: relative; margin: 12px 0; }
+  .tree ul > li::before { content: ""; position: absolute; left: -18px; top: 22px; width: 18px; border-top: 2px solid var(--line); }
+  .tree ul > li:last-child::after { content: ""; position: absolute; left: -20px; top: 24px; bottom: -14px; width: 4px; background: #fcfbf8; }
+  .crm-cols { display: grid; grid-template-columns: 1.35fr 1fr; gap: 26px; }
+  .group-title { font-size: 12px; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: .06em; margin: 0 0 4px; }
+
+  /* Kopīgi */
+  .common { margin-top: 34px; display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 28px; align-items: start; }
+  .shell { border: 2px solid var(--lake-500); border-radius: 12px; background: #fff; overflow: hidden; }
+  .shell .bar { background: var(--lake-100); padding: 8px 12px; font-size: 13px; display: flex; gap: 14px; flex-wrap: wrap; }
+  .shell .bar b { color: var(--lake-900); }
+  .shell .body { padding: 10px 12px; font-size: 13px; color: var(--muted); text-align: center; }
+  .stack > .box + .box { margin-top: 14px; }
+
+  svg.links { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; overflow: visible; }
+  footer { margin-top: 26px; font-size: 12.5px; color: var(--muted); display: flex; justify-content: space-between; }
+</style>
+</head>
+<body>
+<div class="page" id="page">
+  <svg class="links" id="links"></svg>
+
+  <header>
+    <div>
+      <h1>CRM ekrānu karte</h1>
+      <p class="subtitle">Ezermalas novada pašvaldība · atbilstoši docs/prasibu-saraksts.md · stāvoklis 2026-10-14</p>
+    </div>
+    <div class="legend">
+      <span><span class="box done" style="padding:2px 10px">Gatavs</span></span>
+      <span><span class="box part" style="padding:2px 10px">Daļēji</span></span>
+      <span><span class="box todo" style="padding:2px 10px">Vēl nav</span></span>
+      <span><span class="id">F1</span> prasība</span>
+      <span><span class="id ai">MI-1</span> MI funkcija</span>
+    </div>
+  </header>
+
+  <section class="entry">
+    <div class="box done" id="login"><span class="badge">GATAVS</span>
+      <div class="t">Pieslēgties <span class="id">F0</span></div><div class="u">/login</div><div class="d">e-pasts + parole</div></div>
+    <div class="box done" id="register"><span class="badge">GATAVS</span>
+      <div class="t">Reģistrēties <span class="id">F0</span></div><div class="u">/register</div><div class="d">+ pieprasītā loma (Darbinieks / Vadītājs)</div></div>
+  </section>
+
+  <section class="hub">
+    <div class="box part" id="panel"><span class="badge">DAĻĒJI</span>
+      <div class="t">Vadības panelis <span class="id">F9</span></div><div class="u">/panelis</div>
+      <div class="d">Atveras pēc pieslēgšanās · saturs atkarīgs no lomas · kopsavilkuma kartes, uzdevumi šodien, kavētie pieprasījumi, pēdējās mijiedarbības</div></div>
+  </section>
+
+  <section class="lanes">
+    <div class="lane" id="lane-pending">
+      <div class="lane-head" id="head-pending">Bez lomas<small>jauns, neapstiprināts konts</small></div>
+      <div class="box done"><span class="badge">GATAVS</span>
+        <div class="t">Konts gaida apstiprinājumu <span class="id">F0</span></div>
+        <div class="d">Rāda pieprasīto lomu. CRM dati nav redzami.</div></div>
+    </div>
+
+    <div class="lane" id="lane-crm">
+      <div class="lane-head" id="head-crm">Darbinieks un vadītājs<small>darbinieks labo savas organizācijas, vadītājs visas</small></div>
+      <div class="crm-cols">
+        <div>
+          <p class="group-title">Organizācijas un to kartīte</p>
+          <ul class="tree">
+            <li><div class="box done"><span class="badge">GATAVS</span>
+              <div class="t">Organizāciju saraksts <span class="id">F1</span></div><div class="u">/organizacijas</div><div class="d">filtri: veids, atbildīgais</div></div>
+              <ul>
+                <li><div class="box done"><span class="badge">GATAVS</span>
+                  <div class="t">Jauna organizācija <span class="id">F1</span></div><div class="u">/organizacijas/jauna</div></div></li>
+                <li><div class="box done"><span class="badge">GATAVS</span>
+                  <div class="t">Organizācijas kartīte <span class="id">F1</span></div><div class="u">/organizacijas/&lt;id&gt;</div><div class="d">atvēršana tiek ierakstīta žurnālā (N2)</div></div>
+                  <ul>
+                    <li><div class="box done"><span class="badge">GATAVS</span><div class="t">Labot organizāciju <span class="id">F1</span></div><div class="d">tikai atbildīgais vai vadītājs</div></div></li>
+                    <li><div class="box todo"><span class="badge">VĒL NAV</span><div class="t">Kontaktpersonas forma <span class="id">F2</span></div><div class="d">tikai nepieciešamie lauki · glabāt līdz +3 gadi</div></div></li>
+                    <li><div class="box todo"><span class="badge">VĒL NAV</span><div class="t">Mijiedarbības forma <span class="id">F3</span> <span class="id ai">MI-1</span></div><div class="d">zvans / e-pasts / sanāksme · MI kopsavilkums, cilvēks apstiprina</div></div></li>
+                    <li><div class="box todo"><span class="badge">VĒL NAV</span><div class="t">Pieprasījuma forma <span class="id">F4</span></div><div class="d">Jauns → Darbā → Atbildēts · termiņš +1 mēnesis</div></div></li>
+                    <li><div class="box todo"><span class="badge">VĒL NAV</span><div class="t">Uzdevuma forma <span class="id">F5</span></div><div class="d">sev vai kolēģim</div></div></li>
+                  </ul>
+                </li>
+              </ul>
+            </li>
+          </ul>
+        </div>
+        <div>
+          <p class="group-title">Saraksti un pārskati</p>
+          <div class="stack" style="margin-top:12px">
+            <div class="box todo"><span class="badge">VĒL NAV</span><div class="t">Pieprasījumu saraksts <span class="id">F4</span></div><div class="d">filtri: statuss, kavēti · "KAVĒTS (N d.)" tekstā</div></div>
+            <div class="box todo"><span class="badge">VĒL NAV</span><div class="t">Mani uzdevumi šodien <span class="id">F5</span></div><div class="d">poga "Izpildīts" · nokavētie augšā</div></div>
+            <div class="box todo"><span class="badge">VĒL NAV</span><div class="t">Kontakti "Jāpārskata" <span class="id">N2</span></div><div class="d">glabāšanas termiņš beidzies · pagarināt vai dzēst</div></div>
+            <div class="box todo"><span class="badge">VĒL NAV</span><div class="t">Vadītāja pārskats <span class="id">F7</span></div><div class="d">tikai vadītājam · 7/30/90 d. · diagramma + tā pati tabula</div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="lane" id="lane-admin">
+      <div class="lane-head" id="head-admin">Administrators<small>pārvaldība, ne CRM dati</small></div>
+      <div class="stack">
+        <div class="box done"><span class="badge">GATAVS</span><div class="t">Lomu apstiprināšana panelī <span class="id">F0</span></div><div class="d">Apstiprināt · Cita loma · Noraidīt</div></div>
+        <div class="box done"><span class="badge">GATAVS</span><div class="t">Lietotāji un lomas <span class="id">F0</span></div><div class="u">/lietotaji</div></div>
+        <div class="box done"><span class="badge">GATAVS</span><div class="t">Piekļuves žurnāls <span class="id">N2</span></div><div class="u">/zurnals</div><div class="d">kas, ko, kad · tikai ID</div></div>
+        <div class="box todo"><span class="badge">VĒL NAV</span><div class="t">Dzēšanas pieprasījumi <span class="id">N2</span></div><div class="d">dzēš kontaktpersonu, mijiedarbības anonimizē</div></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="common">
+    <div>
+      <p class="group-title">Visās lapās · galvene</p>
+      <div class="shell">
+        <div class="bar"><b>◉ Zīmols → Sākums</b><span>Navigācija pēc lomas</span><span id="search-slot"><b>Meklēšana</b> <span class="id">F6</span></span><span>Vārds · Iziet</span></div>
+        <div class="body">… lapas saturs …</div>
+        <div class="bar"><span>© pašvaldība · foto autorība</span><span id="a11y-slot"><b>Piekļūstamības paziņojums</b> <span class="id">F8</span></span></div>
+      </div>
+    </div>
+    <div class="stack">
+      <div class="box todo" id="search"><span class="badge">VĒL NAV</span><div class="t">Meklēšanas rezultāti <span class="id">F6</span></div><div class="d">organizācijas · kontakti · pieprasījumi · tabulas ar caption</div></div>
+      <div class="box todo" id="a11y"><span class="badge">VĒL NAV</span><div class="t">Piekļūstamības paziņojums <span class="id">F8</span></div><div class="u">/pieklustamiba</div><div class="d">reāli testu atradumi (axe, NVDA)</div></div>
+    </div>
+    <div class="stack">
+      <div class="box done"><span class="badge">GATAVS</span><div class="t">Kļūdas lapa</div><div class="d">404 "Lapa nav atrasta" · 403 "Nav piekļuves"</div></div>
+      <div class="box todo"><span class="badge">VĒL NAV</span><div class="t">MI-2 klasifikācija <span class="id ai">MI-2</span></div><div class="d">tikai dokuments docs/mi2-klasifikacija.md · ekrāna nav</div></div>
+    </div>
+  </section>
+
+  <footer>
+    <span>Bloki: gatavi 11 · daļēji 1 · vēl nav 12</span>
+    <span>Avots: docs/ekranu-karte.html</span>
+  </footer>
+</div>
+
+<script>
+  // Savienojumu bultas starp galvenajiem blokiem
+  const page = document.getElementById("page");
+  const svg = document.getElementById("links");
+  const NS = "http://www.w3.org/2000/svg";
+  svg.innerHTML = '<defs><marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="#5f8794"/></marker></defs>';
+  const box = id => { const r = document.getElementById(id).getBoundingClientRect(), p = page.getBoundingClientRect();
+                      return { l: r.left - p.left, r: r.right - p.left, t: r.top - p.top, b: r.bottom - p.top, cx: (r.left + r.right) / 2 - p.left, cy: (r.top + r.bottom) / 2 - p.top }; };
+  function path(d, both = false, dash = false) {
+    const el = document.createElementNS(NS, "path");
+    el.setAttribute("d", d); el.setAttribute("fill", "none"); el.setAttribute("stroke", "#5f8794"); el.setAttribute("stroke-width", "2.5");
+    el.setAttribute("marker-end", "url(#arrow)"); if (both) el.setAttribute("marker-start", "url(#arrow)");
+    if (dash) el.setAttribute("stroke-dasharray", "6 5");
+    svg.appendChild(el);
+  }
+  function label(x, y, text) {
+    const t = document.createElementNS(NS, "text");
+    t.setAttribute("x", x); t.setAttribute("y", y); t.setAttribute("font-size", "13"); t.setAttribute("fill", "#5d6f78");
+    t.setAttribute("font-family", "DejaVu Sans, Arial"); t.textContent = text; svg.appendChild(t);
+  }
+  const L = box("login"), R = box("register"), P = box("panel");
+  path(`M${R.l - 2},${R.cy} L${L.r + 4},${L.cy}`, true);
+  path(`M${L.cx},${L.b} L${L.cx},${(L.b + P.t) / 2} L${P.cx - 120},${(L.b + P.t) / 2} L${P.cx - 120},${P.t - 4}`);
+  label(L.cx - 128, L.b + 26, "pēc pieslēgšanās");
+  for (const id of ["head-pending", "head-crm", "head-admin"]) {
+    const H = box(id), mid = (P.b + H.t) / 2;
+    path(`M${P.cx},${P.b} L${P.cx},${mid} L${H.cx},${mid} L${H.cx},${H.t - 4}`);
+  }
+  const S = box("search-slot"), SR = box("search");
+  path(`M${S.r + 2},${S.cy} L${SR.l - 18},${S.cy} L${SR.l - 18},${SR.cy} L${SR.l - 4},${SR.cy}`, false, true);
+  const A = box("a11y-slot"), AR = box("a11y");
+  path(`M${A.r + 2},${A.cy} L${AR.l - 18},${A.cy} L${AR.l - 18},${AR.cy} L${AR.l - 4},${AR.cy}`, false, true);
+</script>
+</body>
+</html>

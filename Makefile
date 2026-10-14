@@ -1,4 +1,4 @@
-.PHONY: verify-setup test lint-contract install run seed users role
+.PHONY: verify-setup test lint-contract install run seed users role ekranu-karte
 
 verify-setup:
 	@python --version
@@ -28,3 +28,7 @@ users:
 # Lietošana: make role EMAIL=vards@example.com ROLE=darbinieks
 role:
 	python -m app.roles set "$(EMAIL)" "$(ROLE)"
+
+# Atjauno ekrānu kartes attēlu no docs/ekranu-karte.html (vajag: pip install playwright && playwright install chromium)
+ekranu-karte:
+	python tools/html_to_png.py docs/ekranu-karte.html docs/ekranu-karte.png

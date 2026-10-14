@@ -802,7 +802,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 .topbar { flex-wrap: wrap; }
 .topbar-brand span, .topbar-name, .topbar nav a { white-space: nowrap; }
 .topbar-search input { width: 11rem; }
-@media (max-width: 1240px) {
+@media (max-width: 1320px) {
   .topbar-brand small { display: none; }
   .topbar-search { order: 3; flex-basis: 100%; margin: 0; }
   .topbar-search input { flex: 1; width: auto; max-width: 28rem; }
@@ -818,7 +818,8 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 }
 /* N1: 320 px bez horizontālas ritināšanas — režģa elementi nedrīkst izplesties līdz satura platumam */
 .blocks > *, .chart-grid > *, .block { min-width: 0; }
-.facts dd, .facts dt, td, th { overflow-wrap: anywhere; }
+.facts dd, .facts dt { overflow-wrap: anywhere; }
+/* Tabulās vārdus nelauž: šaurā ekrānā tabula ritinās savā .table-wrap laukumā */
 @media (max-width: 860px) {
   .blocks, .chart-grid { grid-template-columns: minmax(0, 1fr); }
   .facts { grid-template-columns: minmax(0, 1fr); gap: 0.1rem; }
@@ -828,3 +829,21 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
 /* Ekrāna lasītāja teksti tabulās paliek ritināmajā laukumā, nevis paplašina lapu */
 .table-wrap { position: relative; }
 .visually-hidden { margin: -1px; padding: 0; border: 0; }
+
+/* F8 · piekļūstamības paziņojums */
+.plain-list { margin: 0; padding-left: 1.2rem; }
+.plain-list li { margin-bottom: 0.4rem; }
+code { font-family: "DejaVu Sans Mono", monospace; font-size: 0.85em; background: var(--lake-100); padding: 0.05rem 0.3rem; border-radius: 4px; }
+
+/* N1 (axe link-in-text-block, WCAG 1.4.1): saites atšķiras ne tikai ar krāsu — pasvītrotas */
+a { text-decoration: underline; text-underline-offset: 0.18em; text-decoration-thickness: 1px; }
+a:hover { text-decoration-thickness: 2px; }
+.topbar nav a, .topbar-brand, a.btn, a.btn-small, .stat-link, th[scope="row"] > a:only-child { text-decoration: none; }
+th[scope="row"] > a:only-child:hover, .topbar nav a:hover { text-decoration: underline; }
+
+/* N1: fokuss redzams arī datuma laukos (fokuss ir lauka iekšējā daļā) */
+input:focus-within, select:focus-visible { outline: none; border-color: var(--lake-500); box-shadow: 0 0 0 3px rgba(31, 138, 166, 0.2); }
+
+/* N1: gari vārdi (e-pasti) lūst šaurā ekrānā */
+.statement p, .block p { overflow-wrap: anywhere; }
+@media (max-width: 1320px) { .topbar-search + .topbar-user { margin-left: auto; } }

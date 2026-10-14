@@ -5,6 +5,7 @@ Palaišana: `make run`, tad atver http://localhost:8000/login
 
 from __future__ import annotations
 
+import json
 import logging
 import os
 from datetime import date
@@ -682,6 +683,18 @@ def create_app(db_path: Path | None = None, cookie_secure: bool | None = None) -
         user = require("vaditajs")
         period = report.period_from(request.args.get("periods", ""))
         return render_template("parskats.html", user=user, today=date.today(), **report.build(conn(), date.today(), period))
+
+    # --- F8 · piekļūstamības paziņojums ---------------------------------------------
+
+    @app.get("/pieklustamiba")
+    def accessibility_statement():
+        """Publiska lapa; rāda pēdējās automātiskās pārbaudes (make a11y) reālos rezultātus."""
+        report_path = Path(__file__).resolve().parents[1] / "docs" / "a11y-rezultati.json"
+        try:
+            a11y = json.loads(report_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            a11y = None
+        return render_template("pieklustamiba.html", user=current_user(), a11y=a11y)
 
     # --- JSON API (docs/openapi.yaml) -----------------------------------------
 

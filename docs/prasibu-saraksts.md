@@ -1,6 +1,6 @@
 # CRM mazai iestādei · prasību saraksts
 
-> Versija 1.8 · 2026-10-14 · Statuss: precizēts pēc intervijas ar produkta īpašnieku.
+> Versija 1.9 · 2026-10-14 · Statuss: precizēts pēc intervijas ar produkta īpašnieku.
 > Avots: uzdevums-starteris "CRM mazai iestādei" un konceptuālās arhitektūras shēma.
 > Mācību projekts. Visi dati ir sintētiski.
 
@@ -25,13 +25,13 @@ Statusu atjauno tajā pašā komitā, kurā prasība tiek īstenota.
 | F5 | Uzdevumi un atgādinājumi | ✅ DONE | zars `crm-4-pieprasijumi`; `tests/test_requests_tasks.py` |
 | F6 | Meklēšana | ✅ DONE | zars `crm-5-meklesana-parskats`; `tests/test_search_report.py` |
 | F7 | Pārskats vadītājam | ✅ DONE | zars `crm-5-meklesana-parskats`; `tests/test_search_report.py` |
-| F8 | Piekļūstamības paziņojums | ⬜ NAV SĀKTS | |
+| F8 | Piekļūstamības paziņojums | 🟡 DAĻĒJI (1 no 2) | zars `crm-6-pieklustamiba`; gaida manuālās NVDA pārbaudes rezultātus |
 | F9 | Vadības panelis pēc pieslēgšanās | ✅ DONE | zari `f9-panelis` … `crm-5-meklesana-parskats` |
 | MI-1 | Mijiedarbības kopsavilkums un nākamais solis | ✅ DONE | zars `crm-3-mijiedarbibas`; `app/ai.py`; Claude ceļš nav pārbaudīts ar īstu API atslēgu |
-| MI-2 | Organizāciju prioritizācija: tikai klasifikācija | ⬜ NAV SĀKTS | |
-| N1 | Piekļūstamība | 🟡 DAĻĒJI | 320 px pārbaudīts automātiski visās 21 lapā (`crm-5-meklesana-parskats`); axe un tastatūras testi — 6. posmā |
+| MI-2 | Organizāciju prioritizācija: tikai klasifikācija | ✅ DONE | [mi2-klasifikacija.md](mi2-klasifikacija.md): iespējams augsts risks, lēmums "nebūvēt" |
+| N1 | Piekļūstamība | 🟡 DAĻĒJI (5 no 6) | `make a11y`: 23 lapas, axe 0 pārkāpumu, 320 px / 200 %, tastatūra; trūkst manuālā NVDA testa |
 | N2 | Personas dati (VDAR) | ✅ DONE | zari `crm-2-kontakti` … `crm-5-meklesana-parskats` |
-| N3 | Lomas | 🟡 DAĻĒJI | lomu pieprasīšana un apstiprināšana, tiesības F1 un F9; pārējās tiesības nāks ar F2–F7 |
+| N3 | Lomas | ✅ DONE | tiesību matrica pārbaudīta `tests/test_roles_matrix.py` (5 lomas × 13 lapas) |
 | N4 | Tehnoloģijas un laiks | 🟡 DAĻĒJI | Flask + Jinja2 + SQLite un sākumdati: zars `n4-flask`; 1,5 h nav ievērots |
 
 ## 1. Situācija un mērķis
@@ -257,14 +257,14 @@ Dalībnieki var būt tikai šīs organizācijas kontaktpersonas un darbinieki. D
 
 ### F8 · Piekļūstamības paziņojums
 
+**Statuss: 🟡 DAĻĒJI (1 no 2).** Zars `crm-6-pieklustamiba`. Lapa `/pieklustamiba` (publiska) rāda `docs/a11y-rezultati.json`, ko izveido `make a11y`. Testi: `tests/test_roles_matrix.py`.
+
 **Pieņemšanas kritēriji**
-1. Lapa `/pieklustamiba`, saite uz to ir katras lapas kājenē.
-2. Saturā ir:
-   - atbilstības statuss (EN 301 549 / WCAG 2.2 AA);
-   - **reālie testa atradumi** no `tests/a11y_check.py` un manuālajiem testiem;
-   - zināmie ierobežojumi;
-   - kontakts atsauksmēm;
-   - pārbaudes datums.
+
+| # | Kritērijs | Statuss |
+|---|---|---|
+| 1 | Lapa `/pieklustamiba`, saite uz to ir katras lapas kājenē | ✅ DONE |
+| 2 | Saturā ir: atbilstības statuss (EN 301 549 / WCAG 2.2 AA); **reālie testa atradumi** no `tests/a11y_check.py` un manuālajiem testiem; zināmie ierobežojumi; kontakts atsauksmēm; pārbaudes datums | 🟡 DAĻĒJI: viss ir, automātiskie atradumi ir reāli; manuālais NVDA tests atzīmēts "Nav veikts" — jāveic cilvēkam ar Windows |
 
 ### F9 · Vadības panelis pēc pieslēgšanās
 
@@ -340,16 +340,23 @@ Testa lietotāji (sākumdati, `make seed`): `darbinieks@example.com`, `darbiniek
 - MI akta riska klases novērtējums (iespējams augsts) un pamatojums;
 - lēmums "būvēt vai nē" un nosacījumi, ar kādiem to varētu pārskatīt.
 
+
+**Statuss: ✅ DONE.** Klasifikācija: [mi2-klasifikacija.md](mi2-klasifikacija.md). Secinājums: iespējams augsta riska sistēma (MI akta III pielikuma 5. punkts, profilēšana); lēmums **nebūvēt**; ir uzskaitīti nosacījumi pārskatīšanai.
 ## 6. Nefunkcionālās prasības
 
 ### N1 · Piekļūstamība (EN 301 549 / WCAG 2.2 AA)
 
-1. `tests/a11y_check.py` (axe-core + Playwright) uz visiem galvenajiem ekrāniem neatrod **critical** vai **serious** pārkāpumus.
-2. Galvenajā ceļā (pieslēgšanās → panelis → organizācija → mijiedarbība → pieprasījums → uzdevums) visu var izdarīt tikai ar tastatūru, un fokuss vienmēr ir redzams.
-3. Lapas ir lietojamas 200 % mērogā un 320 px platumā bez horizontālas ritināšanas.
-4. Ir skip-link, orientieri (`header`, `nav`, `main`, `footer`), loģiska virsrakstu secība un unikāli lapu virsraksti.
-5. Statusi un kavējumi ir izteikti ar tekstu, ne tikai ar krāsu. Kontrasts ≥ 4.5:1.
-6. Manuāls tests ar NVDA galvenajā ceļā. Rezultāti tiek ierakstīti F8 lapā.
+**Statuss: 🟡 DAĻĒJI (5 no 6).** Zars `crm-6-pieklustamiba`. Pārbaude: `make a11y` (`tests/a11y_check.py`, axe-core 4.12, 23 lapas, 4 lomas).
+Pirmā palaišana atrada reālas problēmas, kas izlabotas: saites tekstā atšķīrās tikai ar krāsu (`link-in-text-block`, serious, 20 lapās), datuma laukiem nebija redzama fokusa, F8 lapa 320 px platumā bija par plašu.
+
+| # | Kritērijs | Statuss |
+|---|---|---|
+| 1 | `tests/a11y_check.py` (axe-core + Playwright) uz visiem galvenajiem ekrāniem neatrod **critical** vai **serious** pārkāpumus | ✅ DONE: 0 pārkāpumu (arī moderate/minor) |
+| 2 | Galvenajā ceļā (pieslēgšanās → panelis → organizācija → mijiedarbība → pieprasījums → uzdevums) visu var izdarīt tikai ar tastatūru, un fokuss vienmēr ir redzams | ✅ DONE: automatizēts tastatūras scenārijs; fokuss pārbaudīts ar Tab katrā lapā |
+| 3 | Lapas ir lietojamas 200 % mērogā un 320 px platumā bez horizontālas ritināšanas | ✅ DONE: 320 px un 640 CSS px (200 % no 1280 px) visās lapās |
+| 4 | Ir skip-link, orientieri (`header`, `nav`, `main`, `footer`), loģiska virsrakstu secība un unikāli lapu virsraksti | ✅ DONE |
+| 5 | Statusi un kavējumi ir izteikti ar tekstu, ne tikai ar krāsu. Kontrasts ≥ 4.5:1 | ✅ DONE (kontrastu pārbauda axe; teksts uz fotogrāfijas ir "nepilnīgs", jāvērtē manuāli) |
+| 6 | Manuāls tests ar NVDA galvenajā ceļā. Rezultāti tiek ierakstīti F8 lapā | ⬜ NAV SĀKTS: jāveic cilvēkam (Windows + NVDA) |
 
 ### N2 · Personas dati (VDAR)
 

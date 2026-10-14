@@ -1,0 +1,86 @@
+{% extends "base.html" %}
+{% block title %}Piekļūstamības paziņojums{% endblock %}
+{% block content %}
+    <div class="page-head">
+      <h1>Piekļūstamības paziņojums</h1>
+      <p class="sub">Ezermalas novada pašvaldības pieteikumu sistēma (CRM) · mācību prototips</p>
+    </div>
+
+    <div class="blocks statement">
+      <section class="block block-wide" aria-labelledby="statuss">
+        <h2 id="statuss">Atbilstības statuss</h2>
+        <p>Sistēma <strong>daļēji atbilst</strong> standartam EN 301 549 un WCAG 2.2 AA līmenim.
+          Automātiskās pārbaudes neatrod kritiskas vai nopietnas problēmas, taču manuālā pārbaude ar ekrāna lasītāju vēl nav veikta
+          (sk. "Zināmie ierobežojumi").</p>
+      </section>
+
+      <section class="block block-wide" aria-labelledby="atradumi">
+        <h2 id="atradumi">Testu atradumi</h2>
+        {% if a11y %}
+        {% set s = a11y.summary %}
+        <p>Pēdējā automātiskā pārbaude: <strong>{{ fmt_date(a11y.checked_at) }}</strong>, axe-core {{ a11y.axe_version }}, {{ a11y.standard }}.
+          Pārbaudītas <strong>{{ s.pages }}</strong> lapas.</p>
+        <ul class="stats">
+          <li class="stat{% if s.blocking_violations %} warn{% endif %}"><span class="stat-value">{{ s.blocking_violations }}</span> <span class="stat-label">kritiski vai nopietni pārkāpumi</span></li>
+          <li class="stat{% if s.other_violations %} warn{% endif %}"><span class="stat-value">{{ s.other_violations }}</span> <span class="stat-label">citi pārkāpumi (moderate, minor)</span></li>
+          <li class="stat{% if s.overflow_pages %} warn{% endif %}"><span class="stat-value">{{ s.overflow_pages }}</span> <span class="stat-label">lapas ar horizontālu ritināšanu (320 px, 200 %)</span></li>
+          <li class="stat{% if s.focus_problem_pages %} warn{% endif %}"><span class="stat-value">{{ s.focus_problem_pages }}</span> <span class="stat-label">lapas ar neredzamu fokusu</span></li>
+        </ul>
+        <p>Galvenais ceļš tikai ar tastatūru (pieslēgšanās → organizācija → mijiedarbība → pieprasījums → uzdevums):
+          {% if s.keyboard_main_path_failed %}<strong>neizdevās</strong> — {{ s.keyboard_main_path_failed | join(", ") }}.{% else %}<strong>izdevās</strong>.{% endif %}</p>
+
+        <div class="table-wrap">
+          <table>
+            <caption>Rezultāti pa lapām</caption>
+            <thead><tr><th scope="col">Lapa</th><th scope="col">axe pārkāpumi</th><th scope="col">Nepilnīgi (jāpārbauda manuāli)</th><th scope="col">320 px / 200 %</th></tr></thead>
+            <tbody>
+              {% for p in a11y.pages %}
+              <tr>
+                <th scope="row">{{ p.title }}</th>
+                <td>{% if p.violations %}{% for v in p.violations %}<span class="tag {{ 'late' if v.impact in ('critical', 'serious') else 'soon' }}">{{ v.impact }}</span> {{ v.help }} ({{ v.id }}){% if not loop.last %}<br>{% endif %}{% endfor %}{% else %}Nav{% endif %}</td>
+                <td class="num">{{ p.incomplete }}</td>
+                <td>{% for k, px in p.horizontal_overflow_px.items() %}{{ k }}: {{ "labi" if px <= 0 else "+" ~ px ~ " px" }}{% if not loop.last %} · {% endif %}{% endfor %}</td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        <p class="meta">Pārbaudi palaiž ar <code>make a11y</code> (<code>tests/a11y_check.py</code>). "Nepilnīgi" ir axe atradumi, ko rīks nevar izlemt automātiski, piemēram, kontrasts uz fotogrāfijas.</p>
+        {% else %}
+        <p class="empty">Automātiskā pārbaude vēl nav veikta. Palaidiet <code>make a11y</code>.</p>
+        {% endif %}
+      </section>
+
+      <section class="block" aria-labelledby="manuali">
+        <h2 id="manuali">Manuālās pārbaudes</h2>
+        <div class="table-wrap">
+          <table>
+            <caption class="visually-hidden">Manuālo pārbaužu stāvoklis</caption>
+            <thead><tr><th scope="col">Pārbaude</th><th scope="col">Rezultāts</th></tr></thead>
+            <tbody>
+              <tr><th scope="row">Tastatūra, galvenais ceļš</th><td>Automatizēts (sk. augstāk)</td></tr>
+              <tr><th scope="row">200 % mērogs</th><td>Automatizēts (640 CSS px platums)</td></tr>
+              <tr><th scope="row">Ekrāna lasītājs NVDA</th><td><span class="tag soon">Nav veikts</span></td></tr>
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="block" aria-labelledby="ierobezojumi">
+        <h2 id="ierobezojumi">Zināmie ierobežojumi</h2>
+        <ul class="plain-list">
+          <li>Manuālā pārbaude ar NVDA vēl nav veikta.</li>
+          <li>Reģistrācijas lapā paroles garuma indikators atjaunojas ar JavaScript; bez tā prasība ir redzama tekstā.</li>
+          <li>Datuma laukus attēlo pārlūks; to formāts atkarīgs no pārlūka valodas.</li>
+          <li>Fotogrāfijai pieslēgšanās lapā ir dekoratīva nozīme; teksts uz tās ir ar tumšu pārklājumu, bet kontrasts nav izmērāms automātiski.</li>
+        </ul>
+      </section>
+
+      <section class="block block-wide" aria-labelledby="atsauksmes">
+        <h2 id="atsauksmes">Atsauksmes un kontakti</h2>
+        <p>Ja kādu sistēmas daļu nevarat izmantot, rakstiet: <strong>pieklustamiba@ezermala.example</strong> (mācību piemērs).
+          Atbildēsim 10 darba dienu laikā un piedāvāsim informāciju citā veidā.</p>
+        <p class="meta">Paziņojums sagatavots 2026-10-14. To atjauno pēc katras automātiskās vai manuālās pārbaudes.</p>
+      </section>
+    </div>
+{% endblock %}

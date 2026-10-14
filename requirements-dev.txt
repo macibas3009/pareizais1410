@@ -1,0 +1,4 @@
+# Izstrādes un pārbaudes rīki (nav vajadzīgi lietotnes darbībai)
+pytest
+playwright
+axe-playwright-python

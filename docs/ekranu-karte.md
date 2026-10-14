@@ -53,11 +53,11 @@
 | Galvene: zīmols → Sākums, navigācija pēc lomas, vārds, **Iziet** | F0, F9 | ✅ |
 | Galvene: meklēšanas lauks → Meklēšanas rezultāti (`/meklet`) | F6 | ✅ |
 | Kājene: foto autorība | — | ✅ |
-| Kājene: saite uz Piekļūstamības paziņojumu (`/pieklustamiba`) | F8 | ⬜ |
+| Kājene: saite uz Piekļūstamības paziņojumu (`/pieklustamiba`; NVDA tests vēl nav veikts) | F8 | 🟡 |
 | Kļūdas lapa (404, 403) | — | ✅ |
-| MI-2 klasifikācija: tikai dokuments, ekrāna nav | MI-2 | ⬜ |
+| MI-2 klasifikācija: tikai dokuments ([mi2-klasifikacija.md](mi2-klasifikacija.md)), ekrāna nav | MI-2 | ✅ |
 
-**Kopā:** gatavi 24 · daļēji 0 · vēl nav 2.
+**Kopā:** gatavi 25 · daļēji 1 · vēl nav 0.
 
 ## Kā atjaunot attēlu
 

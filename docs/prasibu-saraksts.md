@@ -1,6 +1,6 @@
 # CRM mazai iestādei · prasību saraksts
 
-> Versija 1.4 · 2026-10-14 · Statuss: precizēts pēc intervijas ar produkta īpašnieku.
+> Versija 1.5 · 2026-10-14 · Statuss: precizēts pēc intervijas ar produkta īpašnieku.
 > Avots: uzdevums-starteris "CRM mazai iestādei" un konceptuālās arhitektūras shēma.
 > Mācību projekts. Visi dati ir sintētiski.
 
@@ -19,7 +19,7 @@ Statusu atjauno tajā pašā komitā, kurā prasība tiek īstenota.
 |---|---|---|---|
 | F0 | Pieslēgšanās un reģistrācija | ✅ DONE | zari `cr-4-auth`, `f9-panelis`, `n4-flask`; lomu apstiprināšana zarā `f0-lomas` |
 | F1 | Organizācijas: izveidot, rediģēt, meklēt | ✅ DONE | zars `f0-lomas`; `tests/test_organizations.py` |
-| F2 | Kontaktpersonas pie organizācijas | ⬜ NAV SĀKTS | |
+| F2 | Kontaktpersonas pie organizācijas | 🟡 DAĻĒJI (2 no 3) | zars `crm-2-kontakti`; pārrēķins pēc mijiedarbības nāks ar F3 |
 | F3 | Mijiedarbību žurnāls | ⬜ NAV SĀKTS | |
 | F4 | Pieprasījumi no organizācijām | ⬜ NAV SĀKTS | |
 | F5 | Uzdevumi un atgādinājumi | ⬜ NAV SĀKTS | |
@@ -30,7 +30,7 @@ Statusu atjauno tajā pašā komitā, kurā prasība tiek īstenota.
 | MI-1 | Mijiedarbības kopsavilkums un nākamais solis | ⬜ NAV SĀKTS | |
 | MI-2 | Organizāciju prioritizācija: tikai klasifikācija | ⬜ NAV SĀKTS | |
 | N1 | Piekļūstamība | ⬜ NAV SĀKTS | |
-| N2 | Personas dati (VDAR) | 🟡 DAĻĒJI | piekļuves žurnāls (organizāciju kartītes, lomu izmaiņas) un tā skatīšana administratoram; trūkst "Jāpārskata" saraksta un dzēšanas (F2) |
+| N2 | Personas dati (VDAR) | 🟡 DAĻĒJI (4 no 6) | zars `crm-2-kontakti`; trūkst mijiedarbību anonimizācijas (F3) un meklēšanas ierobežojuma (F6) |
 | N3 | Lomas | 🟡 DAĻĒJI | lomu pieprasīšana un apstiprināšana, tiesības F1 un F9; pārējās tiesības nāks ar F2–F7 |
 | N4 | Tehnoloģijas un laiks | 🟡 DAĻĒJI | Flask + Jinja2 + SQLite un sākumdati: zars `n4-flask`; 1,5 h nav ievērots |
 
@@ -146,15 +146,21 @@ Meklēšana pēc nosaukuma būs F6. Kartītē kontakti, pieprasījumi, uzdevumi 
 | Vārds, uzvārds | ✔ | Latviešu burti, atstarpe, defise |
 | Amats | ✔ | |
 | E-pasts | vismaz viens no abiem | Derīgs formāts |
-| Tālrunis | vismaz viens no abiem | Formāts: sk. 10. nodaļu (atvērts) |
+| Tālrunis | vismaz viens no abiem | 8 cipari, var ar `+371` (pieņēmums, 10. nodaļa) |
 | Saziņas pamats | ✔ | Vienīgā vērtība: `Līgums` |
 | Saziņas pamata datums | ✔ | Līguma vai sadarbības sākuma datums |
 | Glabāt līdz | automātiski | Pēdējās mijiedarbības datums + 3 gadi (ja nav mijiedarbību, tad izveides datums + 3 gadi) |
 
+**Statuss: 🟡 DAĻĒJI (2 no 3).** Zars `crm-2-kontakti`. Lapas: `/organizacijas/<id>/kontakti/jauns`, `/kontakti/<id>`, `/kontakti/<id>/labot`. Testi: `tests/test_contacts.py`.
+Kontaktus pievieno un labo organizācijas atbildīgais vai vadītājs. Organizācijas kartītē redzams tikai vārds un amats; e-pasts un tālrunis ir kontaktpersonas kartītē, kuras atvēršana tiek žurnalēta.
+
 **Pieņemšanas kritēriji**
-1. Formā ir tikai šie lauki, citu personas datu lauku nav (datu minimizācija). Nav lauka "piezīmes par personu".
-2. "Glabāt līdz" netiek ievadīts. Tas tiek pārrēķināts pēc katras mijiedarbības, kurā kontakts piedalās.
-3. Kontaktu kartītes atvēršana tiek ierakstīta piekļuves žurnālā.
+
+| # | Kritērijs | Statuss |
+|---|---|---|
+| 1 | Formā ir tikai šie lauki, citu personas datu lauku nav (datu minimizācija). Nav lauka "piezīmes par personu" | ✅ DONE |
+| 2 | "Glabāt līdz" netiek ievadīts. Tas tiek pārrēķināts pēc katras mijiedarbības, kurā kontakts piedalās | 🟡 DAĻĒJI: tiek aprēķināts automātiski (izveide + 3 gadi); pārrēķins pēc mijiedarbības nāks ar F3 dalībniekiem |
+| 3 | Kontaktu kartītes atvēršana tiek ierakstīta piekļuves žurnālā | ✅ DONE |
 
 ### F3 · Mijiedarbību žurnāls
 
@@ -263,9 +269,9 @@ Trūkstošās daļas ir atkarīgas no sarakstiem un pārskata, kas vēl nav uzta
 |---|---|---|
 | 1 | Pēc veiksmīgas pieslēgšanās lietotājs tiek novirzīts uz `/panelis`. Bez sesijas `/panelis` novirza uz `/login` | ✅ DONE |
 | 2 | Katram blokam ir virsraksts (`h2`). Saraksti ir tabulas ar `<caption>` vai saraksti (`ul`). Katrā blokā ir saite "Skatīt visus" uz pilno sarakstu | 🟡 DAĻĒJI: virsraksti un tabulas ir; saites "Skatīt visus" nav, jo nav sarakstu (F3, F4, F5) |
-| 3 | Skaitļi ir teksts ar paskaidrojumu (piem., "3 kavēti pieprasījumi"), nevis tikai krāsa vai ikona. Katrs skaitlis ir saite uz atfiltrētu sarakstu | 🟡 DAĻĒJI: teksts ir; organizāciju karte ir saite uz sarakstu (F1); pārējās kartes gaida F2, F4, F5 |
+| 3 | Skaitļi ir teksts ar paskaidrojumu (piem., "3 kavēti pieprasījumi"), nevis tikai krāsa vai ikona. Katrs skaitlis ir saite uz atfiltrētu sarakstu | 🟡 DAĻĒJI: teksts ir; saites: organizācijas (F1), jāpārskata (F2), administratoram lietotāji un dzēšanas pieprasījumi; gaida F4, F5 |
 | 4 | Ja blokā nav datu, tiek parādīts teksts, piem., "Šodien uzdevumu nav" | ✅ DONE |
-| 5 | Darbinieks redz tikai savu organizāciju datus. Vadītājs redz visas iestādes datus (N3) | 🟡 DAĻĒJI: darbinieka un vadītāja tvērums ir; administratoram ir apstiprināšana un saite uz piekļuves žurnālu; trūkst vadītāja saites uz F7 un dzēšanas pieprasījumu bloka |
+| 5 | Darbinieks redz tikai savu organizāciju datus. Vadītājs redz visas iestādes datus (N3) | 🟡 DAĻĒJI: darbinieka un vadītāja tvērums ir; administratoram lomu apstiprināšana, dzēšanas pieprasījumi un žurnāls; trūkst vadītāja saites uz F7 |
 | 6 | Paneļa atvēršana netiek ierakstīta piekļuves žurnālā. Žurnālā tiek ierakstīta kartītes atvēršana no paneļa saitēm (N2) | ✅ DONE paneļa daļā (kartītes nāks ar F1) |
 | 7 | Panelis atbilst N1: 320 px platumā bloki izkārtojas vienā kolonnā, un tas strādā bez JavaScript | 🟡 DAĻĒJI: bez JS ir notestēts; 320 px izkārtojums ir CSS, bet nav pārbaudīts pārlūkā |
 
@@ -311,15 +317,16 @@ Testa lietotāji (sākumdati, `make seed`): `darbinieks@example.com`, `darbiniek
 
 ### N2 · Personas dati (VDAR)
 
-1. **Minimizācija:** tikai F2 lauki, bez brīva teksta laukiem par personu. Meklēšana nemeklē mijiedarbību tekstā.
-2. **Glabāšanas termiņš:** 3 gadi pēc pēdējās mijiedarbības (F2).
-3. **Pēc termiņa beigām** kontakts nonāk sarakstā "Jāpārskata". Atbildīgais darbinieks vai vadītājs to pagarina (ar pamatojumu, kas tiek ierakstīts žurnālā) vai dzēš. Automātiskas dzēšanas nav.
-4. **Piekļuves žurnāls:** katra organizācijas vai kontaktpersonas kartītes atvēršana tiek ierakstīta (kas, ko, kad, darbība). Žurnālu var skatīt tikai administrators.
-5. **Dzēšana pēc pieprasījuma** (veic administrators):
-   - kontaktpersonas ieraksts tiek dzēsts neatgriezeniski;
-   - mijiedarbībās dalībnieks tiek aizstāts ar "Dzēsta kontaktpersona";
-   - žurnālā tiek ierakstīts dzēšanas fakts (kas, kad, ieraksta ID) bez personas datiem.
-6. Lietotnes žurnālā (`logging`) netiek rakstīti personas dati un mijiedarbību teksti.
+**Statuss: 🟡 DAĻĒJI (4 no 6).** Zars `crm-2-kontakti`. Testi: `tests/test_contacts.py`, `tests/test_organizations.py`, `tests/test_roles_flow.py`.
+
+| # | Kritērijs | Statuss |
+|---|---|---|
+| 1 | **Minimizācija:** tikai F2 lauki, bez brīva teksta laukiem par personu. Meklēšana nemeklē mijiedarbību tekstā | 🟡 DAĻĒJI: forma ✅; meklēšana būs F6 |
+| 2 | **Glabāšanas termiņš:** 3 gadi pēc pēdējās mijiedarbības (F2) | ✅ DONE (pārrēķins pēc mijiedarbības ar F3) |
+| 3 | **Pēc termiņa beigām** kontakts nonāk sarakstā "Jāpārskata". Atbildīgais darbinieks vai vadītājs to pagarina (ar pamatojumu, kas tiek ierakstīts žurnālā) vai dzēš. Automātiskas dzēšanas nav | ✅ DONE: `/kontakti/japarskata`; pirms dzēšanas apstiprinājuma lapa |
+| 4 | **Piekļuves žurnāls:** katra organizācijas vai kontaktpersonas kartītes atvēršana tiek ierakstīta (kas, ko, kad, darbība). Žurnālu var skatīt tikai administrators | ✅ DONE: `/zurnals` |
+| 5 | **Dzēšana pēc pieprasījuma** (veic administrators): ieraksts dzēsts neatgriezeniski; mijiedarbībās "Dzēsta kontaktpersona"; žurnālā fakts bez personas datiem | 🟡 DAĻĒJI: darbinieks reģistrē pieprasījumu kontakta kartītē, administrators izpilda vai noraida lapā `/dzesanas-pieprasijumi`; mijiedarbību anonimizācija nāks ar F3 |
+| 6 | Lietotnes žurnālā (`logging`) netiek rakstīti personas dati un mijiedarbību teksti | ✅ DONE |
 
 ### N3 · Lomas
 

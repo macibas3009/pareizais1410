@@ -34,7 +34,8 @@
 {% elif view == "admin" %}
 {{ hero("Sistēmas pārvaldība") }}
     <ul class="stats">
-{{ stat(pending_users|length, "lietotājs gaida lomu", "lietotāji gaida lomu", warn=true) }}
+{{ stat(pending_users|length, "lietotājs gaida lomu", "lietotāji gaida lomu", warn=true, href="/lietotaji") }}
+{{ stat(open_deletions, "dzēšanas pieprasījums gaida", "dzēšanas pieprasījumi gaida", warn=true, href="/dzesanas-pieprasijumi") }}
     </ul>
     <div class="blocks">
       <section class="block block-wide" aria-labelledby="gaida">
@@ -73,7 +74,7 @@
         {% else %}
         <p class="empty">Neviens lietotājs negaida apstiprinājumu.</p>
         {% endif %}
-        <p class="block-links"><a href="/lietotaji">Visi lietotāji un lomas</a> · <a href="/zurnals">Piekļuves žurnāls</a></p>
+        <p class="block-links"><a href="/lietotaji">Visi lietotāji un lomas</a> · <a href="/dzesanas-pieprasijumi">Dzēšanas pieprasījumi</a> · <a href="/zurnals">Piekļuves žurnāls</a></p>
       </section>
     </div>
 
@@ -89,7 +90,7 @@
 {% endif %}
 {{ stat(stats.open_requests, "atvērts pieprasījums", "atvērti pieprasījumi") }}
 {{ stat(stats.tasks_today, "uzdevums šodien", "uzdevumi šodien", warn=true) }}
-{{ stat(stats.contacts_to_review, "kontakts jāpārskata", "kontakti jāpārskata", warn=true) }}
+{{ stat(stats.contacts_to_review, "kontakts jāpārskata", "kontakti jāpārskata", warn=true, href="/kontakti/japarskata") }}
       </ul>
     </section>
 

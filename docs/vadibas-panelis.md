@@ -78,7 +78,7 @@ Ja ekrāns ir šaurāks par 860 px, bloki izkārtojas vienā kolonnā, un mijied
 | **Organizācijas** | Manu organizāciju skaits. Vadītājam: "organizācijas iestādē" | nekad |
 | **Atvērti pieprasījumi** | Manu organizāciju pieprasījumi ar statusu `Jauns` vai `Darbā` | nekad |
 | **Uzdevumi šodien** | Man piešķirtie neizpildītie uzdevumi ar termiņu **šodien vai agrāk** (arī nokavētie). Vadītājam: visu darbinieku | skaits > 0 |
-| **Kontakti jāpārskata** | Manu organizāciju kontaktpersonas, kuru "Glabāt līdz" datums ir pagājis (N2) | skaits > 0 |
+| **Kontakti jāpārskata** | Manu organizāciju kontaktpersonas, kuru "Glabāt līdz" datums ir pagājis (N2). Saite uz `/kontakti/japarskata` | skaits > 0 |
 
 Teksts tiek locīts pēc skaitļa: "1 atvērts pieprasījums", "5 atvērti pieprasījumi", "21 atvērts pieprasījums".
 Krāsa ir tikai papildu norāde. Nozīme vienmēr ir saprotama no teksta.
@@ -114,12 +114,12 @@ Krāsa ir tikai papildu norāde. Nozīme vienmēr ir saprotama no teksta.
 
 ### 5.5. Administratora panelis
 
-- Karte: cik lietotāju gaida lomu.
+- Kartes: cik lietotāju gaida lomu un cik dzēšanas pieprasījumu gaida (abas ir saites).
 - Tabula "Lietotāji, kas gaida lomu": vārds, e-pasts, **pieprasītā loma**, reģistrācijas datums un darbības:
   - **Apstiprināt**: piešķir pieprasīto lomu ar vienu klikšķi;
   - **Cita loma**: atver lapu `/lietotaji`, kur var izvēlēties citu lomu;
   - **Noraidīt**: dzēš kontu, kas vēl nav apstiprināts.
-- Saites uz lapām "Visi lietotāji un lomas" (`/lietotaji`) un "Piekļuves žurnāls" (`/zurnals`).
+- Saites uz lapām "Visi lietotāji un lomas" (`/lietotaji`), "Dzēšanas pieprasījumi" (`/dzesanas-pieprasijumi`) un "Piekļuves žurnāls" (`/zurnals`).
 - Visas lomu izmaiņas tiek ierakstītas piekļuves žurnālā. Savu lomu administrators mainīt nevar.
 
 ## 6. Piekļūstamība (N1)
@@ -185,7 +185,6 @@ Jaunam darbiniekam sākumā nav organizāciju, tāpēc viņa panelī būs nulles
 
 | Trūkst | Kāpēc | Kad būs |
 |---|---|---|
-| Saites "Skatīt visus" un saites no kartēm uz sarakstiem (izņemot organizācijas) | Sarakstu lapas vēl nav | F2, F4, F5 |
+| Saites "Skatīt visus" un no kartēm "atvērti pieprasījumi", "uzdevumi šodien" | Sarakstu lapas vēl nav | F4, F5 |
 | Vadītājam saite "Atvērt pilno pārskatu" | Pārskata vēl nav | F7 |
-| Administratoram dzēšanas pieprasījumu bloks | Vēl nav uztaisīts | F2 / N2 |
 | 320 px izkārtojums | Uzrakstīts, bet nav pārbaudīts pārlūkā | N1 testi |

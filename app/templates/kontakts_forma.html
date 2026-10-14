@@ -1,0 +1,37 @@
+{% extends "base.html" %}
+{% import "_forms.html" as f %}
+{% set editing = contact is not none %}
+{% block title %}{% if errors %}Kļūda: {% endif %}{{ "Labot kontaktpersonu" if editing else "Jauna kontaktpersona" }}{% endblock %}
+{% block content %}
+    <nav class="breadcrumbs" aria-label="Atrašanās vieta">
+      <a href="/organizacijas">Organizācijas</a> <span aria-hidden="true">›</span>
+      <a href="/organizacijas/{{ org.id }}">{{ org.name }}</a> <span aria-hidden="true">›</span>
+      {% if editing %}<a href="/kontakti/{{ contact.id }}">{{ contact.full_name }}</a> <span aria-hidden="true">›</span> <span aria-current="page">Labot</span>
+      {% else %}<span aria-current="page">Jauna kontaktpersona</span>{% endif %}
+    </nav>
+
+    <div class="page-head">
+      <h1>{{ "Labot: " ~ contact.full_name if editing else "Jauna kontaktpersona" }}</h1>
+      <p class="sub">{{ org.name }} · Glabājam tikai darbam nepieciešamos datus. E-pasts vai tālrunis ir obligāts vismaz viens.</p>
+    </div>
+
+    <section class="block form-block">
+{{ f.error_summary(errors, labels) }}
+      <form method="post" action="{{ '/kontakti/' ~ contact.id ~ '/labot' if editing else '/organizacijas/' ~ org.id ~ '/kontakti/jauns' }}" novalidate>
+{{ f.input("full_name", labels.full_name, errors, values, autocomplete="off", placeholder="Jānis Bērziņš") }}
+{{ f.input("position", labels.position, errors, values, autocomplete="off", placeholder="Valdes loceklis") }}
+{{ f.input("email", labels.email, errors, values, type="email", autocomplete="off", placeholder="vards@example.com", required=false) }}
+{{ f.input("phone", labels.phone, errors, values, type="tel", autocomplete="off", placeholder="+37120000000", hint="8 cipari, var ar +371", required=false) }}
+        <div class="field">
+          <span class="label">Saziņas pamats</span>
+          <p class="readonly">{{ legal_basis }}</p>
+        </div>
+{{ f.input("basis_date", labels.basis_date, errors, values, type="date", max=today.isoformat()) }}
+        <p class="hint">Glabāšanas termiņš tiek aprēķināts automātiski: pēdējā mijiedarbība + 3 gadi.</p>
+        <div class="form-actions">
+          <button type="submit">{{ "Saglabāt izmaiņas" if editing else "Pievienot kontaktpersonu" }}</button>
+          <a class="btn-link" href="{{ '/kontakti/' ~ contact.id if editing else '/organizacijas/' ~ org.id }}">Atcelt</a>
+        </div>
+      </form>
+    </section>
+{% endblock %}

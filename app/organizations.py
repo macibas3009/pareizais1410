@@ -61,7 +61,7 @@ def card(conn: sqlite3.Connection, org_id: int) -> dict:
     """Kartītes saturs: kontakti (F2), mijiedarbības (F3), pieprasījumi (F4), uzdevumi (F5)."""
     return {
         "contacts": conn.execute(
-            "SELECT full_name, position, email, phone, retain_until FROM contacts "
+            "SELECT id, full_name, position, retain_until FROM contacts "
             "WHERE organization_id = ? ORDER BY full_name",
             (org_id,),
         ).fetchall(),

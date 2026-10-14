@@ -1,0 +1,45 @@
+{% extends "base.html" %}
+{% block title %}{% if error %}Kļūda: {% endif %}Kontakti, kas jāpārskata{% endblock %}
+{% block content %}
+    <div class="page-head">
+      <h1>Kontakti, kas jāpārskata</h1>
+      <p class="sub">Šo kontaktpersonu glabāšanas termiņš ir beidzies (N2). Pagariniet to ar pamatojumu vai dzēsiet kontaktu.
+        {% if user.role == "vaditajs" %}Jūs redzat visas iestādes kontaktus.{% else %}Jūs redzat savu organizāciju kontaktus.{% endif %}</p>
+    </div>
+
+    {% if notice == "pagarinats" %}<div class="alert ok" role="status">Glabāšanas termiņš pagarināts par 3 gadiem.</div>{% endif %}
+    {% if notice == "dzests" %}<div class="alert ok" role="status">Kontaktpersona dzēsta.</div>{% endif %}
+    {% if error %}<div class="alert error" role="alert"><a href="#reason-{{ error_id }}">{{ error }}</a></div>{% endif %}
+
+    <section class="block">
+      {% if rows %}
+      <ul class="review-list">
+        {% for c in rows %}
+        <li class="review-item">
+          <div class="review-head">
+            <div>
+              <a class="task-title" href="/kontakti/{{ c.id }}">{{ c.full_name }}</a>
+              <span class="meta">{{ c.position }} · {{ c.organization }}{% if user.role == "vaditajs" %} · atbildīgais: {{ c.responsible }}{% endif %}</span>
+            </div>
+            <span class="tag late">Termiņš beidzās {{ fmt_date(c.retain_until) }}</span>
+          </div>
+          <div class="review-actions">
+            <form method="post" action="/kontakti/{{ c.id }}/pagarinat" class="extend-form">
+              <label for="reason-{{ c.id }}">Pamatojums pagarinājumam <span class="visually-hidden">: {{ c.full_name }}</span></label>
+              <div class="inline-form">
+                <input id="reason-{{ c.id }}" name="reason" maxlength="200" required
+                       placeholder="piem., aktīvs sadarbības līgums līdz 2028. gadam"
+                       {%- if error and error_id == c.id %} aria-invalid="true" value="{{ reason }}"{% endif %}>
+                <button type="submit" class="btn-small">Pagarināt par 3 gadiem<span class="visually-hidden">: {{ c.full_name }}</span></button>
+              </div>
+            </form>
+            <a class="btn-small btn-danger" href="/kontakti/{{ c.id }}/dzest">Dzēst kontaktu<span class="visually-hidden">: {{ c.full_name }}</span></a>
+          </div>
+        </li>
+        {% endfor %}
+      </ul>
+      {% else %}
+      <p class="empty">Nav kontaktu, kas jāpārskata.</p>
+      {% endif %}
+    </section>
+{% endblock %}

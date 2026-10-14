@@ -152,7 +152,11 @@ def context(conn: sqlite3.Connection, user: sqlite3.Row, today: date) -> dict:
     if role is None:
         return {"view": "pending"}
     if role == "administrators":
-        return {"view": "admin", "pending_users": users.pending(conn)}
+        return {
+            "view": "admin",
+            "pending_users": users.pending(conn),
+            "open_deletions": conn.execute("SELECT COUNT(*) FROM deletion_requests WHERE status = 'open'").fetchone()[0],
+        }
     whole = role == "vaditajs"
     scope = Scope(user_id=user["id"], whole_institution=whole)
     return {

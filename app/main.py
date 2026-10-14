@@ -14,7 +14,7 @@ from typing import Any
 from flask import Flask, abort, g, jsonify, redirect, render_template, request
 from werkzeug.exceptions import HTTPException
 
-from app import accounts, audit, dashboard, db, organizations, users
+from app import accounts, audit, contacts, dashboard, db, organizations, users
 
 VERSION = "0.1.0"
 API_PREFIXES = ("/auth/", "/health")
@@ -337,6 +337,152 @@ def create_app(db_path: Path | None = None, cookie_secure: bool | None = None) -
         organizations.update(conn(), org_id, values)
         audit.log(conn(), user["id"], "update", "organization", org_id)
         return redirect(f"/organizacijas/{org_id}?saglabats=1", code=303)
+
+    # --- F2 · kontaktpersonas, N2 · pārskatīšana un dzēšana --------------------
+
+    def contact_form(user, org, contact=None, values=None, details=(), status=200):
+        errors = {d["field"]: contacts.MESSAGES[(d["field"], d["issue"])] for d in details}
+        return render_template(
+            "kontakts_forma.html", user=user, org=org, contact=contact, values=values or {}, errors=errors,
+            labels=contacts.FIELD_LABELS, today=date.today(), legal_basis=contacts.LEGAL_BASIS,
+        ), status
+
+    def editable_org(user, org_id: int):
+        org = organizations.get(conn(), org_id)
+        if org is None:
+            abort(404)
+        if not organizations.can_edit(user, org):
+            abort(403)
+        return org
+
+    def editable_contact(user, contact_id: int):
+        contact = contacts.get(conn(), contact_id)
+        if contact is None:
+            abort(404)
+        if not contacts.can_edit(user, contact):
+            abort(403)
+        return contact
+
+    @app.get("/organizacijas/<int:org_id>/kontakti/jauns")
+    def contact_new(org_id: int):
+        user = require(*CRM_ROLES)
+        return contact_form(user, editable_org(user, org_id))
+
+    @app.post("/organizacijas/<int:org_id>/kontakti/jauns")
+    def contact_create(org_id: int):
+        user = require(*CRM_ROLES)
+        org = editable_org(user, org_id)
+        values = contacts.read_form(request.form)
+        details = contacts.validate(values, date.today())
+        if details:
+            return contact_form(user, org, values=values, details=details, status=400)
+        contact_id = contacts.create(conn(), user, org_id, values, date.today())
+        return redirect(f"/kontakti/{contact_id}?saglabats=1", code=303)
+
+    @app.get("/kontakti/<int:contact_id>")
+    def contact_card(contact_id: int):
+        user = require(*CRM_ROLES)
+        contact = contacts.get(conn(), contact_id)
+        if contact is None:
+            abort(404)
+        # N2: katra kontaktpersonas kartītes atvēršana tiek ierakstīta žurnālā
+        audit.log(conn(), user["id"], "view", "contact", contact_id)
+        return render_template(
+            "kontakts.html", user=user, contact=contact, can_edit=contacts.can_edit(user, contact),
+            today=date.today(), pending_deletion=contacts.open_deletion_request(conn(), contact_id),
+            notice=request.args.get("zinojums"), saved="saglabats" in request.args, error=None,
+        )
+
+    @app.get("/kontakti/<int:contact_id>/labot")
+    def contact_edit(contact_id: int):
+        user = require(*CRM_ROLES)
+        contact = editable_contact(user, contact_id)
+        values = dict(contact)
+        values["email"] = values["email"] or ""
+        values["phone"] = values["phone"] or ""
+        return contact_form(user, organizations.get(conn(), contact["organization_id"]), contact, values)
+
+    @app.post("/kontakti/<int:contact_id>/labot")
+    def contact_update(contact_id: int):
+        user = require(*CRM_ROLES)
+        contact = editable_contact(user, contact_id)
+        values = contacts.read_form(request.form)
+        details = contacts.validate(values, date.today())
+        if details:
+            org = organizations.get(conn(), contact["organization_id"])
+            return contact_form(user, org, contact, values, details, status=400)
+        contacts.update(conn(), user, contact_id, values)
+        return redirect(f"/kontakti/{contact_id}?saglabats=1", code=303)
+
+    @app.get("/kontakti/japarskata")
+    def contacts_review():
+        user = require(*CRM_ROLES)
+        return render_template("japarskata.html", user=user, rows=contacts.to_review(conn(), user, date.today()),
+                               notice=request.args.get("zinojums"), today=date.today())
+
+    @app.post("/kontakti/<int:contact_id>/pagarinat")
+    def contact_extend(contact_id: int):
+        user = require(*CRM_ROLES)
+        editable_contact(user, contact_id)
+        problem = contacts.extend(conn(), user, contact_id, request.form.get("reason", ""), date.today())
+        if problem:
+            rows = contacts.to_review(conn(), user, date.today())
+            return render_template("japarskata.html", user=user, rows=rows, error=problem, error_id=contact_id,
+                                   reason=request.form.get("reason", ""), notice=None, today=date.today()), 400
+        return redirect("/kontakti/japarskata?zinojums=pagarinats", code=303)
+
+    @app.get("/kontakti/<int:contact_id>/dzest")
+    def contact_delete_confirm(contact_id: int):
+        """Apstiprinājums pirms neatgriezeniskas dzēšanas (bez JavaScript)."""
+        user = require(*CRM_ROLES)
+        contact = editable_contact(user, contact_id)
+        if contact["retain_until"] >= date.today().isoformat():
+            abort(403)
+        return render_template("apstiprinat_dzesanu.html", user=user, name=contact["full_name"],
+                               organization=contact["organization"], action=f"/kontakti/{contact_id}/dzest",
+                               back="/kontakti/japarskata")
+
+    @app.post("/kontakti/<int:contact_id>/dzest")
+    def contact_delete_expired(contact_id: int):
+        """Dzēšana no saraksta "Jāpārskata": tikai, ja glabāšanas termiņš ir beidzies (N2)."""
+        user = require(*CRM_ROLES)
+        contact = editable_contact(user, contact_id)
+        if contact["retain_until"] >= date.today().isoformat():
+            abort(403)
+        contacts.delete(conn(), user, contact_id)
+        return redirect("/kontakti/japarskata?zinojums=dzests", code=303)
+
+    @app.post("/kontakti/<int:contact_id>/dzesanas-pieprasijums")
+    def contact_request_deletion(contact_id: int):
+        user = require(*CRM_ROLES)
+        contact = editable_contact(user, contact_id)
+        contacts.request_deletion(conn(), user, contact)
+        return redirect(f"/kontakti/{contact_id}?zinojums=dzesana", code=303)
+
+    @app.get("/dzesanas-pieprasijumi")
+    def deletion_requests_page():
+        admin = require("administrators")
+        return render_template("dzesanas_pieprasijumi.html", user=admin, rows=contacts.deletion_requests(conn()),
+                               notice=request.args.get("zinojums"))
+
+    @app.get("/dzesanas-pieprasijumi/<int:request_id>/izpildit")
+    def deletion_request_confirm(request_id: int):
+        admin = require("administrators")
+        row = next((r for r in contacts.deletion_requests(conn()) if r["id"] == request_id and r["status"] == "open"), None)
+        if row is None:
+            abort(404)
+        return render_template("apstiprinat_dzesanu.html", user=admin, name=row["contact"] or "Dzēsta kontaktpersona",
+                               organization=row["organization"], action=f"/dzesanas-pieprasijumi/{request_id}/izpildit",
+                               back="/dzesanas-pieprasijumi")
+
+    @app.post("/dzesanas-pieprasijumi/<int:request_id>/<action>")
+    def deletion_request_handle(request_id: int, action: str):
+        admin = require("administrators")
+        if action not in ("izpildit", "noraidit"):
+            abort(404)
+        if not contacts.handle_deletion_request(conn(), admin, request_id, approve=action == "izpildit"):
+            abort(404)
+        return redirect(f"/dzesanas-pieprasijumi?zinojums={action}", code=303)
 
     # --- JSON API (docs/openapi.yaml) -----------------------------------------
 

@@ -75,6 +75,28 @@ CREATE TABLE IF NOT EXISTS tasks (
     done_at         TEXT
 );
 
+-- N2 · kontaktpersonas dzēšana pēc tās pieprasījuma (izpilda administrators)
+CREATE TABLE IF NOT EXISTS deletion_requests (
+    id              INTEGER PRIMARY KEY AUTOINCREMENT,
+    contact_id      INTEGER REFERENCES contacts(id) ON DELETE SET NULL,
+    organization_id INTEGER NOT NULL REFERENCES organizations(id),
+    requested_by    INTEGER NOT NULL REFERENCES users(id),
+    requested_at    TEXT    NOT NULL,
+    status          TEXT    NOT NULL DEFAULT 'open' CHECK (status IN ('open', 'done', 'rejected')),
+    handled_by      INTEGER REFERENCES users(id),
+    handled_at      TEXT
+);
+
+-- N2 · glabāšanas termiņa pagarinājumi ar pamatojumu
+CREATE TABLE IF NOT EXISTS retention_extensions (
+    id         INTEGER PRIMARY KEY AUTOINCREMENT,
+    contact_id INTEGER REFERENCES contacts(id) ON DELETE SET NULL,
+    user_id    INTEGER NOT NULL REFERENCES users(id),
+    reason     TEXT    NOT NULL,
+    new_until  TEXT    NOT NULL,
+    at         TEXT    NOT NULL
+);
+
 -- N2 · piekļuves žurnāls: kas, ko, kad. Bez personas datiem, tikai ID
 CREATE TABLE IF NOT EXISTS access_log (
     id          INTEGER PRIMARY KEY AUTOINCREMENT,

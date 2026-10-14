@@ -26,13 +26,14 @@
 | └ Jauna organizācija | `/organizacijas/jauna` | F1 | ✅ |
 | └ Organizācijas kartīte (atvēršana žurnālā) | `/organizacijas/<id>` | F1, N2 | ✅ |
 | &nbsp;&nbsp;&nbsp;└ Labot organizāciju | `/organizacijas/<id>/labot` | F1 | ✅ |
-| &nbsp;&nbsp;&nbsp;└ Kontaktpersonas forma | — | F2 | ⬜ |
+| &nbsp;&nbsp;&nbsp;└ Kontaktpersonas kartīte (atvēršana žurnālā) | `/kontakti/<id>` | F2, N2 | ✅ |
+| &nbsp;&nbsp;&nbsp;└ Kontaktpersonas forma | `/organizacijas/<id>/kontakti/jauns`, `/kontakti/<id>/labot` | F2 | ✅ |
 | &nbsp;&nbsp;&nbsp;└ Mijiedarbības forma + MI kopsavilkums | — | F3, MI-1 | ⬜ |
 | &nbsp;&nbsp;&nbsp;└ Pieprasījuma forma | — | F4 | ⬜ |
 | &nbsp;&nbsp;&nbsp;└ Uzdevuma forma | — | F5 | ⬜ |
 | Pieprasījumu saraksts (statuss, kavēti) | — | F4 | ⬜ |
 | Mani uzdevumi šodien | — | F5 | ⬜ |
-| Kontakti "Jāpārskata" | — | N2 | ⬜ |
+| Kontakti "Jāpārskata" (pagarināt / dzēst ar apstiprinājumu) | `/kontakti/japarskata` | N2 | ✅ |
 | Vadītāja pārskats (tikai vadītājam) | — | F7 | ⬜ |
 
 ### Administrators
@@ -42,7 +43,7 @@
 | Lomu apstiprināšana panelī (Apstiprināt / Cita loma / Noraidīt) | `/panelis` | F0 | ✅ |
 | Lietotāji un lomas | `/lietotaji` | F0 | ✅ |
 | Piekļuves žurnāls | `/zurnals` | N2 | ✅ |
-| Dzēšanas pieprasījumi | — | N2 | ⬜ |
+| Dzēšanas pieprasījumi (izpildīt ar apstiprinājumu / noraidīt) | `/dzesanas-pieprasijumi` | N2 | ✅ |
 
 ### Visās lapās
 
@@ -55,7 +56,7 @@
 | Kļūdas lapa (404, 403) | — | ✅ |
 | MI-2 klasifikācija: tikai dokuments, ekrāna nav | MI-2 | ⬜ |
 
-**Kopā:** gatavi 11 · daļēji 1 · vēl nav 12.
+**Kopā:** gatavi 15 · daļēji 1 · vēl nav 9.
 
 ## Kā atjaunot attēlu
 

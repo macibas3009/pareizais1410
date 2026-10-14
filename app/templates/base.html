@@ -21,7 +21,7 @@
     {% if user %}
     {% set links = [("/panelis", "Sākums")] %}
     {% if user.role in ("darbinieks", "vaditajs") %}{% set links = links + [("/organizacijas", "Organizācijas")] %}{% endif %}
-    {% if user.role == "administrators" %}{% set links = links + [("/lietotaji", "Lietotāji"), ("/zurnals", "Piekļuves žurnāls")] %}{% endif %}
+    {% if user.role == "administrators" %}{% set links = links + [("/lietotaji", "Lietotāji"), ("/dzesanas-pieprasijumi", "Dzēšanas pieprasījumi"), ("/zurnals", "Piekļuves žurnāls")] %}{% endif %}
     <nav aria-label="Galvenā navigācija">
       {% for href, text in links %}
       <a href="{{ href }}"{% if request.path == href or (href != "/panelis" and request.path.startswith(href ~ "/")) %} aria-current="page"{% endif %}>{{ text }}</a>

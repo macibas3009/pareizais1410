@@ -30,10 +30,11 @@
           {%- endif %}
 {%- endmacro %}
 
-{% macro input(name, label, errors, values, type="text", autocomplete="", placeholder="", hint="", inputmode="") %}
+{% macro input(name, label, errors, values, type="text", autocomplete="", placeholder="", hint="", inputmode="", required=true, max="") %}
         <div class="field">
-          <label for="{{ name }}">{{ label }}</label>
-          <input id="{{ name }}" name="{{ name }}" type="{{ type }}" required
+          <label for="{{ name }}">{{ label }}{% if not required %} <span class="optional">(nav obligāts)</span>{% endif %}</label>
+          <input id="{{ name }}" name="{{ name }}" type="{{ type }}"{% if required %} required{% endif %}
+                 {%- if max %} max="{{ max }}"{% endif %}
                  {%- if autocomplete %} autocomplete="{{ autocomplete }}"{% endif %}
                  {%- if placeholder %} placeholder="{{ placeholder }}"{% endif %}
                  {%- if inputmode %} inputmode="{{ inputmode }}"{% endif %}

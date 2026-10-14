@@ -40,7 +40,7 @@ body {
 .scene {
   position: relative;
   overflow: hidden;
-  background: var(--lake-900) url("/static/lake.svg") center / cover no-repeat;
+  background: var(--lake-900) url("/static/usmas-ezers.jpg") 62% center / cover no-repeat;
   color: #fff;
   display: flex;
   flex-direction: column;
@@ -52,7 +52,7 @@ body {
   content: "";
   position: absolute;
   inset: 0;
-  background: linear-gradient(180deg, rgba(10, 47, 62, 0.55) 0%, rgba(10, 47, 62, 0) 45%);
+  background: linear-gradient(180deg, rgba(10, 30, 40, 0.6) 0%, rgba(10, 30, 40, 0.15) 40%, rgba(10, 30, 40, 0.1) 65%, rgba(10, 30, 40, 0.55) 100%);
   pointer-events: none;
 }
 
@@ -79,24 +79,30 @@ body {
   opacity: 0.8;
 }
 
-.scene-text h2 {
-  margin: 0 0 0.5rem;
-  font-size: clamp(1.6rem, 2.6vw, 2.3rem);
-  line-height: 1.2;
+/* Virsraksts debesīs virs horizonta, paskaidrojums uz ūdens zem tā */
+.scene-title {
+  margin: clamp(2rem, 12vh, 7rem) 0 0;
+  font-size: clamp(1.8rem, 3vw, 2.6rem);
+  line-height: 1.15;
   font-weight: 650;
-  max-width: 16ch;
+  max-width: 15ch;
 }
 
-.scene-text p {
-  margin: 0;
-  max-width: 34ch;
-  opacity: 0.88;
+.scene-lead {
+  margin: 0 0 1.75rem;
+  max-width: 36ch;
+  font-size: 1.05rem;
+  opacity: 0.95;
 }
+
+.scene-title, .scene-lead, .brand { text-shadow: 0 1px 12px rgba(0, 0, 0, 0.4); }
 
 .scene-footer {
-  font-size: 0.8rem;
-  opacity: 0.75;
+  font-size: 0.75rem;
+  opacity: 0.85;
 }
+
+.scene-footer a { color: inherit; font-weight: 400; text-decoration: underline; }
 
 /* --- Forma ---------------------------------------------------------------- */
 
@@ -253,9 +259,9 @@ a:hover { text-decoration: underline; }
   .scene {
     min-height: 220px;
     padding: 1.5rem;
-    background-position: center 70%;
+    background-position: 62% 60%;
   }
-  .scene-text h2 { font-size: 1.4rem; }
-  .scene-text p, .scene-footer { display: none; }
+  .scene-title { margin-top: 1.25rem; font-size: 1.4rem; }
+  .scene-lead { display: none; }
   .panel { padding: 2rem 1.25rem 3rem; align-items: flex-start; }
 }

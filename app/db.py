@@ -140,6 +140,8 @@ def open_db(path: Path) -> sqlite3.Connection:
     conn = sqlite3.connect(path)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
+    # SQLite LOWER() pārveido tikai ASCII; latviešu burtiem (Ā, Č, Ē …) vajag Python casefold (F6)
+    conn.create_function("lv_lower", 1, lambda s: s.casefold() if isinstance(s, str) else s, deterministic=True)
     return conn
 
 

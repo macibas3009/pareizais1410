@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui %}
+{% set total = (results.organizations|length + results.contacts|length + results.requests|length) if results else 0 %}
+{% block title %}Meklēšana{% if query %}: {{ query }}{% endif %}{% endblock %}
+{% block content %}
+    <div class="page-head">
+      <h1>Meklēšanas rezultāti: {{ total }} atrasti</h1>
+      <p class="sub">
+        {% if results is none %}Ievadiet vismaz {{ min_length }} rakstzīmes.
+        {% else %}Vaicājums "{{ query }}". Meklē organizācijās, kontaktpersonās un pieprasījumos (ne mijiedarbību tekstā).{% endif %}
+        Lielie un mazie burti nav svarīgi, garumzīmes jāievada.
+      </p>
+    </div>
+
+    {% if results is none and query %}<div class="alert error" role="alert">Vaicājums ir par īsu: ievadiet vismaz {{ min_length }} rakstzīmes.</div>{% endif %}
+
+    {% if results is not none %}
+    <div class="blocks">
+      <section class="block block-wide" aria-labelledby="r-org">
+        <h2 id="r-org">Organizācijas</h2>
+        {% if results.organizations %}
+        <div class="table-wrap"><table>
+          <caption>Organizācijas: {{ results.organizations|length }}</caption>
+          <thead><tr><th scope="col">Nosaukums</th><th scope="col">Reģ. nr.</th><th scope="col">Veids</th><th scope="col">Atbildīgais</th></tr></thead>
+          <tbody>
+            {% for o in results.organizations %}
+            <tr><th scope="row"><a href="/organizacijas/{{ o.id }}">{{ o.name }}</a></th><td>{{ o.reg_no }}</td><td>{{ o.kind }}</td><td>{{ o.responsible }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table></div>
+        {% else %}<p class="empty">Neviena organizācija nav atrasta.</p>{% endif %}
+      </section>
+
+      <section class="block block-wide" aria-labelledby="r-kon">
+        <h2 id="r-kon">Kontaktpersonas</h2>
+        {% if results.contacts %}
+        <div class="table-wrap"><table>
+          <caption>Kontaktpersonas: {{ results.contacts|length }}</caption>
+          <thead><tr><th scope="col">Vārds, uzvārds</th><th scope="col">Amats</th><th scope="col">Organizācija</th></tr></thead>
+          <tbody>
+            {% for c in results.contacts %}
+            <tr><th scope="row"><a href="/kontakti/{{ c.id }}">{{ c.full_name }}</a></th><td>{{ c.position }}</td><td><a href="/organizacijas/{{ c.organization_id }}">{{ c.organization }}</a></td></tr>
+            {% endfor %}
+          </tbody>
+        </table></div>
+        <p class="meta">Kontaktinformācija ir kontaktpersonas kartītē; tās atvēršana tiek ierakstīta piekļuves žurnālā.</p>
+        {% else %}<p class="empty">Neviena kontaktpersona nav atrasta.</p>{% endif %}
+      </section>
+
+      <section class="block block-wide" aria-labelledby="r-piepr">
+        <h2 id="r-piepr">Pieprasījumi</h2>
+        {% if results.requests %}
+        <div class="table-wrap"><table>
+          <caption>Pieprasījumi: {{ results.requests|length }}</caption>
+          <thead><tr><th scope="col">Temats</th><th scope="col">Organizācija</th><th scope="col">Statuss</th><th scope="col">Termiņš</th></tr></thead>
+          <tbody>
+            {% for r in results.requests %}
+            <tr>
+              <th scope="row"><a href="/pieprasijumi/{{ r.id }}">{{ r.subject }}</a></th>
+              <td><a href="/organizacijas/{{ r.organization_id }}">{{ r.organization }}</a></td>
+              <td>{{ r.status }}</td>
+              <td>{% if r.status == "Atbildēts" %}<span class="meta">{{ fmt_date(r.due) }}</span>{% else %}{{ ui.due_tag(r.due, today) }}{% endif %}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table></div>
+        {% else %}<p class="empty">Neviens pieprasījums nav atrasts.</p>{% endif %}
+      </section>
+    </div>
+    {% endif %}
+{% endblock %}

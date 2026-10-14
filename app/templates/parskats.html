@@ -1,0 +1,91 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui %}
+{% block title %}Pārskats{% endblock %}
+{% block content %}
+    <div class="page-head page-head-row">
+      <div>
+        <h1>Pārskats vadītājam</h1>
+        <p class="sub">Periods: {{ fmt_date(since.isoformat()) }} – {{ fmt_date(today.isoformat()) }} (pēdējās {{ period }} dienas)</p>
+      </div>
+      <form method="get" action="/parskats" class="filters period-filter" aria-label="Pārskata periods">
+        <div class="field">
+          <label for="periods">Periods</label>
+          <select id="periods" name="periods">
+            {% for p in periods %}<option value="{{ p }}"{% if p == period %} selected{% endif %}>Pēdējās {{ p }} dienas</option>{% endfor %}
+          </select>
+        </div>
+        <button type="submit" class="btn-small">Rādīt</button>
+      </form>
+    </div>
+
+    <ul class="stats">
+      <li class="stat"><span class="stat-value">{{ total }}</span> <span class="stat-label">{{ plural(total, "mijiedarbība periodā", "mijiedarbības periodā") }}</span></li>
+      <li class="stat{% if overdue %} warn{% endif %}"><a class="stat-link" href="/pieprasijumi?kaveti=1"><span class="stat-value">{{ overdue|length }}</span> <span class="stat-label">{{ plural(overdue|length, "kavēts pieprasījums", "kavēti pieprasījumi") }}</span></a></li>
+    </ul>
+
+    <div class="blocks">
+      <section class="block block-wide" aria-labelledby="aktivitate">
+        <h2 id="aktivitate">Aktivitāte pa darbiniekiem</h2>
+        {% set c = chart %}
+        <div class="chart-grid">
+          <figure class="chart">
+            <svg viewBox="0 0 {{ c.width }} {{ c.height }}" role="img" aria-labelledby="chart-title chart-desc" class="bar-chart">
+              <title id="chart-title">Mijiedarbību skaits pa darbiniekiem, pēdējās {{ period }} dienas</title>
+              <desc id="chart-desc">Horizontāla stabiņu diagramma. {% for b in c.bars %}{{ b.label }}: {{ b.value }}. {% endfor %}Tie paši dati ir tabulā blakus.</desc>
+              {% for t in c.ticks %}
+              <line x1="{{ t.x }}" x2="{{ t.x }}" y1="{{ c.plot_top }}" y2="{{ c.plot_bottom }}" class="grid{% if loop.first %} baseline{% endif %}"/>
+              <text x="{{ t.x }}" y="{{ c.plot_bottom + 18 }}" class="tick" text-anchor="middle">{{ t.value }}</text>
+              {% endfor %}
+              {% for b in c.bars %}
+              <g class="bar-row">
+                <title>{{ b.label }}: {{ b.value }} {{ plural(b.value, "mijiedarbība", "mijiedarbības") }}</title>
+                <rect x="0" y="{{ b.y }}" width="{{ c.width }}" height="{{ c.row_h }}" class="hit"/>
+                <text x="{{ c.label_w - 10 }}" y="{{ b.y + c.row_h / 2 }}" class="bar-label" text-anchor="end" dominant-baseline="middle">{{ b.label }}</text>
+                {% if b.path %}<path d="{{ b.path }}" class="bar"/>{% endif %}
+                <text x="{{ c.label_w + b.w + 6 }}" y="{{ b.y + c.row_h / 2 }}" class="bar-value" dominant-baseline="middle">{{ b.value }}</text>
+              </g>
+              {% endfor %}
+            </svg>
+            <figcaption>Mijiedarbību skaits periodā pēc ieraksta autora. Novietojiet kursoru uz stabiņa, lai redzētu precīzu vērtību.</figcaption>
+          </figure>
+          <div class="table-wrap">
+            <table>
+              <caption>Aktivitāte pa darbiniekiem (tie paši dati)</caption>
+              <thead><tr><th scope="col">Darbinieks</th><th scope="col" class="num">Mijiedarbības</th></tr></thead>
+              <tbody>
+                {% for r in activity %}<tr><th scope="row">{{ r.full_name }}</th><td class="num">{{ r.n }}</td></tr>{% endfor %}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <section class="block" aria-labelledby="aktivakas">
+        <h2 id="aktivakas">Aktīvākās organizācijas</h2>
+        {% if top %}
+        <div class="table-wrap"><table>
+          <caption>Top {{ top|length }} pēc mijiedarbību skaita periodā</caption>
+          <thead><tr><th scope="col">#</th><th scope="col">Organizācija</th><th scope="col" class="num">Mijiedarbības</th></tr></thead>
+          <tbody>
+            {% for o in top %}<tr><td>{{ loop.index }}.</td><th scope="row"><a href="/organizacijas/{{ o.id }}">{{ o.name }}</a></th><td class="num">{{ o.n }}</td></tr>{% endfor %}
+          </tbody>
+        </table></div>
+        {% else %}<p class="empty">Periodā mijiedarbību nav.</p>{% endif %}
+      </section>
+
+      <section class="block" aria-labelledby="kavetie">
+        <h2 id="kavetie">Kavētie pieprasījumi ({{ overdue|length }})</h2>
+        {% if overdue %}
+        <div class="table-wrap"><table>
+          <caption class="visually-hidden">Kavētie pieprasījumi, vecākie augšā</caption>
+          <thead><tr><th scope="col">Temats</th><th scope="col">Atbildīgais</th><th scope="col">Termiņš</th></tr></thead>
+          <tbody>
+            {% for r in overdue %}
+            <tr><th scope="row"><a href="/pieprasijumi/{{ r.id }}">{{ r.subject }}</a><br><span class="meta">{{ r.organization }}</span></th><td>{{ r.responsible }}</td><td>{{ ui.due_tag(r.due, today) }}</td></tr>
+            {% endfor %}
+          </tbody>
+        </table></div>
+        {% else %}<p class="empty">Kavētu pieprasījumu nav.</p>{% endif %}
+      </section>
+    </div>
+{% endblock %}

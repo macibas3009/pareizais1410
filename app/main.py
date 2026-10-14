@@ -10,18 +10,18 @@ import logging
 import os
 import re
 import threading
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import Any
 
 from fastapi import FastAPI, Request, Response
 from fastapi.exceptions import RequestValidationError
-from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
 from fastapi.staticfiles import StaticFiles
 from pydantic import BaseModel
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
-from app import db, security
+from app import dashboard, db, security
 
 VERSION = "0.1.0"
 STATIC = Path(__file__).parent / "static"
@@ -110,6 +110,13 @@ def create_app(db_path: Path | None = None, cookie_secure: bool | None = None) -
                 (security.token_hash(token), now),
             ).fetchone()
 
+    def end_session(request: Request) -> None:
+        token = request.cookies.get(SESSION_COOKIE)
+        if token:
+            with lock:
+                conn.execute("DELETE FROM sessions WHERE token_hash = ?", (security.token_hash(token),))
+                conn.commit()
+
     # --- Lapas ----------------------------------------------------------------
 
     @app.get("/", include_in_schema=False)
@@ -125,8 +132,40 @@ def create_app(db_path: Path | None = None, cookie_secure: bool | None = None) -
         return FileResponse(STATIC / "register.html")
 
     @app.get("/profile", include_in_schema=False)
-    def profile_page() -> FileResponse:
-        return FileResponse(STATIC / "profile.html")
+    def profile_page() -> RedirectResponse:
+        return RedirectResponse("/panelis")
+
+    # --- F9 · vadības panelis (servera pusē renderēts, bez JavaScript) --------
+
+    @app.get("/panelis", include_in_schema=False)
+    def dashboard_page(request: Request):
+        user = current_user(request)
+        if user is None:
+            return RedirectResponse("/login", status_code=303)
+        with lock:
+            html = dashboard.render_dashboard(conn, user, date.today())
+        return HTMLResponse(html)
+
+    @app.post("/uzdevumi/{task_id}/izpildits", include_in_schema=False)
+    def complete_task(task_id: int, request: Request):
+        user = current_user(request)
+        if user is None:
+            return RedirectResponse("/login", status_code=303)
+        if user["role"] not in ("darbinieks", "vaditajs"):
+            return error(403, "FORBIDDEN", "Not allowed")
+        with lock:
+            done = dashboard.complete_task(conn, task_id, user, datetime.now(timezone.utc).isoformat())
+        if not done:
+            return error(404, "NOT_FOUND", "Task not found")
+        return RedirectResponse("/panelis", status_code=303)
+
+    @app.post("/iziet", include_in_schema=False)
+    def logout_form(request: Request) -> RedirectResponse:
+        """Iziešana no HTML formas (bez JavaScript); API variants ir /auth/logout."""
+        end_session(request)
+        response = RedirectResponse("/login", status_code=303)
+        response.delete_cookie(SESSION_COOKIE)
+        return response
 
     # --- API ------------------------------------------------------------------
 
@@ -200,11 +239,7 @@ def create_app(db_path: Path | None = None, cookie_secure: bool | None = None) -
 
     @app.post("/auth/logout", tags=["Autentifikācija"], status_code=204)
     def logout(request: Request) -> Response:
-        token = request.cookies.get(SESSION_COOKIE)
-        if token:
-            with lock:
-                conn.execute("DELETE FROM sessions WHERE token_hash = ?", (security.token_hash(token),))
-                conn.commit()
+        end_session(request)
         response = Response(status_code=204)
         response.delete_cookie(SESSION_COOKIE)
         return response

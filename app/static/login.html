@@ -76,7 +76,7 @@
           body: JSON.stringify({ email: form.email.value, password: form.password.value }),
         });
         if (res.ok) {
-          location.href = "/profile";
+          location.href = "/panelis";
           return;
         }
         alertBox.textContent = res.status === 401 || res.status === 400

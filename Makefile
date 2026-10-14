@@ -1,4 +1,4 @@
-.PHONY: verify-setup test lint-contract run
+.PHONY: verify-setup test lint-contract run seed
 
 verify-setup:
 	@python --version
@@ -15,3 +15,6 @@ lint-contract:
 
 run:
 	uvicorn --factory app.main:create_app --host 0.0.0.0 --port 8000 --reload
+
+seed:
+	python -m app.seed

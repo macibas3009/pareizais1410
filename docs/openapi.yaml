@@ -22,6 +22,8 @@ tags:
     description: Iesnieguma pieņemšana un apskate (R1–R3)
   - name: Sistēma
     description: Tehniskie galapunkti (R4)
+  - name: Autentifikācija
+    description: Lietotāju reģistrācija un pieslēgšanās (CR-4)
 
 paths:
   /health:
@@ -101,6 +103,143 @@ paths:
                 $ref: '#/components/schemas/Submission'
         '404':
           $ref: '#/components/responses/NotFound'
+
+  /auth/register:
+    post:
+      tags: [Autentifikācija]
+      operationId: registerUser
+      summary: Reģistrēt lietotāju (CR-4)
+      description: |
+        Izveido lietotāja kontu. `email` tiek saglabāts mazajiem burtiem un bez
+        atstarpēm; viens e-pasts var piederēt tikai vienam kontam.
+        Parole tiek glabāta tikai kā jaucējvērtība (scrypt), nekad atklātā tekstā.
+        Žurnālā netiek rakstīta parole, e-pasts vai vārds.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/RegisterRequest'
+            example:
+              email: janis@example.com
+              fullName: Jānis Bērziņš
+              password: drosa-parole-123
+      responses:
+        '201':
+          description: Konts izveidots
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/AuthValidationError'
+        '404':
+          $ref: '#/components/responses/AuthNotFound'
+        '409':
+          description: E-pasts jau ir reģistrēts
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: EMAIL_TAKEN
+                  message: Email is already registered
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /auth/login:
+    post:
+      tags: [Autentifikācija]
+      operationId: loginUser
+      summary: Pieslēgties (CR-4)
+      description: |
+        Pārbauda e-pastu un paroli. Veiksmes gadījumā iestata sesijas sīkdatni
+        `session` (HttpOnly, SameSite=Lax, derīga 8 h).
+        Nepareiza parole un neesošs e-pasts saņem **vienādu** 401 atbildi,
+        lai neatklātu, vai konts eksistē.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LoginRequest'
+            example:
+              email: janis@example.com
+              password: drosa-parole-123
+      responses:
+        '200':
+          description: Pieslēgšanās izdevās
+          headers:
+            Set-Cookie:
+              description: Sesijas sīkdatne `session` (HttpOnly)
+              schema:
+                type: string
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/AuthValidationError'
+        '401':
+          description: Nepareizs e-pasts vai parole
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: INVALID_CREDENTIALS
+                  message: Invalid email or password
+        '404':
+          $ref: '#/components/responses/AuthNotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /auth/logout:
+    post:
+      tags: [Autentifikācija]
+      operationId: logoutUser
+      summary: Atslēgties (CR-4)
+      description: Padara sesiju nederīgu un dzēš sīkdatni. Bez sesijas arī atbild 204.
+      responses:
+        '204':
+          description: Sesija beigta
+        '400':
+          $ref: '#/components/responses/AuthValidationError'
+        '404':
+          $ref: '#/components/responses/AuthNotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
+
+  /auth/me:
+    get:
+      tags: [Autentifikācija]
+      operationId: getCurrentUser
+      summary: Pašreizējais lietotājs (CR-4)
+      responses:
+        '200':
+          description: Pieslēgtais lietotājs
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/User'
+        '400':
+          $ref: '#/components/responses/AuthValidationError'
+        '401':
+          description: Nav derīgas sesijas
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+              example:
+                error:
+                  code: UNAUTHENTICATED
+                  message: Not logged in
+        '404':
+          $ref: '#/components/responses/AuthNotFound'
+        '500':
+          $ref: '#/components/responses/InternalError'
 
 components:
   schemas:
@@ -216,6 +355,56 @@ components:
       enum: [RECEIVED, IN_PROGRESS, FORWARDED, ANSWERED, WITHDRAWN]
       example: RECEIVED
 
+    RegisterRequest:
+      type: object
+      required: [email, fullName, password]
+      properties:
+        email:
+          type: string
+          format: email
+          maxLength: 254
+          example: janis@example.com
+        fullName:
+          type: string
+          maxLength: 100
+          description: Burti (arī latviešu), atstarpes, defise, apostrofs
+          example: Jānis Bērziņš
+        password:
+          type: string
+          format: password
+          minLength: 12
+          maxLength: 128
+          writeOnly: true
+
+    LoginRequest:
+      type: object
+      required: [email, password]
+      properties:
+        email:
+          type: string
+          format: email
+          example: janis@example.com
+        password:
+          type: string
+          format: password
+          writeOnly: true
+
+    User:
+      type: object
+      description: Lietotāja konts. Parole atbildē nekad netiek iekļauta.
+      required: [id, email, fullName]
+      properties:
+        id:
+          type: integer
+          example: 1
+        email:
+          type: string
+          format: email
+          example: janis@example.com
+        fullName:
+          type: string
+          example: Jānis Bērziņš
+
     Error:
       type: object
       description: Vienota kļūdu shēma visiem galapunktiem
@@ -271,3 +460,40 @@ components:
             error:
               code: NOT_FOUND
               message: Submission not found
+    AuthValidationError:
+      description: |
+        Kļūdains pieprasījums (CR-4). `issue` vērtības:
+        `REQUIRED`, `INVALID_FORMAT`, `TOO_SHORT`, `TOO_LONG`.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: VALIDATION_ERROR
+              message: Request validation failed
+              details:
+                - field: password
+                  issue: TOO_SHORT
+    AuthNotFound:
+      description: |
+        Resurss nav atrasts. CR-4 galapunkti paši 404 neatgriež (neesošs konts
+        pieslēdzoties → 401); deklarēts kursa līguma noteikumu dēļ.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: NOT_FOUND
+              message: Resource not found
+    InternalError:
+      description: Neparedzēta servera kļūda. Atbildē un žurnālā nav personas datu.
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+          example:
+            error:
+              code: INTERNAL_ERROR
+              message: Internal server error

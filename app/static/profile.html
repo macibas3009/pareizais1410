@@ -1,0 +1,64 @@
+<!doctype html>
+<html lang="lv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Mans konts · Ezermalas pieteikumu sistēma</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="scene">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true">
+        <circle cx="20" cy="20" r="19" fill="#fff" fill-opacity="0.14" stroke="#fff" stroke-opacity="0.6"/>
+        <circle cx="26" cy="15" r="5" fill="#ffd99a"/>
+        <path d="M7 24 q4.3-3 8.6 0 t8.6 0 t8.6 0" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+        <path d="M10 29.5 q3.3-2.4 6.6 0 t6.6 0 t6.6 0" fill="none" stroke="#fff" stroke-opacity="0.7" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <div>Ezermalas novada pašvaldība<small>Pieteikumu sistēma</small></div>
+    </div>
+    <div class="scene-text">
+      <h2>Iesniegumi pašvaldībai vienuviet</h2>
+      <p>Iesniedziet jautājumus par ceļiem, atkritumiem un teritorijas plānošanu un sekojiet līdzi atbildēm.</p>
+    </div>
+    <div class="scene-footer">© Ezermalas novada pašvaldība · mācību prototips</div>
+  </aside>
+
+  <main class="panel">
+    <div class="card">
+      <h1>Sveiki, <span id="name"></span>!</h1>
+      <p class="sub">Jūs esat veiksmīgi pieslēdzies.</p>
+
+      <dl class="profile-box">
+        <dt>Vārds, uzvārds</dt>
+        <dd id="fullName"></dd>
+        <dt>E-pasts</dt>
+        <dd id="email"></dd>
+      </dl>
+
+      <button id="logout" type="button" class="secondary">Iziet</button>
+    </div>
+  </main>
+</div>
+
+  <script>
+    (async () => {
+      const res = await fetch("/auth/me");
+      if (!res.ok) {
+        location.href = "/login";
+        return;
+      }
+      const user = await res.json();
+      document.getElementById("name").textContent = user.fullName.split(" ")[0];
+      document.getElementById("fullName").textContent = user.fullName;
+      document.getElementById("email").textContent = user.email;
+    })();
+
+    document.getElementById("logout").addEventListener("click", async () => {
+      await fetch("/auth/logout", { method: "POST" });
+      location.href = "/login";
+    });
+  </script>
+</body>
+</html>

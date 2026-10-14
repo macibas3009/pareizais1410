@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="lv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Reģistrēties · Ezermalas pieteikumu sistēma</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+<div class="layout">
+  <aside class="scene">
+    <div class="brand">
+      <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true">
+        <circle cx="20" cy="20" r="19" fill="#fff" fill-opacity="0.14" stroke="#fff" stroke-opacity="0.6"/>
+        <circle cx="26" cy="15" r="5" fill="#ffd99a"/>
+        <path d="M7 24 q4.3-3 8.6 0 t8.6 0 t8.6 0" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+        <path d="M10 29.5 q3.3-2.4 6.6 0 t6.6 0 t6.6 0" fill="none" stroke="#fff" stroke-opacity="0.7" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <div>Ezermalas novada pašvaldība<small>Pieteikumu sistēma</small></div>
+    </div>
+    <div class="scene-text">
+      <h2>Iesniegumi pašvaldībai vienuviet</h2>
+      <p>Iesniedziet jautājumus par ceļiem, atkritumiem un teritorijas plānošanu un sekojiet līdzi atbildēm.</p>
+    </div>
+    <div class="scene-footer">© Ezermalas novada pašvaldība · mācību prototips</div>
+  </aside>
+
+  <main class="panel">
+    <div class="card">
+      <h1>Izveidot kontu</h1>
+      <p class="sub">Reģistrējieties, lai iesniegtu iesniegumus pašvaldībai.</p>
+
+      <div id="alert" class="alert error" role="alert" hidden></div>
+
+      <form id="form" novalidate>
+        <div class="field">
+          <label for="fullName">Vārds, uzvārds</label>
+          <input id="fullName" name="fullName" autocomplete="name" placeholder="Jānis Bērziņš" required>
+          <div class="field-error" data-for="fullName" hidden></div>
+        </div>
+        <div class="field">
+          <label for="email">E-pasts</label>
+          <input id="email" name="email" type="email" autocomplete="email" placeholder="vards@example.com" required>
+          <div class="field-error" data-for="email" hidden></div>
+        </div>
+        <div class="field">
+          <label for="password">Parole</label>
+          <input id="password" name="password" type="password" autocomplete="new-password" minlength="12" aria-describedby="password-rule" required>
+          <div id="password-rule" class="hint"><span class="dot"></span>Parolei jābūt vismaz 12 rakstzīmes garai</div>
+          <div class="field-error" data-for="password" hidden></div>
+        </div>
+        <div class="field">
+          <label for="password2">Parole vēlreiz</label>
+          <input id="password2" name="password2" type="password" autocomplete="new-password" required>
+          <div class="field-error" data-for="password2" hidden></div>
+        </div>
+        <button type="submit">Izveidot kontu</button>
+      </form>
+
+      <p class="switch">Jau ir konts? <a href="/login">Pieslēgties</a></p>
+    </div>
+  </main>
+</div>
+
+  <script>
+    const MESSAGES = {
+      REQUIRED: "Lauks ir obligāts.",
+      INVALID_FORMAT: {
+        email: "Nederīga e-pasta adrese.",
+        fullName: "Vārdā drīkst būt tikai burti, atstarpes un defise.",
+      },
+      TOO_SHORT: "Parolei jābūt vismaz 12 rakstzīmes garai.",
+      TOO_LONG: "Vērtība ir pārāk gara.",
+    };
+
+    const form = document.getElementById("form");
+    const alertBox = document.getElementById("alert");
+
+    const passwordRule = document.getElementById("password-rule");
+
+    form.password.addEventListener("input", () => {
+      passwordRule.classList.toggle("met", form.password.value.length >= 12);
+    });
+
+    function showFieldError(field, text) {
+      const el = form.querySelector(`[data-for="${field}"]`);
+      if (!el) return;
+      el.textContent = text;
+      el.hidden = false;
+      form.elements[field]?.setAttribute("aria-invalid", "true");
+    }
+
+    function clearErrors() {
+      alertBox.hidden = true;
+      form.querySelectorAll(".field-error").forEach((el) => { el.hidden = true; });
+      form.querySelectorAll("[aria-invalid]").forEach((el) => el.removeAttribute("aria-invalid"));
+    }
+
+    form.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      clearErrors();
+
+      if (form.password.value.length < 12) {
+        showFieldError("password", MESSAGES.TOO_SHORT);
+        return;
+      }
+      if (form.password.value !== form.password2.value) {
+        showFieldError("password2", "Paroles nesakrīt.");
+        return;
+      }
+
+      const button = form.querySelector("button");
+      button.disabled = true;
+      try {
+        const res = await fetch("/auth/register", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            fullName: form.fullName.value,
+            email: form.email.value,
+            password: form.password.value,
+          }),
+        });
+        if (res.status === 201) {
+          location.href = "/login?registered";
+          return;
+        }
+        const data = await res.json().catch(() => ({}));
+        const err = data.error || {};
+        if (err.code === "EMAIL_TAKEN") {
+          showFieldError("email", "Šis e-pasts jau ir reģistrēts.");
+        } else if (err.code === "VALIDATION_ERROR" && err.details) {
+          for (const { field, issue } of err.details) {
+            const msg = MESSAGES[issue];
+            showFieldError(field, typeof msg === "object" ? msg[field] : msg || "Nederīga vērtība.");
+          }
+        } else {
+          alertBox.textContent = "Radās kļūda. Lūdzu, mēģiniet vēlreiz.";
+          alertBox.hidden = false;
+        }
+      } catch {
+        alertBox.textContent = "Nevar sazināties ar serveri.";
+        alertBox.hidden = false;
+      } finally {
+        button.disabled = false;
+      }
+    });
+  </script>
+</body>
+</html>

@@ -155,6 +155,10 @@ Parole visiem: `Ezermala-2026!`. Citu paroli var uzdot ar vides mainīgo `SEED_P
 
 ### Lomas piešķiršana jaunam lietotājam
 
+![Infografika: lietotājs reģistrējas un pieprasa lomu, konts gaida apstiprinājumu, administrators apstiprina, izvēlas citu lomu vai noraida, lietotājs atsvaidzina lapu un redz paneli](lomu-pieskirsana.png)
+
+Infografikas avots: [lomu-pieskirsana.html](lomu-pieskirsana.html), atjaunošana: `make lomu-infografika`.
+
 1. Lietotājs reģistrējas lapā `/register` un izvēlas, kādu lomu pieprasa: **Darbinieks** vai **Vadītājs**.
 2. Pēc pieslēgšanās viņš redz "Konts gaida apstiprinājumu" un pieprasīto lomu.
 3. Administrators (`admin@example.com`) savā panelī redz pieprasījumu un nospiež **Apstiprināt**. Ja vajag citu lomu, izmanto **Cita loma**.

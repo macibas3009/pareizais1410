@@ -1,0 +1,193 @@
+<!doctype html>
+<!-- Lomu piešķiršanas infografikas avots. Attēlu docs/lomu-pieskirsana.png atjauno ar: make lomu-infografika -->
+<html lang="lv">
+<head>
+<meta charset="utf-8">
+<title>Lomu piešķiršana</title>
+<style>
+  :root {
+    --lake-900: #0a2f3e; --lake-700: #11566b; --lake-600: #176a82; --lake-500: #1f8aa6; --lake-100: #e3f1f4;
+    --sand: #faf7f1; --line: #5f8794; --ink: #17262e; --muted: #5d6f78;
+    --ok: #1e6b4a; --ok-bg: #e5f4ec; --warn: #8a5a00; --warn-bg: #fff3d6; --bad: #a3281b; --bad-bg: #fdecea;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--sand); color: var(--ink); font-family: "DejaVu Sans", "Liberation Sans", Arial, sans-serif; }
+  .page { position: relative; width: 1560px; padding: 36px 44px 34px; }
+  header { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 30px; }
+  h1 { margin: 0; font-size: 30px; color: var(--lake-900); }
+  .subtitle { margin: 4px 0 0; color: var(--muted); font-size: 15px; }
+  .who { display: flex; gap: 14px; font-size: 14px; }
+  .who span { display: inline-flex; align-items: center; gap: 6px; }
+  .dot { width: 12px; height: 12px; border-radius: 50%; display: inline-block; }
+
+  /* Soļi */
+  .flow { display: grid; grid-template-columns: 1fr 64px 1fr 64px 1.55fr 64px 1fr; align-items: stretch; }
+  .step { position: relative; background: #fff; border: 2px solid #c9d6da; border-radius: 14px; padding: 18px 18px 16px; }
+  .step.user { border-top: 6px solid var(--lake-500); }
+  .step.admin { border-top: 6px solid #6b3fa0; }
+  .num { position: absolute; top: -18px; left: 16px; width: 34px; height: 34px; border-radius: 50%; display: grid; place-items: center;
+         font-weight: 700; font-size: 16px; color: #fff; background: var(--lake-600); border: 3px solid var(--sand); }
+  .step.admin .num { background: #6b3fa0; }
+  .actor { font-size: 11.5px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; color: var(--muted); margin: 6px 0 4px; }
+  .step h2 { margin: 0 0 8px; font-size: 19px; color: var(--lake-900); }
+  .step p { margin: 0 0 8px; font-size: 14px; line-height: 1.4; }
+  .url { font-family: "DejaVu Sans Mono", monospace; font-size: 12px; color: var(--lake-700); background: var(--lake-100); padding: 1px 6px; border-radius: 5px; }
+  .mock { margin-top: 10px; border: 1px solid #dfe6e8; border-radius: 8px; background: #fbfcfc; padding: 10px; font-size: 13px; }
+  .radio { display: flex; align-items: center; gap: 8px; padding: 6px 8px; border: 1px solid #cfd9dd; border-radius: 6px; margin-bottom: 6px; background: #fff; }
+  .radio.on { border-color: var(--lake-500); background: var(--lake-100); }
+  .radio i { width: 12px; height: 12px; border-radius: 50%; border: 2px solid #8aa; display: inline-block; }
+  .radio.on i { border-color: var(--lake-600); background: radial-gradient(var(--lake-600) 45%, transparent 50%); }
+  .radio.no { color: var(--muted); border-style: dashed; }
+  .radio.no s { text-decoration-thickness: 2px; }
+  .pill { display: inline-block; padding: 2px 9px; border-radius: 999px; font-size: 12px; font-weight: 700; }
+  .pill.wait { background: var(--warn-bg); color: var(--warn); }
+  .pill.ok { background: var(--ok-bg); color: var(--ok); }
+  .pill.bad { background: var(--bad-bg); color: var(--bad); }
+
+  .arrow { display: grid; place-items: center; }
+  .arrow svg { width: 56px; height: 28px; }
+
+  /* Administratora izvēle */
+  .choices { display: grid; gap: 8px; margin-top: 10px; }
+  .choice { display: grid; grid-template-columns: 130px 1fr; gap: 10px; align-items: center; padding: 8px 10px; border-radius: 8px; font-size: 13px; }
+  .choice b.btn { display: inline-block; text-align: center; padding: 6px 8px; border-radius: 7px; font-size: 13px; color: #fff; background: var(--lake-600); }
+  .choice.c1 { background: var(--ok-bg); }
+  .choice.c2 { background: var(--lake-100); }
+  .choice.c2 b.btn { background: #fff; color: var(--lake-700); border: 1px solid #b6c9cf; }
+  .choice.c3 { background: var(--bad-bg); }
+  .choice.c3 b.btn { background: #fff; color: var(--bad); border: 1px solid #e7b7b2; }
+
+  /* Lejas josla */
+  .bottom { display: grid; grid-template-columns: 1.7fr 1fr; gap: 26px; margin-top: 34px; }
+  .panel { background: #fff; border: 1px solid #dfe6e8; border-radius: 14px; padding: 18px 20px; }
+  .panel h3 { margin: 0 0 12px; font-size: 17px; color: var(--lake-900); }
+  .roles { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .role { border-radius: 10px; padding: 12px 14px; border: 1px solid #dfe6e8; }
+  .role h4 { margin: 0 0 6px; font-size: 15px; display: flex; align-items: center; gap: 8px; }
+  .role ul { margin: 0; padding-left: 18px; font-size: 13px; line-height: 1.45; }
+  .r1 { background: #f2f9fb; } .r2 { background: #eef5f7; } .r3 { background: #f6f1fb; }
+  .rules { margin: 0; padding-left: 18px; font-size: 13.5px; line-height: 1.55; }
+  .rules li { margin-bottom: 4px; }
+  code { font-family: "DejaVu Sans Mono", monospace; font-size: 12px; background: var(--lake-100); padding: 1px 5px; border-radius: 4px; }
+  footer { margin-top: 20px; font-size: 12.5px; color: var(--muted); display: flex; justify-content: space-between; }
+</style>
+</head>
+<body>
+<div class="page" id="page">
+  <header>
+    <div>
+      <h1>Kā lietotājs iegūst lomu</h1>
+      <p class="subtitle">Ezermalas novada pašvaldības CRM · F0 #6 un N3 · lietotājs lomu pieprasa, administrators apstiprina</p>
+    </div>
+    <div class="who">
+      <span><i class="dot" style="background:#1f8aa6"></i> Lietotājs</span>
+      <span><i class="dot" style="background:#6b3fa0"></i> Administrators</span>
+    </div>
+  </header>
+
+  <section class="flow">
+    <div class="step user">
+      <span class="num">1</span>
+      <p class="actor">Lietotājs</p>
+      <h2>Reģistrējas un pieprasa lomu</h2>
+      <p>Lapā <span class="url">/register</span> norāda vārdu, e-pastu, paroli un izvēlas lomu.</p>
+      <div class="mock">
+        <div class="radio on"><i></i> <b>Darbinieks</b></div>
+        <div class="radio"><i></i> <b>Vadītājs</b></div>
+        <div class="radio no"><i></i> <s>Administrators</s> <span>— nevar pieprasīt</span></div>
+      </div>
+    </div>
+
+    <div class="arrow"><svg viewBox="0 0 56 28" aria-hidden="true"><path d="M2 14h44" stroke="#5f8794" stroke-width="3"/><path d="M42 6l12 8-12 8z" fill="#5f8794"/></svg></div>
+
+    <div class="step user">
+      <span class="num">2</span>
+      <p class="actor">Lietotājs</p>
+      <h2>Konts gaida apstiprinājumu</h2>
+      <p>Konts ir izveidots, bet <b>bez lomas</b>. Pēc pieslēgšanās lietotājs redz tikai paziņojumu, CRM datus neredz.</p>
+      <div class="mock">
+        <span class="pill wait">Konts gaida apstiprinājumu</span>
+        <p style="margin:8px 0 0">Jūs pieprasījāt lomu: <b>Darbinieks</b></p>
+      </div>
+    </div>
+
+    <div class="arrow"><svg viewBox="0 0 56 28" aria-hidden="true"><path d="M2 14h44" stroke="#5f8794" stroke-width="3"/><path d="M42 6l12 8-12 8z" fill="#5f8794"/></svg></div>
+
+    <div class="step admin">
+      <span class="num">3</span>
+      <p class="actor">Administrators</p>
+      <h2>Izlemj vadības panelī</h2>
+      <p>Panelī ir karte "lietotāji gaida lomu" un tabula ar vārdu, e-pastu un <b>pieprasīto lomu</b>.</p>
+      <div class="choices">
+        <div class="choice c1"><b class="btn">Apstiprināt</b><span>Piešķir pieprasīto lomu ar vienu klikšķi</span></div>
+        <div class="choice c2"><b class="btn">Cita loma</b><span>Lapā <span class="url">/lietotaji</span> izvēlas citu lomu</span></div>
+        <div class="choice c3"><b class="btn">Noraidīt</b><span>Neapstiprināts konts tiek <b>dzēsts</b></span></div>
+      </div>
+    </div>
+
+    <div class="arrow"><svg viewBox="0 0 56 28" aria-hidden="true"><path d="M2 14h44" stroke="#5f8794" stroke-width="3"/><path d="M42 6l12 8-12 8z" fill="#5f8794"/></svg></div>
+
+    <div class="step user">
+      <span class="num">4</span>
+      <p class="actor">Lietotājs</p>
+      <h2>Atsvaidzina lapu</h2>
+      <p>Loma tiek nolasīta katrā pieprasījumā, tāpēc <b>no jauna pieslēgties nevajag</b>.</p>
+      <div class="mock">
+        <span class="pill ok">Vadības panelis</span>
+        <p style="margin:8px 0 0">Saturs atbilst lomai: savas organizācijas, uzdevumi, termiņi.</p>
+      </div>
+    </div>
+  </section>
+
+  <section class="bottom">
+    <div class="panel">
+      <h3>Ko redz katra loma</h3>
+      <div class="roles">
+        <div class="role r1">
+          <h4><i class="dot" style="background:#1f8aa6"></i> Darbinieks</h4>
+          <ul>
+            <li>Redz visas organizācijas un kontaktus</li>
+            <li>Labo <b>savas</b> organizācijas, to kontaktus un pieprasījumus</li>
+            <li>Mijiedarbības jebkurai organizācijai</li>
+            <li>Savi uzdevumi, uzdevumi kolēģiem</li>
+          </ul>
+        </div>
+        <div class="role r2">
+          <h4><i class="dot" style="background:#11566b"></i> Vadītājs</h4>
+          <ul>
+            <li>Viss, ko darbinieks, <b>visām</b> organizācijām</li>
+            <li>Maina atbildīgo darbinieku</li>
+            <li>Redz visu uzdevumus</li>
+            <li>Pārskats <span class="url">/parskats</span></li>
+          </ul>
+        </div>
+        <div class="role r3">
+          <h4><i class="dot" style="background:#6b3fa0"></i> Administrators</h4>
+          <ul>
+            <li>Lietotāji un lomas</li>
+            <li>Dzēšanas pieprasījumi</li>
+            <li>Piekļuves žurnāls</li>
+            <li><b>CRM datus neredz</b></li>
+          </ul>
+        </div>
+      </div>
+    </div>
+    <div class="panel">
+      <h3>Noteikumi</h3>
+      <ul class="rules">
+        <li>Administratora lomu nevar pieprasīt reģistrācijā; to piešķir tikai administrators.</li>
+        <li>Administrators <b>nevar mainīt savu lomu</b>, lai sistēma nepaliktu bez administratora.</li>
+        <li>Katra lomas izmaiņa tiek ierakstīta piekļuves žurnālā (kas, kad, lietotāja ID).</li>
+        <li>Lomu var arī mainīt vēlāk lapā <span class="url">/lietotaji</span>.</li>
+        <li>Rezerves variants terminālī: <code>make role EMAIL=… ROLE=…</code></li>
+      </ul>
+    </div>
+  </section>
+
+  <footer>
+    <span>Avots: docs/lomu-pieskirsana.html · atjaunot: make lomu-infografika</span>
+    <span>Atbilst kodam: app/users.py, app/templates/register.html, panelis.html, lietotaji.html</span>
+  </footer>
+</div>
+</body>
+</html>

@@ -1,4 +1,4 @@
-.PHONY: verify-setup test lint-contract install install-dev run seed users role ekranu-karte a11y
+.PHONY: verify-setup test lint-contract install install-dev run seed users role ekranu-karte lomu-infografika a11y
 
 verify-setup:
 	@python --version
@@ -41,3 +41,6 @@ ekranu-karte:
 # N1: axe-core + Playwright piekļūstamības pārbaude; rezultāts docs/a11y-rezultati.json (rāda /pieklustamiba)
 a11y:
 	python tests/a11y_check.py
+
+lomu-infografika:
+	python tools/html_to_png.py docs/lomu-pieskirsana.html docs/lomu-pieskirsana.png

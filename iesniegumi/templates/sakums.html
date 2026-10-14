@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Sākums: izvēlieties lomu{% endblock %}
+{% block content %}
+    <section class="hero" aria-labelledby="virsraksts">
+      <div class="hero-inner">
+        <h1 id="virsraksts">Iesniegumi pašvaldībai</h1>
+        <p>Ziņojiet par bedrēm, apgaismojumu, atkritumiem, jautājiet par bērnudārza rindu vai sociālo palīdzību.</p>
+      </div>
+    </section>
+
+    {% if vajag_lomu %}<div class="alert info" role="status">Lai atvērtu šo lapu, vispirms izvēlieties lomu.</div>{% endif %}
+    {% if kluda %}<div class="alert error" role="alert">{{ kluda }}</div>{% endif %}
+
+    <form method="post" action="{{ url_for('izvelas_lomu') }}" class="role-form">
+      <fieldset>
+        <legend><h2>Kas jūs esat?</h2></legend>
+        <div class="role-cards">
+          <button type="submit" name="loma" value="iedzivotajs" class="role-card">
+            <strong>Iedzīvotājs</strong>
+            <span>Iesniegt iesniegumu un pārbaudīt tā statusu</span>
+          </button>
+          <button type="submit" name="loma" value="darbinieks" class="role-card">
+            <strong>Darbinieks</strong>
+            <span>Apstrādāt iesniegumus un sagatavot atbildes</span>
+          </button>
+          <button type="submit" name="loma" value="vaditajs" class="role-card">
+            <strong>Vadītājs</strong>
+            <span>Iesniegumu pārskats un apstrāde</span>
+          </button>
+        </div>
+      </fieldset>
+    </form>
+{% endblock %}

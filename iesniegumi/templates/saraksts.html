@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Iesniegumu saraksts{% if filtered %} (filtrēts){% endif %}{% endblock %}
+{% block content %}
+    <h1>Iesniegumi</h1>
+    <p class="lead">Visi iedzīvotāju iesniegumi, jaunākie augšā.</p>
+
+    <form method="get" action="{{ url_for('saraksts') }}">
+      <fieldset class="filters">
+        <legend>Filtrēt iesniegumus</legend>
+        <div class="filter-row">
+          <div class="field">
+            <label for="statuss">Statuss</label>
+            <select id="statuss" name="statuss">
+              <option value="">Visi statusi</option>
+              {% for s in statusi %}<option value="{{ s }}"{% if s == statuss %} selected{% endif %}>{{ s }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label for="tema">Tēma</label>
+            <select id="tema" name="tema">
+              <option value="">Visas tēmas</option>
+              {% for t in temas %}<option value="{{ t.id }}"{% if tema == t.id|string %} selected{% endif %}>{{ t.nosaukums }}</option>{% endfor %}
+            </select>
+          </div>
+          <div class="field">
+            <label for="q">Meklēt tekstā</label>
+            <input type="search" id="q" name="q" value="{{ q }}" aria-describedby="q-hint">
+            <p id="q-hint" class="hint">Numurs, vārds, vieta vai apraksts.</p>
+          </div>
+          <div class="actions">
+            <button type="submit">Rādīt</button>
+            {% if filtered %}<a href="{{ url_for('saraksts') }}">Notīrīt filtrus</a>{% endif %}
+          </div>
+        </div>
+      </fieldset>
+    </form>
+
+    <div class="table-wrap">
+      <table>
+        <caption>Iesniegumi: {{ rows|length }}{% if filtered %} (filtrēts){% endif %}</caption>
+        <thead>
+          <tr>
+            <th scope="col">Numurs</th>
+            <th scope="col">Datums</th>
+            <th scope="col">Tēma</th>
+            <th scope="col">Iesniedzējs</th>
+            <th scope="col">Statuss</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for r in rows %}
+          <tr>
+            <th scope="row"><a href="{{ url_for('detalas', numurs=r.numurs) }}">Iesniegums {{ r.numurs }}</a></th>
+            <td>{{ fmt_date(r.izveidots) }}</td>
+            <td>{{ r.tema }}</td>
+            <td>{{ r.vards }}</td>
+            <td><span class="status status-{{ status_class(r.statuss) }}">{{ r.statuss }}</span></td>
+          </tr>
+          {% else %}
+          <tr><td colspan="5">Neviens iesniegums neatbilst filtriem.</td></tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+{% endblock %}

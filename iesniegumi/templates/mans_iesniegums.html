@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}{% if error %}Kļūda: {% endif %}Mans iesniegums{% if row %}: {{ row.numurs }}{% endif %}{% endblock %}
+{% block content %}
+    <h1>Mans iesniegums</h1>
+    <p class="lead">Ierakstiet iesnieguma numuru, kas redzams apstiprinājuma lapā. Nekas cits nav vajadzīgs.</p>
+
+    <form method="get" action="{{ url_for('mans_iesniegums') }}" class="card narrow" novalidate>
+      <div class="field">
+        <label for="numurs">Iesnieguma numurs</label>
+        <input type="text" id="numurs" name="numurs" inputmode="numeric" autocomplete="off" value="{{ numurs }}"
+               aria-describedby="numurs-hint{{ ' numurs-kluda' if error }}"{% if error %} aria-invalid="true"{% endif %}>
+        <p id="numurs-hint" class="hint">Piemēram, 2026-0001.</p>
+        {% if error %}<p id="numurs-kluda" class="field-error" role="alert">{{ error }}</p>{% endif %}
+      </div>
+      <button type="submit">Pārbaudīt statusu</button>
+    </form>
+
+    {% if row %}
+    <section class="card narrow" aria-labelledby="rezultats">
+      <h2 id="rezultats">Iesniegums {{ row.numurs }}</h2>
+      <dl class="facts">
+        <dt>Statuss</dt><dd><span class="status status-{{ status_class(row.statuss) }}">{{ row.statuss }}</span></dd>
+        <dt>Tēma</dt><dd>{{ row.tema }}</dd>
+        <dt>Iesniegts</dt><dd>{{ fmt_date(row.izveidots) }}</dd>
+        {% if last %}<dt>Pēdējais notikums</dt><dd>{{ fmt_date(last.laiks) }}: {{ last.apraksts }}</dd>{% endif %}
+      </dl>
+      {% if row.statuss in ("Atbildēts", "Noraidīts") and row.atbilde %}
+      <h3>{{ "Atbilde" if row.statuss == "Atbildēts" else "Noraidījuma pamatojums" }}</h3>
+      <p class="prewrap">{{ row.atbilde }}</p>
+      {% endif %}
+    </section>
+    {% endif %}
+{% endblock %}

@@ -1,0 +1,454 @@
+{
+  "pages": [
+    {
+      "title": "Sākumlapa",
+      "url": "",
+      "page_title": "Sākums: izvēlieties lomu · Ezermalas novada pašvaldība",
+      "headings": [
+        [
+          1,
+          "Iesniegumi pašvaldībai"
+        ],
+        [
+          2,
+          "Kas jūs esat?"
+        ]
+      ],
+      "heading_problems": [],
+      "landmarks": {
+        "banner": true,
+        "navigation": true,
+        "main": 1,
+        "contentinfo": true
+      },
+      "small_targets": [],
+      "fields": []
+    },
+    {
+      "title": "Iesnieguma forma",
+      "url": "iesniegt",
+      "page_title": "Iesniegt iesniegumu · Ezermalas novada pašvaldība",
+      "headings": [
+        [
+          1,
+          "Iesniegt iesniegumu"
+        ]
+      ],
+      "heading_problems": [],
+      "landmarks": {
+        "banner": true,
+        "navigation": true,
+        "main": 1,
+        "contentinfo": true
+      },
+      "small_targets": [],
+      "fields": [
+        {
+          "id": "vards",
+          "name": "Vārds, uzvārds (obligāts)",
+          "required": true,
+          "invalid": false,
+          "description": ""
+        },
+        {
+          "id": "epasts",
+          "name": "E-pasts (obligāts)",
+          "required": true,
+          "invalid": false,
+          "description": "Uz šo adresi nosūtīsim atbildi, piemēram, vards@domens.lv."
+        },
+        {
+          "id": "tema",
+          "name": "Tēma (obligāts)",
+          "required": true,
+          "invalid": false,
+          "description": ""
+        },
+        {
+          "id": "vieta",
+          "name": "Adrese vai vieta (obligāts)",
+          "required": true,
+          "invalid": false,
+          "description": "Piemēram, «Ezera iela 12» vai «pie stacijas stāvlaukuma»."
+        },
+        {
+          "id": "apraksts",
+          "name": "Apraksts (obligāts)",
+          "required": true,
+          "invalid": false,
+          "description": "Kas noticis vai ko lūdzat. Līdz 3000 rakstzīmēm. Lūdzu, nerakstiet personas kodu vai veselības datus, ja tas nav nepieciešams."
+        },
+        {
+          "id": "piekrisana",
+          "name": "Piekrītu, ka pašvaldība apstrādā manus datus iesnieguma izskatīšanai (obligāts)",
+          "required": true,
+          "invalid": false,
+          "description": "Dati tiek izmantoti tikai šī iesnieguma izskatīšanai un atbildes nosūtīšanai."
+        }
+      ]
+    },
+    {
+      "title": "Mans iesniegums",
+      "url": "mans-iesniegums",
+      "page_title": "Mans iesniegums · Ezermalas novada pašvaldība",
+      "headings": [
+        [
+          1,
+          "Mans iesniegums"
+        ]
+      ],
+      "heading_problems": [],
+      "landmarks": {
+        "banner": true,
+        "navigation": true,
+        "main": 1,
+        "contentinfo": true
+      },
+      "small_targets": [],
+      "fields": [
+        {
+          "id": "numurs",
+          "name": "Iesnieguma numurs",
+          "required": false,
+          "invalid": false,
+          "description": "Piemēram, 2026-0001."
+        }
+      ]
+    },
+    {
+      "title": "Paziņojums",
+      "url": "pieklustamiba",
+      "page_title": "Piekļūstamības paziņojums · Ezermalas novada pašvaldība",
+      "headings": [
+        [
+          1,
+          "Piekļūstamības paziņojums"
+        ],
+        [
+          2,
+          "Cik piekļūstama ir šī tīmekļvietne?"
+        ],
+        [
+          2,
+          "Nepiekļūstamais saturs"
+        ],
+        [
+          2,
+          "Pārbaudes rezultāti"
+        ],
+        [
+          2,
+          "Piekļūstamības alternatīvas"
+        ],
+        [
+          2,
+          "Atsauksmēm un saziņai"
+        ],
+        [
+          2,
+          "Sūdzību iesniegšana"
+        ],
+        [
+          2,
+          "Ziņas par paziņojuma sagatavošanu"
+        ]
+      ],
+      "heading_problems": [],
+      "landmarks": {
+        "banner": true,
+        "navigation": true,
+        "main": 1,
+        "contentinfo": true
+      },
+      "small_targets": [],
+      "fields": []
+    },
+    {
+      "title": "Iesnieguma forma ar kļūdām",
+      "url": "iesniegt",
+      "page_title": "Kļūda: Iesniegt iesniegumu · Ezermalas novada pašvaldība",
+      "headings": [
+        [
+          1,
+          "Iesniegt iesniegumu"
+        ],
+        [
+          2,
+          "Formā ir 6 kļūdas"
+        ]
+      ],
+      "heading_problems": [],
+      "landmarks": {
+        "banner": true,
+        "navigation": true,
+        "main": 1,
+        "contentinfo": true
+      },
+      "small_targets": [],
+      "fields": [
+        {
+          "id": "vards",
+          "name": "Vārds, uzvārds (obligāts)",
+          "required": true,
+          "invalid": true,
+          "description": "Ierakstiet savu vārdu un uzvārdu."
+        },
+        {
+          "id": "epasts",
+          "name": "E-pasts (obligāts)",
+          "required": true,
+          "invalid": true,
+          "description": "Uz šo adresi nosūtīsim atbildi, piemēram, vards@domens.lv. Ierakstiet e-pasta adresi, uz kuru sūtīsim atbildi."
+        },
+        {
+          "id": "tema",
+          "name": "Tēma (obligāts)",
+          "required": true,
+          "invalid": true,
+          "description": "Izvēlieties tēmu no saraksta. Ja neviena neder, izvēlieties «Cits»."
+        },
+        {
+          "id": "vieta",
+          "name": "Adrese vai vieta (obligāts)",
+          "required": true,
+          "invalid": true,
+          "description": "Piemēram, «Ezera iela 12» vai «pie stacijas stāvlaukuma». Ierakstiet adresi vai vietas aprakstu, piemēram, «Ezera iela 12» vai «pie stacijas»."
+        },
+        {
+          "id": "apraksts",
+          "name": "Apraksts (obligāts)",
+          "required": true,
+          "invalid": true,
+          "description": "Kas noticis vai ko lūdzat. Līdz 3000 rakstzīmēm. Lūdzu, nerakstiet personas kodu vai veselības datus, ja tas nav nepieciešams. Aprakstiet, kas noticis vai ko lūdzat."
+        },
+        {
+          "id": "piekrisana",
+          "name": "Piekrītu, ka pašvaldība apstrādā manus datus iesnieguma izskatīšanai (obligāts)",
+          "required": true,
+          "invalid": true,
+          "description": "Dati tiek izmantoti tikai šī iesnieguma izskatīšanai un atbildes nosūtīšanai. Atzīmējiet piekrišanu, citādi iesniegumu nevaram reģistrēt."
+        }
+      ]
+    },
+    {
+      "title": "Apstiprinājums",
+      "url": "iesniegts/2026-0011",
+      "page_title": "Iesniegums reģistrēts: 2026-0011 · Ezermalas novada pašvaldība",
+      "headings": [
+        [
+          1,
+          "Iesniegums reģistrēts"
+        ],
+        [
+          2,
+          "Kas notiks tālāk"
+        ]
+      ],
+      "heading_problems": [],
+      "landmarks": {
+        "banner": true,
+        "navigation": true,
+        "main": 1,
+        "contentinfo": true
+      },
+      "small_targets": [],
+      "fields": []
+    },
+    {
+      "title": "Saraksts",
+      "url": "darbinieks/iesniegumi",
+      "page_title": "Iesniegumu saraksts · Ezermalas novada pašvaldība",
+      "headings": [
+        [
+          1,
+          "Iesniegumi"
+        ]
+      ],
+      "heading_problems": [],
+      "landmarks": {
+        "banner": true,
+        "navigation": true,
+        "main": 1,
+        "contentinfo": true
+      },
+      "small_targets": [],
+      "fields": [
+        {
+          "id": "statuss",
+          "name": "Statuss",
+          "required": false,
+          "invalid": false,
+          "description": ""
+        },
+        {
+          "id": "tema",
+          "name": "Tēma",
+          "required": false,
+          "invalid": false,
+          "description": ""
+        },
+        {
+          "id": "q",
+          "name": "Meklēt tekstā",
+          "required": false,
+          "invalid": false,
+          "description": "Numurs, vārds, vieta vai apraksts."
+        }
+      ]
+    },
+    {
+      "title": "Detaļas",
+      "url": "darbinieks/iesniegumi/2026-0006",
+      "page_title": "Iesniegums 2026-0006 · Ezermalas novada pašvaldība",
+      "headings": [
+        [
+          1,
+          "Iesniegums 2026-0006"
+        ],
+        [
+          2,
+          "Iesnieguma dati"
+        ],
+        [
+          3,
+          "Apraksts"
+        ],
+        [
+          2,
+          "Statuss un atbilde"
+        ],
+        [
+          2,
+          "MI ieteikums"
+        ],
+        [
+          3,
+          "Atbildes projekts"
+        ],
+        [
+          2,
+          "Pievienot komentāru"
+        ],
+        [
+          2,
+          "Vēsture"
+        ]
+      ],
+      "heading_problems": [],
+      "landmarks": {
+        "banner": true,
+        "navigation": true,
+        "main": 1,
+        "contentinfo": true
+      },
+      "small_targets": [],
+      "fields": [
+        {
+          "id": "komentars",
+          "name": "Iekšējs komentārs (iedzīvotājs to neredz)",
+          "required": false,
+          "invalid": false,
+          "description": ""
+        }
+      ]
+    },
+    {
+      "title": "Detaļas pēc statusa maiņas",
+      "url": "darbinieks/iesniegumi/2026-0006?pazinojums=statuss#pazinojums",
+      "page_title": "Statuss nomainīts uz «Apstrādē»: Iesniegums 2026-0006 · Ezermalas novada pašvaldība",
+      "headings": [
+        [
+          1,
+          "Iesniegums 2026-0006"
+        ],
+        [
+          2,
+          "Iesnieguma dati"
+        ],
+        [
+          3,
+          "Apraksts"
+        ],
+        [
+          2,
+          "Statuss un atbilde"
+        ],
+        [
+          2,
+          "MI ieteikums"
+        ],
+        [
+          3,
+          "Atbildes projekts"
+        ],
+        [
+          2,
+          "Pievienot komentāru"
+        ],
+        [
+          2,
+          "Vēsture"
+        ]
+      ],
+      "heading_problems": [],
+      "landmarks": {
+        "banner": true,
+        "navigation": true,
+        "main": 1,
+        "contentinfo": true
+      },
+      "small_targets": [],
+      "fields": [
+        {
+          "id": "atbilde",
+          "name": "Atbilde iedzīvotājam vai noraidījuma pamatojums",
+          "required": false,
+          "invalid": false,
+          "description": "Teksts tiek nosūtīts iedzīvotājam tikai tad, kad nospiežat «Nosūtīt atbildi» vai «Noraidīt»."
+        },
+        {
+          "id": "komentars",
+          "name": "Iekšējs komentārs (iedzīvotājs to neredz)",
+          "required": false,
+          "invalid": false,
+          "description": ""
+        }
+      ],
+      "status_region": "Statuss nomainīts uz «Apstrādē».",
+      "focused_after_reload": "div#pazinojums"
+    },
+    {
+      "title": "Pārskats",
+      "url": "vaditajs/parskats",
+      "page_title": "Pārskats vadītājam · Ezermalas novada pašvaldība",
+      "headings": [
+        [
+          1,
+          "Pārskats vadītājam"
+        ],
+        [
+          2,
+          "Pa statusiem"
+        ],
+        [
+          2,
+          "Pa tēmām"
+        ],
+        [
+          2,
+          "Diagramma: iesniegumi pa tēmām"
+        ]
+      ],
+      "heading_problems": [],
+      "landmarks": {
+        "banner": true,
+        "navigation": true,
+        "main": 1,
+        "contentinfo": true
+      },
+      "small_targets": [],
+      "fields": []
+    }
+  ],
+  "duplicate_titles": []
+}

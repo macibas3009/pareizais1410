@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="lv">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>{% block title %}{% endblock %} · Ezermalas novada pašvaldība</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <a class="skip-link" href="#saturs">Pāriet uz saturu</a>
+  <header class="topbar">
+    <a class="brand" href="{{ url_for('sakums') }}">
+      <svg class="brand-mark" viewBox="0 0 40 40" aria-hidden="true">
+        <circle cx="20" cy="20" r="19" fill="#176a82"/>
+        <circle cx="26" cy="15" r="5" fill="#ffd99a"/>
+        <path d="M7 24 q4.3-3 8.6 0 t8.6 0 t8.6 0" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>
+        <path d="M10 29.5 q3.3-2.4 6.6 0 t6.6 0 t6.6 0" fill="none" stroke="#fff" stroke-opacity="0.7" stroke-width="2" stroke-linecap="round"/>
+      </svg>
+      <span>Ezermalas novada pašvaldība<small>Iesniegumi</small></span>
+    </a>
+    {% set links = [("iesniegt", "Iesniegt iesniegumu"), ("mans_iesniegums", "Mans iesniegums")] %}
+    {% if loma in ("darbinieks", "vaditajs") %}{% set links = links + [("saraksts", "Iesniegumi")] %}{% endif %}
+    {% if loma == "vaditajs" %}{% set links = links + [("parskats", "Pārskats")] %}{% endif %}
+    <nav aria-label="Galvenā navigācija">
+      {% for endpoint, text in links %}
+      {% if endpoint in endpoints %}
+      <a href="{{ url_for(endpoint) }}"{% if request.endpoint == endpoint %} aria-current="page"{% endif %}>{{ text }}</a>
+      {% endif %}
+      {% endfor %}
+    </nav>
+    <div class="role-box">
+      {% if loma %}
+      <span>Loma: <strong>{{ lomas[loma] }}</strong></span>
+      <form method="post" action="{{ url_for('iziet') }}"><button type="submit" class="btn-ghost">Mainīt lomu</button></form>
+      {% else %}
+      <a href="{{ url_for('sakums') }}">Izvēlēties lomu</a>
+      {% endif %}
+    </div>
+  </header>
+  <p class="training-note">Mācību režīms: loma tiek izvēlēta bez paroles, dati ir izdomāti.</p>
+  <main id="saturs" tabindex="-1">
+{% block content %}{% endblock %}
+  </main>
+  <footer class="footer">
+    <p>Ezermalas novada pašvaldība · Ezera iela 1, Ezermala · tālrunis 60000000 · iesniegumi@ezermala.example</p>
+    <p><a href="{{ url_for('pieklustamiba') if 'pieklustamiba' in endpoints else '#' }}">Piekļūstamības paziņojums</a></p>
+    <p class="credit">Foto: Usmas ezers, <a href="https://commons.wikimedia.org/wiki/File:Usmas_ezers,_2015.jpg">WikedKentaur</a>, <a href="https://creativecommons.org/licenses/by-sa/4.0/deed.lv">CC BY-SA 4.0</a></p>
+  </footer>
+{% block scripts %}{% endblock %}
+</body>
+</html>

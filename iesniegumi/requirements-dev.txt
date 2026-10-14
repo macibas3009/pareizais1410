@@ -1,0 +1,4 @@
+pytest
+playwright
+axe-playwright-python
+python-pptx

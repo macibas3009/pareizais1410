@@ -1,0 +1,224 @@
+/* «Iesniegumi» · stils. WCAG 2.2 AA: kontrasts ≥ 4.5:1, redzams fokuss, galvene nav fiksēta (2.4.11), mērķi ≥ 24 px (2.5.8). */
+
+:root {
+  --lake-900: #0a2f3e;
+  --lake-700: #11566b;
+  --lake-600: #176a82;
+  --lake-500: #1f8aa6;
+  --lake-100: #e3f1f4;
+  --bar: #0b7fa3;          /* diagrammas joslas; pārbaudīts ≥ 3:1 pret fonu */
+  --sand-50: #faf7f1;
+  --sand-200: #ece4d4;
+  --ink: #17262e;
+  --muted: #56666f;
+  --border: #b9c6cc;
+  --danger: #a3281b;
+  --danger-bg: #fdecea;
+  --ok: #1d6647;
+  --ok-bg: #e5f4ec;
+  --warn: #7a4300;
+  --warn-bg: #fff1d6;
+  --ai: #5b3391;
+  --ai-bg: #f3edfa;
+  --radius: 10px;
+}
+
+* { box-sizing: border-box; }
+html { font-size: 100%; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", Roboto, "DejaVu Sans", sans-serif;
+  line-height: 1.5;
+  color: var(--ink);
+  background: var(--sand-50);
+}
+
+a { color: var(--lake-600); text-decoration: underline; text-underline-offset: 0.18em; }
+a:hover { text-decoration-thickness: 2px; }
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible,
+summary:focus-visible, main:focus-visible, .error-summary:focus {
+  outline: 3px solid var(--lake-500);
+  outline-offset: 2px;
+}
+main:focus { outline: none; }
+
+.visually-hidden {
+  position: absolute !important; width: 1px; height: 1px; margin: -1px; padding: 0; border: 0;
+  overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap;
+}
+
+.skip-link {
+  position: absolute; left: 1rem; top: -3rem; z-index: 10;
+  padding: 0.6rem 1rem; border-radius: 6px; background: var(--lake-900); color: #fff;
+}
+.skip-link:focus { top: 1rem; }
+
+/* --- Galvene (nav fiksēta) --------------------------------------------------------- */
+
+.topbar {
+  display: flex; flex-wrap: wrap; align-items: center; gap: 0.75rem 1.5rem;
+  padding: 0.75rem 1.5rem; background: #fff; border-bottom: 1px solid var(--sand-200);
+}
+.brand { display: flex; align-items: center; gap: 0.6rem; color: var(--lake-900); font-weight: 700; text-decoration: none; }
+.brand small { display: block; font-weight: 400; font-size: 0.8rem; color: var(--muted); }
+.brand-mark { width: 40px; height: 40px; flex: none; }
+.topbar nav { display: flex; flex-wrap: wrap; gap: 0.25rem 1rem; }
+.topbar nav a { color: var(--ink); text-decoration: none; padding: 0.3rem 0; border-bottom: 2px solid transparent; }
+.topbar nav a:hover { text-decoration: underline; }
+.topbar nav a[aria-current="page"] { border-bottom-color: var(--lake-600); color: var(--lake-700); font-weight: 600; }
+.role-box { margin-left: auto; display: flex; align-items: center; gap: 0.75rem; font-size: 0.92rem; }
+.role-box form { margin: 0; }
+.role-box a { display: inline-block; padding: 0.35rem 0.2rem; } /* 2.5.8: ≥ 24 px augsts mērķis */
+.training-note { margin: 0; padding: 0.35rem 1.5rem; background: var(--warn-bg); color: var(--warn); font-size: 0.85rem; }
+
+main { display: block; max-width: 1100px; margin: 0 auto; padding: 1.5rem 1.5rem 3rem; }
+
+.footer { border-top: 1px solid var(--sand-200); padding: 1rem 1.5rem; color: var(--muted); font-size: 0.88rem; text-align: center; }
+.footer p { margin: 0.2rem 0; }
+
+/* --- Teksts un bloki -------------------------------------------------------------- */
+
+h1 { font-size: 1.9rem; line-height: 1.25; color: var(--lake-900); margin: 0.5rem 0 0.5rem; }
+h2 { font-size: 1.25rem; color: var(--lake-900); margin: 0 0 0.75rem; }
+.lead { color: var(--muted); margin: 0 0 1.5rem; }
+.meta { color: var(--muted); font-size: 0.88rem; }
+
+.card { background: #fff; border: 1px solid var(--sand-200); border-radius: var(--radius); padding: 1.25rem 1.4rem; margin-bottom: 1.25rem; }
+.narrow { max-width: 640px; }
+.grid-2 { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.25rem; }
+.grid-2 > * { min-width: 0; }
+
+.alert { padding: 0.75rem 1rem; border-radius: 8px; margin: 0 0 1.25rem; }
+.alert.error { background: var(--danger-bg); color: var(--danger); }
+.alert.ok { background: var(--ok-bg); color: var(--ok); }
+.alert.info { background: var(--lake-100); color: var(--lake-900); }
+
+/* --- Sākumlapa -------------------------------------------------------------------- */
+
+.hero {
+  position: relative; border-radius: 14px; overflow: hidden; min-height: 200px; margin-bottom: 1.5rem;
+  display: flex; align-items: flex-end; color: #fff;
+  background: var(--lake-900) url("usmas-ezers.jpg") center 58% / cover no-repeat;
+}
+/* 1.4.3: teksta zonā (līdz ~60 % platuma) pārklājums ≥ 0.62 → sliktākajā gadījumā (balts pikselis fotogrāfijā)
+   fons ≈ rgb(108,120,126), kontrasts ar baltu ≈ 4.6:1. Aprēķins: docs/pieejamibas-atskaite.md, atradums #4 */
+.hero::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(10,30,40,.85), rgba(10,30,40,.62) 60%, rgba(10,30,40,.2)); }
+.hero-inner { position: relative; padding: 1.75rem 2rem; max-width: 34rem; text-shadow: 0 1px 8px rgba(0,0,0,.45); }
+.hero h1 { color: #fff; margin: 0 0 0.4rem; }
+.hero p { margin: 0; }
+
+.role-form fieldset { border: 0; padding: 0; margin: 0; }
+.role-form legend { padding: 0; }
+.role-cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1rem; }
+.role-card {
+  display: flex; flex-direction: column; gap: 0.35rem; text-align: left; cursor: pointer;
+  padding: 1.25rem; min-height: 6rem; border: 2px solid var(--border); border-radius: var(--radius);
+  background: #fff; font: inherit; color: inherit;
+}
+.role-card strong { font-size: 1.15rem; color: var(--lake-700); }
+.role-card span { color: var(--muted); }
+.role-card:hover { border-color: var(--lake-500); background: var(--lake-100); }
+
+/* --- Formas ----------------------------------------------------------------------- */
+
+.field { margin-bottom: 1.15rem; }
+label, .label { display: block; margin-bottom: 0.35rem; font-weight: 600; }
+.req { font-weight: 400; color: var(--muted); }
+input[type=text], input[type=email], input[type=search], select, textarea {
+  width: 100%; padding: 0.65rem 0.75rem; border: 1px solid var(--border); border-radius: 8px;
+  font: inherit; color: inherit; background: #fff;
+}
+textarea { resize: vertical; }
+input:focus, select:focus, textarea:focus { border-color: var(--lake-500); }
+[aria-invalid="true"] { border-color: var(--danger) !important; border-width: 2px !important; }
+.hint { margin-top: 0.3rem; font-size: 0.88rem; color: var(--muted); }
+.field-error { margin-top: 0.3rem; font-size: 0.92rem; color: var(--danger); font-weight: 600; }
+.field-error::before { content: "Kļūda: "; }
+.check { display: flex; gap: 0.6rem; align-items: flex-start; font-weight: 400; }
+.check input { width: 1.5rem; height: 1.5rem; margin-top: 0.05rem; flex: none; accent-color: var(--lake-600); } /* 2.5.8: ≥ 24×24 px */
+
+.error-summary { border: 2px solid var(--danger); background: var(--danger-bg); border-radius: 8px; padding: 1rem 1.2rem; margin-bottom: 1.5rem; }
+.error-summary h2 { color: var(--danger); font-size: 1.1rem; margin: 0 0 0.4rem; }
+.error-summary ul { margin: 0; padding-left: 1.2rem; }
+.error-summary a { color: var(--danger); font-weight: 600; }
+
+button, .btn {
+  display: inline-block; min-height: 2.75rem; padding: 0.6rem 1.25rem; border: 0; border-radius: 8px;
+  background: var(--lake-600); color: #fff; font: inherit; font-weight: 600; cursor: pointer; text-decoration: none;
+}
+button:hover, .btn:hover { background: var(--lake-700); }
+.btn-ghost { background: #fff; color: var(--lake-700); border: 1px solid var(--border); min-height: 2.25rem; padding: 0.35rem 0.8rem; }
+.btn-ghost:hover { background: var(--lake-100); }
+.btn-small { min-height: 2.25rem; padding: 0.35rem 0.9rem; font-size: 0.92rem; }
+.btn-ai { background: var(--ai); }
+.btn-ai:hover { background: #462774; }
+.actions { display: flex; flex-wrap: wrap; gap: 0.75rem; align-items: center; }
+
+fieldset.filters { border: 1px solid var(--sand-200); border-radius: var(--radius); padding: 1rem 1.2rem; margin: 0 0 1.25rem; background: #fff; }
+fieldset.filters legend { font-weight: 700; padding: 0 0.3rem; }
+.filter-row { display: flex; flex-wrap: wrap; gap: 1rem; align-items: flex-end; }
+.filter-row .field { margin: 0; flex: 1 1 12rem; }
+
+/* --- Tabulas un statuss ------------------------------------------------------------- */
+
+.table-wrap { overflow-x: auto; position: relative; }
+table { width: 100%; border-collapse: collapse; background: #fff; }
+caption { text-align: left; font-weight: 700; padding: 0 0 0.5rem; color: var(--lake-900); }
+th, td { text-align: left; padding: 0.6rem 0.6rem; border-bottom: 1px solid var(--sand-200); vertical-align: top; }
+thead th { font-size: 0.85rem; color: var(--muted); text-transform: uppercase; letter-spacing: 0.03em; }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+.status { display: inline-block; padding: 0.1rem 0.6rem; border-radius: 999px; font-size: 0.85rem; font-weight: 700; border: 1px solid transparent; }
+.status::before { content: ""; display: inline-block; width: 0.55em; height: 0.55em; border-radius: 50%; margin-right: 0.35em; background: currentColor; vertical-align: 0.05em; }
+.status-jauns { background: var(--lake-100); color: var(--lake-700); }
+.status-apstrade { background: var(--warn-bg); color: var(--warn); }
+.status-atbildets { background: var(--ok-bg); color: var(--ok); }
+.status-noraidits { background: var(--danger-bg); color: var(--danger); }
+
+.timeline { list-style: none; margin: 0; padding: 0; border-left: 3px solid var(--lake-100); }
+.timeline li { position: relative; padding: 0 0 1rem 1.2rem; }
+.timeline li::before { content: ""; position: absolute; left: -8px; top: 0.4rem; width: 13px; height: 13px; border-radius: 50%; background: var(--lake-500); border: 2px solid #fff; }
+
+.facts { display: grid; grid-template-columns: max-content minmax(0, 1fr); gap: 0.4rem 1.25rem; margin: 0; }
+.facts dt { color: var(--muted); }
+.facts dd { margin: 0; font-weight: 600; overflow-wrap: anywhere; }
+.prewrap { white-space: pre-wrap; overflow-wrap: anywhere; }
+
+/* --- MI bloks ---------------------------------------------------------------------- */
+
+.ai-block { border: 2px dashed #b9a6d6; background: var(--ai-bg); border-radius: var(--radius); padding: 1.1rem 1.25rem; margin-bottom: 1.25rem; }
+.ai-block h2 { color: var(--ai); }
+.ai-label { display: inline-block; background: var(--ai); color: #fff; font-weight: 700; font-size: 0.85rem; padding: 0.15rem 0.6rem; border-radius: 999px; margin-bottom: 0.6rem; }
+
+/* --- Diagramma --------------------------------------------------------------------- */
+
+.chart { margin: 0; }
+.chart svg { width: 100%; height: auto; }
+.chart figcaption { color: var(--muted); font-size: 0.88rem; margin-top: 0.4rem; }
+.bar { fill: var(--bar); }
+.grid { stroke: #dde4e6; }
+.baseline { stroke: #8a9ba1; }
+.tick, .bar-label, .bar-value { font-size: 13px; fill: var(--ink); font-family: inherit; }
+.tick { fill: var(--muted); }
+.bar-value { font-weight: 700; }
+.stats { list-style: none; margin: 0 0 1.25rem; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr)); gap: 1rem; }
+.stat { background: #fff; border: 1px solid var(--sand-200); border-left: 5px solid var(--lake-500); border-radius: var(--radius); padding: 1rem 1.2rem; }
+.stat-value { display: block; font-size: 1.9rem; font-weight: 700; color: var(--lake-900); }
+.stat-label { color: var(--muted); }
+
+/* --- Šauri ekrāni (1.4.10 reflow) ------------------------------------------------- */
+
+@media (max-width: 760px) {
+  .role-cards, .grid-2 { grid-template-columns: minmax(0, 1fr); }
+  .topbar { padding: 0.6rem 1rem; }
+  .role-box { margin-left: 0; }
+  main { padding: 1rem 1rem 2rem; }
+  .facts { grid-template-columns: minmax(0, 1fr); }
+  .facts dd { margin-bottom: 0.5rem; }
+  .hero-inner { padding: 1.25rem; }
+  .hero::before { background: rgba(10,30,40,.66); } /* teksts aizņem visu platumu → vienmērīgs pārklājums, ≥ 4.5:1 */
+}
+
+.big-number { font-size: 1.3rem; }
+.big-number strong { font-size: 1.6rem; color: var(--lake-900); letter-spacing: 0.02em; }
+h3 { font-size: 1.05rem; color: var(--lake-900); margin: 1rem 0 0.4rem; }

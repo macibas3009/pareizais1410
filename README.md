@@ -45,3 +45,32 @@ Sākotnējā līguma versija šo pārbaudi neiztur apzināti. Uzdevums ir pabeig
 | `make verify-setup` | Pārbauda Python, kursa pakotnes, Claude Code, saglabāto atbildi un smoke testus |
 | `make test` | Palaiž visus `pytest` testus |
 | `make lint-contract` | Validē OpenAPI dokumentu un kursa līguma noteikumus |
+
+## CRM prototips (Ezermalas novada pašvaldība)
+
+Šajā repozitorijā ir arī mācību CRM mazai iestādei: Flask + Jinja2 + SQLite, servera pusē renderēts HTML,
+kas strādā bez JavaScript. Visi dati ir sintētiski.
+
+```bash
+make install      # Flask (requirements.txt)
+make seed         # sintētiski sākumdati: 4 lietotāji, 10 organizācijas, 20 kontakti, 30 mijiedarbības
+make run          # http://localhost:8000/login
+```
+
+Testa lietotāji (parole `app/seed.py` vai vides mainīgajā `SEED_PASSWORD`): `darbinieks@example.com`,
+`darbinieks2@example.com`, `vaditajs@example.com`, `admin@example.com`.
+
+| Komanda | Nozīme |
+|---|---|
+| `make test` | Visi `pytest` testi, arī CRM pieņemšanas kritēriji |
+| `make install-dev` | Playwright, Chromium un axe pārbaudēm (`requirements-dev.txt`) |
+| `make a11y` | Piekļūstamības pārbaude (axe-core, 320 px, 200 %, tastatūra) → `docs/a11y-rezultati.json` → lapa `/pieklustamiba` |
+| `make ekranu-karte` | Atjauno `docs/ekranu-karte.png` no `docs/ekranu-karte.html` |
+| `make users`, `make role EMAIL=… ROLE=…` | Lomu pārvaldība no termināļa (rezerves variants; ikdienā to dara administrators lapā `/lietotaji`) |
+
+MI-1 kopsavilkums strādā bez ārēja pakalpojuma (atslēgvārdu imitācija). Lai izmantotu Claude API:
+`pip install anthropic` un vides mainīgais `ANTHROPIC_API_KEY` (modelis: `MI_MODEL`, noklusēti `claude-opus-5-5`).
+
+Dokumentācija: [prasību saraksts](docs/prasibu-saraksts.md) (ar izpildes statusu) ·
+[ekrānu karte](docs/ekranu-karte.md) · [vadības panelis](docs/vadibas-panelis.md) ·
+[MI-2 klasifikācija](docs/mi2-klasifikacija.md) · [realizācijas plāns](docs/realizacijas-plans.md)

@@ -1,15 +1,29 @@
 # CRM realizācijas plāns
 
-> Versija 1.0 · 2026-10-14 · Saistītie dokumenti: [prasību saraksts](prasibu-saraksts.md) ·
+> Versija 1.1 · 2026-10-14 · Saistītie dokumenti: [prasību saraksts](prasibu-saraksts.md) ·
 > [ekrānu karte](ekranu-karte.md) · [vadības panelis](vadibas-panelis.md)
 
-## 1. Kur esam
+## 1. Kur esam (pēc 7. posma)
 
 | Gatavs ✅ | Daļēji 🟡 | Vēl nav ⬜ |
 |---|---|---|
-| F0 Pieslēgšanās un lomas · F1 Organizācijas | F9 Panelis (3/7) · N2 Personas dati · N3 Lomas · N4 Tehnoloģijas | F2 · F3 · F4 · F5 · F6 · F7 · F8 · MI-1 · MI-2 · N1 |
+| F0 · F1 · F2 · F3 · F4 · F5 · F6 · F7 · F9 · MI-1 · MI-2 · N2 · N3 | F8 un N1 (gaida manuālo NVDA testu) · N4 (1,5 h netika ievērotas) | — |
 
-Lietotne: Flask + Jinja2 + SQLite, 68 automātiskie testi, 11 gatavi ekrāni no 24 (sk. ekrānu karti).
+Lietotne: Flask + Jinja2 + SQLite, 154 automātiskie testi, `make a11y` bez pārkāpumiem 23 lapās,
+25 no 26 ekrānu kartes blokiem gatavi (sk. [ekrānu karti](ekranu-karte.md)).
+
+| Posms | Prasības | Zars | Rezultāts |
+|---|---|---|---|
+| 1 | F0, F1 (+ F9, N4) | `f0-lomas` | ✅ |
+| 2 | F2, N2 | `crm-2-kontakti` | ✅ (+ apstiprinājums pirms dzēšanas) |
+| 3 | F3, MI-1 | `crm-3-mijiedarbibas` | ✅ (Claude ceļš nav pārbaudīts ar īstu atslēgu) |
+| 4 | F4, F5 | `crm-4-pieprasijumi` | ✅ |
+| 5 | F6, F7, F9 | `crm-5-meklesana-parskats` | ✅ (+ 320 px labojumi) |
+| 6 | N1, F8, MI-2, N3 | `crm-6-pieklustamiba` | 🟡 NVDA tests jāveic cilvēkam |
+| 7 | Noslēgums | `crm-7-nosleguma` | ✅ README, statusi, PR |
+
+**Cilvēkam vēl jāizdara:** manuālais tests ar NVDA (ierakstīt F8 lapā), `setup/claude-answer.md` (A0, bez tā CI neiziet),
+`tracker/CR-4.md`, PR pārskatīšana un apvienošana. Pēc izvēles: pārbaudīt MI-1 ar īstu `ANTHROPIC_API_KEY`.
 
 ## 2. Darba kārtība katrā posmā
 

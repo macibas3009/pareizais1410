@@ -3,6 +3,7 @@
   "image": "ghcr.io/mleitass/m1-devcontainer:2026-09-29",
   "hostRequirements": { "cpus": 2 },
   "forwardPorts": [8000, 8001],
+  "postCreateCommand": "pip install -r requirements.txt",
   "portsAttributes": {
     "8000": { "label": "API — Swagger UI: /docs", "onAutoForward": "notify" },
     "8001": { "label": "Mock OMD", "onAutoForward": "silent" }

@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% import "_forms.html" as f %}
+{% set editing = org is not none %}
+{% block title %}{% if errors %}Kļūda: {% endif %}{{ "Labot organizāciju" if editing else "Jauna organizācija" }}{% endblock %}
+{% block content %}
+    <nav class="breadcrumbs" aria-label="Atrašanās vieta">
+      <a href="/organizacijas">Organizācijas</a> <span aria-hidden="true">›</span>
+      {% if editing %}<a href="/organizacijas/{{ org.id }}">{{ org.name }}</a> <span aria-hidden="true">›</span> <span aria-current="page">Labot</span>
+      {% else %}<span aria-current="page">Jauna</span>{% endif %}
+    </nav>
+
+    <div class="page-head">
+      <h1>{{ "Labot: " ~ org.name if editing else "Jauna organizācija" }}</h1>
+      <p class="sub">Visi lauki ir obligāti.</p>
+    </div>
+
+    <section class="block form-block">
+{{ f.error_summary(errors, labels) }}
+      <form method="post" action="{{ '/organizacijas/' ~ org.id ~ '/labot' if editing else '/organizacijas/jauna' }}" novalidate>
+{{ f.input("name", labels.name, errors, values, autocomplete="organization", placeholder="SIA Piemērs") }}
+{{ f.input("reg_no", labels.reg_no, errors, values, inputmode="numeric", placeholder="40003000001", hint="11 cipari") }}
+{{ f.select("kind", labels.kind, errors, values, kinds_options) }}
+        {% if user.role == "vaditajs" %}
+{{ f.select("responsible_id", labels.responsible_id, errors, values, staff_options) }}
+        {% else %}
+        <div class="field">
+          <span class="label">{{ labels.responsible_id }}</span>
+          <p class="readonly">{{ (org.responsible if editing else user.full_name) }}</p>
+          <p class="hint">Atbildīgo var mainīt vadītājs.</p>
+        </div>
+        {% endif %}
+        <div class="form-actions">
+          <button type="submit">{{ "Saglabāt izmaiņas" if editing else "Izveidot organizāciju" }}</button>
+          <a class="btn-link" href="{{ '/organizacijas/' ~ org.id if editing else '/organizacijas' }}">Atcelt</a>
+        </div>
+      </form>
+    </section>
+{% endblock %}

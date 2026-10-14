@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Organizācijas{% endblock %}
+{% block content %}
+    <div class="page-head page-head-row">
+      <div>
+        <h1>Organizācijas</h1>
+        <p class="sub">Uzņēmumi, NVO un pašvaldības, ar kurām iestāde sadarbojas.</p>
+      </div>
+      <a class="btn" href="/organizacijas/jauna">Pievienot organizāciju</a>
+    </div>
+
+    <form method="get" action="/organizacijas" class="filters" aria-label="Filtrēt organizācijas">
+      <div class="field">
+        <label for="veids">Veids</label>
+        <select id="veids" name="veids">
+          <option value="">Visi veidi</option>
+          {% for k in kinds %}<option value="{{ k }}"{% if kind == k %} selected{% endif %}>{{ k }}</option>{% endfor %}
+        </select>
+      </div>
+      <div class="field">
+        <label for="atbildigais">Atbildīgais</label>
+        <select id="atbildigais" name="atbildigais">
+          <option value="">Visi darbinieki</option>
+          <option value="mani"{% if responsible == "mani" %} selected{% endif %}>Tikai manas</option>
+          {% for s in staff %}<option value="{{ s.id }}"{% if responsible == s.id|string %} selected{% endif %}>{{ s.full_name }}</option>{% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn-small">Filtrēt</button>
+      {% if kind or responsible %}<a class="btn-link" href="/organizacijas">Notīrīt filtrus</a>{% endif %}
+    </form>
+
+    <section class="block">
+      {% if rows %}
+      <div class="table-wrap">
+        <table>
+          <caption>Organizācijas: {{ rows|length }}{% if kind or responsible %} (filtrēts){% endif %}</caption>
+          <thead>
+            <tr>
+              <th scope="col">Nosaukums</th>
+              <th scope="col">Reģ. nr.</th>
+              <th scope="col">Veids</th>
+              <th scope="col">Atbildīgais</th>
+              <th scope="col">Atvērti pieprasījumi</th>
+              <th scope="col">Pēdējā mijiedarbība</th>
+            </tr>
+          </thead>
+          <tbody>
+            {% for o in rows %}
+            <tr>
+              <th scope="row"><a href="/organizacijas/{{ o.id }}">{{ o.name }}</a></th>
+              <td>{{ o.reg_no }}</td>
+              <td>{{ o.kind }}</td>
+              <td>{{ o.responsible }}{% if o.responsible_id == user.id %} <span class="meta">(es)</span>{% endif %}</td>
+              <td>{{ o.open_requests }}</td>
+              <td>{{ fmt_date(o.last_interaction) if o.last_interaction else "—" }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="empty">Neviena organizācija neatbilst filtriem.</p>
+      {% endif %}
+    </section>
+{% endblock %}

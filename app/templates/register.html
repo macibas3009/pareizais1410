@@ -1,0 +1,36 @@
+{% extends "auth_base.html" %}
+{% import "_forms.html" as f %}
+{% block title %}{% if errors %}Kļūda: {% endif %}Reģistrēties{% endblock %}
+
+{% block card %}
+      <h1>Izveidot kontu</h1>
+      <p class="sub">Reģistrējieties, lai iesniegtu iesniegumus pašvaldībai.</p>
+
+{{ f.error_summary(errors, field_labels) }}
+
+      <form method="post" action="/register" novalidate>
+{{ f.input("fullName", "Vārds, uzvārds", errors, values, autocomplete="name", placeholder="Jānis Bērziņš") }}
+{{ f.input("email", "E-pasts", errors, values, type="email", autocomplete="email", placeholder="vards@example.com") }}
+{{ f.radios("requested_role", "Kādu lomu pieprasāt?", errors, values, [
+     ("darbinieks", "Darbinieks", "Strādāju ar savām organizācijām un pieprasījumiem"),
+     ("vaditajs", "Vadītājs", "Redzu visu iestādi un pārskatu"),
+   ], hint="Lomu apstiprina administrators. Līdz tam konts gaida apstiprinājumu.") }}
+{{ f.input("password", "Parole", errors, values, type="password", autocomplete="new-password",
+           hint="Parolei jābūt vismaz " ~ password_min ~ " rakstzīmes garai") }}
+{{ f.input("password2", "Parole vēlreiz", errors, values, type="password", autocomplete="new-password") }}
+        <button type="submit">Izveidot kontu</button>
+      </form>
+
+      <p class="switch">Jau ir konts? <a href="/login">Pieslēgties</a></p>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Tikai uzlabojums (N1): forma strādā arī bez JavaScript
+  const password = document.getElementById("password");
+  const rule = document.getElementById("password-hint");
+  password.addEventListener("input", () => {
+    rule.classList.toggle("met", password.value.length >= {{ password_min }});
+  });
+</script>
+{% endblock %}

@@ -1,0 +1,70 @@
+{# Kopīgi formu elementi (N1): label, kļūda pie lauka ar aria-describedby, kļūdu kopsavilkums ar saitēm. #}
+
+{% macro error_summary(errors, labels) %}
+{% if errors %}
+      <div class="alert error error-summary" role="alert">
+        <h2>{{ "Lūdzu, izlabojiet kļūdu" if errors|length == 1 else "Lūdzu, izlabojiet " ~ errors|length ~ " kļūdas" }}</h2>
+        <ul>
+          {% for name, message in errors.items() %}
+          <li><a href="#{{ name }}">{{ labels[name] }}: {{ message }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+{% endif %}
+{% endmacro %}
+
+{% macro _describedby(name, errors, hint) -%}
+  {%- set ids = [] -%}
+  {%- if hint %}{% set _ = ids.append(name ~ "-hint") %}{% endif -%}
+  {%- if errors.get(name) %}{% set _ = ids.append(name ~ "-error") %}{% endif -%}
+  {%- if ids %} aria-describedby="{{ ids | join(' ') }}"{% endif -%}
+  {%- if errors.get(name) %} aria-invalid="true"{% endif -%}
+{%- endmacro %}
+
+{% macro _messages(name, errors, hint) %}
+          {%- if hint %}
+          <div id="{{ name }}-hint" class="hint"><span class="dot" aria-hidden="true"></span>{{ hint }}</div>
+          {%- endif %}
+          {%- if errors.get(name) %}
+          <div id="{{ name }}-error" class="field-error">{{ errors[name] }}</div>
+          {%- endif %}
+{%- endmacro %}
+
+{% macro input(name, label, errors, values, type="text", autocomplete="", placeholder="", hint="", inputmode="") %}
+        <div class="field">
+          <label for="{{ name }}">{{ label }}</label>
+          <input id="{{ name }}" name="{{ name }}" type="{{ type }}" required
+                 {%- if autocomplete %} autocomplete="{{ autocomplete }}"{% endif %}
+                 {%- if placeholder %} placeholder="{{ placeholder }}"{% endif %}
+                 {%- if inputmode %} inputmode="{{ inputmode }}"{% endif %}
+                 {%- if type != "password" %} value="{{ values.get(name) or '' }}"{% endif %}
+                 {{- _describedby(name, errors, hint) }}>
+{{ _messages(name, errors, hint) }}
+        </div>
+{% endmacro %}
+
+{% macro select(name, label, errors, values, options, placeholder="— izvēlieties —") %}
+        <div class="field">
+          <label for="{{ name }}">{{ label }}</label>
+          <select id="{{ name }}" name="{{ name }}" required{{ _describedby(name, errors, "") }}>
+            <option value="">{{ placeholder }}</option>
+            {% for value, text in options %}
+            <option value="{{ value }}"{% if values.get(name)|string == value|string %} selected{% endif %}>{{ text }}</option>
+            {% endfor %}
+          </select>
+{{ _messages(name, errors, "") }}
+        </div>
+{% endmacro %}
+
+{% macro radios(name, legend, errors, values, options, hint="") %}
+        <fieldset class="field radios" id="{{ name }}"{{ _describedby(name, errors, hint) }}>
+          <legend>{{ legend }}</legend>
+          {% for value, text, description in options %}
+          <label class="radio">
+            <input type="radio" name="{{ name }}" value="{{ value }}" required{% if values.get(name) == value %} checked{% endif %}>
+            <span><strong>{{ text }}</strong>{% if description %}<small>{{ description }}</small>{% endif %}</span>
+          </label>
+          {% endfor %}
+{{ _messages(name, errors, hint) }}
+        </fieldset>
+{% endmacro %}

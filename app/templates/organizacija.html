@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+{% block title %}{{ org.name }}{% endblock %}
+{% block content %}
+    <nav class="breadcrumbs" aria-label="Atrašanās vieta">
+      <a href="/organizacijas">Organizācijas</a> <span aria-hidden="true">›</span> <span aria-current="page">{{ org.name }}</span>
+    </nav>
+
+    <div class="page-head page-head-row">
+      <div>
+        <h1>{{ org.name }}</h1>
+        <p class="sub">{{ org.kind }} · reģ. nr. {{ org.reg_no }}</p>
+      </div>
+      {% if can_edit %}<a class="btn" href="/organizacijas/{{ org.id }}/labot">Labot<span class="visually-hidden"> organizāciju {{ org.name }}</span></a>{% endif %}
+    </div>
+
+    {% if saved %}<div class="alert ok" role="status">Izmaiņas saglabātas.</div>{% endif %}
+
+    <div class="blocks">
+      <section class="block" aria-labelledby="pamatdati">
+        <h2 id="pamatdati">Pamatdati</h2>
+        <dl class="facts">
+          <dt>Nosaukums</dt><dd>{{ org.name }}</dd>
+          <dt>Reģistrācijas nr.</dt><dd>{{ org.reg_no }}</dd>
+          <dt>Veids</dt><dd>{{ org.kind }}</dd>
+          <dt>Atbildīgais darbinieks</dt><dd>{{ org.responsible }}{% if org.responsible_id == user.id %} (es){% endif %}</dd>
+        </dl>
+      </section>
+
+      <section class="block" aria-labelledby="kontakti">
+        <h2 id="kontakti">Kontaktpersonas ({{ contacts|length }})</h2>
+        {% if contacts %}
+        <ul class="contact-list">
+          {% for c in contacts %}
+          <li>
+            <strong>{{ c.full_name }}</strong> <span class="meta">{{ c.position }}</span><br>
+            {% if c.email %}<span>{{ c.email }}</span>{% endif %}{% if c.phone %} · <span>{{ c.phone }}</span>{% endif %}
+            {% if c.retain_until < today.isoformat() %}<br><span class="tag late">Glabāšanas termiņš beidzies — jāpārskata</span>{% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="empty">Kontaktpersonu nav.</p>
+        {% endif %}
+        <p class="meta">Kontaktpersonu pievienošana un labošana būs F2.</p>
+      </section>
+
+      <section class="block" aria-labelledby="pieprasijumi">
+        <h2 id="pieprasijumi">Pieprasījumi ({{ requests|length }})</h2>
+        {% if requests %}
+        <div class="table-wrap">
+          <table>
+            <caption class="visually-hidden">Organizācijas pieprasījumi</caption>
+            <thead><tr><th scope="col">Temats</th><th scope="col">Statuss</th><th scope="col">Termiņš</th></tr></thead>
+            <tbody>
+              {% for r in requests %}
+              <tr>
+                <th scope="row">{{ r.subject }}</th>
+                <td>{{ r.status }}</td>
+                <td>
+                  {% if r.status != "Atbildēts" %}{% set label, cls = due_label(r.due, today) %}<span class="tag {{ cls }}">{{ label }}</span> {% endif %}
+                  <span class="meta">{{ fmt_date(r.due) }}</span>
+                </td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="empty">Pieprasījumu nav.</p>
+        {% endif %}
+      </section>
+
+      <section class="block" aria-labelledby="uzdevumi">
+        <h2 id="uzdevumi">Uzdevumi ({{ tasks|length }})</h2>
+        {% if tasks %}
+        <ul class="task-list">
+          {% for t in tasks %}
+          <li class="task">
+            <div>
+              {% if t.done_at %}<span class="tag upcoming">Izpildīts</span>
+              {% else %}{% set label, cls = due_label(t.due, today) %}<span class="tag {{ cls }}">{{ label }}</span>{% endif %}
+              <span class="task-title">{{ t.description }}</span>
+              <span class="meta">{{ t.assignee }} · {{ fmt_date(t.due) }}</span>
+            </div>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="empty">Uzdevumu nav.</p>
+        {% endif %}
+      </section>
+
+      <section class="block block-wide" aria-labelledby="mijiedarbibas">
+        <h2 id="mijiedarbibas">Mijiedarbību hronoloģija ({{ interactions|length }})</h2>
+        {% if interactions %}
+        <ol class="timeline">
+          {% for i in interactions %}
+          <li>
+            <span class="meta">{{ fmt_date(i.date) }} · {{ i.kind }} · {{ i.author }}</span>
+            <p>{{ i.summary }}</p>
+            {% if i.next_step %}<p class="meta"><strong>Nākamais solis:</strong> {{ i.next_step }}</p>{% endif %}
+          </li>
+          {% endfor %}
+        </ol>
+        {% else %}
+        <p class="empty">Mijiedarbību vēl nav.</p>
+        {% endif %}
+      </section>
+    </div>
+{% endblock %}

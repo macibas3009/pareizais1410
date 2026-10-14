@@ -1,0 +1,33 @@
+{% extends "base.html" %}
+{% block title %}Piekļuves žurnāls{% endblock %}
+{% block content %}
+    <div class="page-head">
+      <h1>Piekļuves žurnāls</h1>
+      <p class="sub">Kurš skatīja vai mainīja ierakstus (N2). Žurnālā glabājas tikai ierakstu numuri, bez personas datiem. Rāda pēdējos 200 notikumus.</p>
+    </div>
+
+    <section class="block">
+      {% if entries %}
+      <div class="table-wrap">
+        <table>
+          <caption class="visually-hidden">Piekļuves žurnāls, jaunākie notikumi augšā</caption>
+          <thead>
+            <tr><th scope="col">Laiks (UTC)</th><th scope="col">Lietotājs</th><th scope="col">Darbība</th><th scope="col">Ieraksts</th></tr>
+          </thead>
+          <tbody>
+            {% for e in entries %}
+            <tr>
+              <td>{{ fmt_date(e.at) }} {{ e.at[11:16] }}</td>
+              <th scope="row">{{ e.user_name }}</th>
+              <td>{{ action_labels.get(e.action, e.action) }}</td>
+              <td>{{ object_labels.get(e.object_type, e.object_type) }} #{{ e.object_id }}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="empty">Žurnālā vēl nav ierakstu.</p>
+      {% endif %}
+    </section>
+{% endblock %}

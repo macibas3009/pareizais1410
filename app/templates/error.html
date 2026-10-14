@@ -1,0 +1,17 @@
+{% extends "base.html" %}
+{% block title %}{{ "Lapa nav atrasta" if status == 404 else "Kļūda" }}{% endblock %}
+{% block content %}
+    <section class="notice-page">
+      {% if status == 404 %}
+      <h1>Lapa nav atrasta</h1>
+      <p>Šāda lapa neeksistē vai ir pārvietota.</p>
+      {% elif status == 403 %}
+      <h1>Nav piekļuves</h1>
+      <p>Jūsu lomai šī lapa nav pieejama.</p>
+      {% else %}
+      <h1>Radās kļūda</h1>
+      <p>Lūdzu, mēģiniet vēlreiz. Ja kļūda atkārtojas, sazinieties ar administratoru.</p>
+      {% endif %}
+      <p><a href="/panelis">Uz sākumu</a></p>
+    </section>
+{% endblock %}

@@ -1,6 +1,6 @@
 # CRM mazai iestādei · prasību saraksts
 
-> Versija 1.1 · 2026-10-14 · Statuss: precizēts pēc intervijas ar produkta īpašnieku.
+> Versija 1.2 · 2026-10-14 · Statuss: precizēts pēc intervijas ar produkta īpašnieku.
 > Avots: uzdevums-starteris "CRM mazai iestādei" un konceptuālās arhitektūras shēma.
 > Mācību projekts. Visi dati ir sintētiski.
 
@@ -17,7 +17,7 @@ Statusu atjauno tajā pašā komitā, kurā prasība tiek īstenota.
 
 | ID | Prasība | Statuss | Kur īstenots |
 |---|---|---|---|
-| F0 | Pieslēgšanās un reģistrācija | 🟡 DAĻĒJI (4 no 7) | zars `cr-4-auth`, komiti `dd373cf`, `2b938ed` |
+| F0 | Pieslēgšanās un reģistrācija | 🟡 DAĻĒJI (5 no 7) | zars `cr-4-auth` (`dd373cf`, `2b938ed`); #5 zarā `f9-panelis` (`cac0a0e`) |
 | F1 | Organizācijas: izveidot, rediģēt, meklēt | ⬜ NAV SĀKTS | |
 | F2 | Kontaktpersonas pie organizācijas | ⬜ NAV SĀKTS | |
 | F3 | Mijiedarbību žurnāls | ⬜ NAV SĀKTS | |
@@ -26,7 +26,7 @@ Statusu atjauno tajā pašā komitā, kurā prasība tiek īstenota.
 | F6 | Meklēšana | ⬜ NAV SĀKTS | |
 | F7 | Pārskats vadītājam | ⬜ NAV SĀKTS | |
 | F8 | Piekļūstamības paziņojums | ⬜ NAV SĀKTS | |
-| F9 | Vadības panelis pēc pieslēgšanās | ⬜ NAV SĀKTS | |
+| F9 | Vadības panelis pēc pieslēgšanās | 🟡 DAĻĒJI (3 no 7) | zars `f9-panelis` (`cac0a0e`) |
 | MI-1 | Mijiedarbības kopsavilkums un nākamais solis | ⬜ NAV SĀKTS | |
 | MI-2 | Organizāciju prioritizācija: tikai klasifikācija | ⬜ NAV SĀKTS | |
 | N1 | Piekļūstamība | ⬜ NAV SĀKTS | |
@@ -93,7 +93,7 @@ Administrators ikdienā CRM datus neapstrādā: viņa ekrāni ir lietotāji, pie
 
 ### F0 · Pieslēgšanās un reģistrācija
 
-**Statuss: 🟡 DAĻĒJI (4 no 7).** Īstenots zarā `cr-4-auth` ar FastAPI. Sk. 10. nodaļas 8. jautājumu par Flask.
+**Statuss: 🟡 DAĻĒJI (5 no 7).** Īstenots zarā `cr-4-auth` ar FastAPI. Sk. 10. nodaļas 8. jautājumu par Flask.
 
 | Lauks | Obligāts | Noteikumi |
 |---|:-:|---|
@@ -109,9 +109,9 @@ Administrators ikdienā CRM datus neapstrādā: viņa ekrāni ir lietotāji, pie
 | 2 | Pieslēgšanās ar e-pastu un paroli. Nepareiza parole un neesošs e-pasts saņem vienādu atbildi "Nepareizs e-pasts vai parole" | ✅ DONE |
 | 3 | Parole glabājas tikai kā jaucējvērtība (scrypt). Sesija tiek glabāta HttpOnly sīkdatnē (8 h). Žurnālā nav e-pasta, vārda un paroles | ✅ DONE |
 | 4 | Poga "Iziet" beidz sesiju. Vecā sesijas sīkdatne vairs nedarbojas | ✅ DONE |
-| 5 | Pēc pieslēgšanās lietotājs nonāk vadības panelī (F9) | ⬜ NAV SĀKTS (šobrīd tiek atvērta lapa "Mans konts") |
-| 6 | Jauns lietotājs bez lomas redz "Konts gaida apstiprinājumu". Lomu piešķir administrators (N3) | ⬜ NAV SĀKTS |
-| 7 | Formas strādā bez JavaScript (N1: POST → redirect → GET) | ⬜ NAV SĀKTS (šobrīd formas tiek nosūtītas ar JavaScript) |
+| 5 | Pēc pieslēgšanās lietotājs nonāk vadības panelī (F9) | ✅ DONE (`f9-panelis`) |
+| 6 | Jauns lietotājs bez lomas redz "Konts gaida apstiprinājumu". Lomu piešķir administrators (N3) | 🟡 DAĻĒJI: paziņojums un administratora saraksts ir; lomas piešķiršanas ekrāna vēl nav, lomas ir sākumdatos |
+| 7 | Formas strādā bez JavaScript (N1: POST → redirect → GET) | ⬜ NAV SĀKTS (pieslēgšanās un reģistrācijas formas tiek nosūtītas ar JavaScript; "Iziet" jau strādā bez JS) |
 
 Saskarne: ezera fotogrāfija ("Usmas ezers, 2015", WikedKentaur, CC BY-SA 4.0) kreisajā pusē.
 Virsraksts atrodas virs horizonta, paskaidrojums zem tā. Autorība ir redzama katrā lapā.
@@ -248,14 +248,23 @@ noklikšķina uz zīmola vai saites "Sākums". Saturs ir atkarīgs no lomas.
 **Vadītājam** ir tie paši bloki par **visu iestādi**, nevis tikai par savām organizācijām, kā arī saite "Atvērt pilno pārskatu" uz F7.
 **Administratoram** panelī ir: lietotāji, kas gaida lomas piešķiršanu, atvērtie dzēšanas pieprasījumi un saite uz piekļuves žurnālu.
 
+**Statuss: 🟡 DAĻĒJI (3 no 7).** Zars `f9-panelis`, komits `cac0a0e`. Testi: `tests/test_dashboard.py`.
+Trūkstošās daļas ir atkarīgas no sarakstiem un pārskata, kas vēl nav uztaisīti (F3, F4, F5, F7).
+
 **Pieņemšanas kritēriji**
-1. Pēc veiksmīgas pieslēgšanās lietotājs tiek novirzīts uz `/panelis`. Bez sesijas `/panelis` novirza uz `/login`.
-2. Katram blokam ir virsraksts (`h2`). Saraksti ir tabulas ar `<caption>` vai saraksti (`ul`). Katrā blokā ir saite "Skatīt visus" uz pilno sarakstu.
-3. Skaitļi ir teksts ar paskaidrojumu (piem., "3 kavēti pieprasījumi"), nevis tikai krāsa vai ikona. Katrs skaitlis ir saite uz atfiltrētu sarakstu.
-4. Ja blokā nav datu, tiek parādīts teksts, piem., "Šodien uzdevumu nav".
-5. Darbinieks redz tikai savu organizāciju datus. Vadītājs redz visas iestādes datus (N3).
-6. Paneļa atvēršana netiek ierakstīta piekļuves žurnālā. Žurnālā tiek ierakstīta kartītes atvēršana no paneļa saitēm (N2).
-7. Panelis atbilst N1: 320 px platumā bloki izkārtojas vienā kolonnā, un tas strādā bez JavaScript.
+
+| # | Kritērijs | Statuss |
+|---|---|---|
+| 1 | Pēc veiksmīgas pieslēgšanās lietotājs tiek novirzīts uz `/panelis`. Bez sesijas `/panelis` novirza uz `/login` | ✅ DONE |
+| 2 | Katram blokam ir virsraksts (`h2`). Saraksti ir tabulas ar `<caption>` vai saraksti (`ul`). Katrā blokā ir saite "Skatīt visus" uz pilno sarakstu | 🟡 DAĻĒJI: virsraksti un tabulas ir; saites "Skatīt visus" nav, jo nav sarakstu (F3, F4, F5) |
+| 3 | Skaitļi ir teksts ar paskaidrojumu (piem., "3 kavēti pieprasījumi"), nevis tikai krāsa vai ikona. Katrs skaitlis ir saite uz atfiltrētu sarakstu | 🟡 DAĻĒJI: teksts ir; saišu nav, jo nav sarakstu |
+| 4 | Ja blokā nav datu, tiek parādīts teksts, piem., "Šodien uzdevumu nav" | ✅ DONE |
+| 5 | Darbinieks redz tikai savu organizāciju datus. Vadītājs redz visas iestādes datus (N3) | 🟡 DAĻĒJI: darbinieka un vadītāja tvērums ir; vadītājam nav saites uz F7; administratoram nav dzēšanas pieprasījumu un piekļuves žurnāla bloka |
+| 6 | Paneļa atvēršana netiek ierakstīta piekļuves žurnālā. Žurnālā tiek ierakstīta kartītes atvēršana no paneļa saitēm (N2) | ✅ DONE paneļa daļā (kartītes nāks ar F1) |
+| 7 | Panelis atbilst N1: 320 px platumā bloki izkārtojas vienā kolonnā, un tas strādā bez JavaScript | 🟡 DAĻĒJI: bez JS ir notestēts; 320 px izkārtojums ir CSS, bet nav pārbaudīts pārlūkā |
+
+**Papildus īstenots:** uzdevumu var atzīmēt kā izpildītu tieši no paneļa (POST forma). Darbinieks to var tikai saviem uzdevumiem, vadītājs jebkuram.
+Testa lietotāji (sākumdati, `make seed`): `darbinieks@example.com`, `darbinieks2@example.com`, `vaditajs@example.com`, `admin@example.com`. Parole ir `app/seed.py` vai vides mainīgajā `SEED_PASSWORD`.
 
 ## 5. MI komponents (`ai.py`)
 

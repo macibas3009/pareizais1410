@@ -62,21 +62,21 @@ Statusa apzīmējumi: ✅ izpildīts un notestēts · 🟡 daļēji · ⬜ nav s
 
 | # | Kritērijs | WCAG | Statuss |
 |---|---|---|---|
-| 1.1 | Lauki: vārds, e-pasts, tēma (no DB), adrese/vieta, apraksts, piekrišana datu apstrādei | — | ⬜ |
-| 1.2 | Servera puses validācija: obligātie lauki, e-pasta formāts, tēma no saraksta, apraksts ≤ 3000 rakstzīmes, piekrišana atzīmēta | 3.3.1 | ⬜ |
-| 1.3 | Pēc kļūdas forma saglabā ievadīto (izņemot neko — nav paroles) | 3.3.7 | ⬜ |
-| 1.4 | Katram laukam `<label>`; obligātie lauki apzīmēti ar tekstu "(obligāts)", ne tikai krāsu | 1.3.1, 3.3.2, 1.4.1 | ⬜ |
-| 1.5 | Kļūdas tekstā pie lauka, saistītas ar `aria-describedby`; kļūda saka, kā labot | 3.3.1, 3.3.3 | ⬜ |
-| 1.6 | Kļūdu kopsavilkums lapas sākumā ar saitēm uz laukiem; fokuss uz kopsavilkumu | 3.3.1 | ⬜ |
-| 1.7 | Nav laika limita (sesija nebeidzas, kamēr aizpilda) | 2.2.1 | ⬜ |
+| 1.1 | Lauki: vārds, e-pasts, tēma (no DB), adrese/vieta, apraksts, piekrišana datu apstrādei | — | ✅ |
+| 1.2 | Servera puses validācija: obligātie lauki, e-pasta formāts, tēma no saraksta, apraksts ≤ 3000 rakstzīmes, piekrišana atzīmēta | 3.3.1 | ✅ |
+| 1.3 | Pēc kļūdas forma saglabā ievadīto (izņemot neko — nav paroles) | 3.3.7 | ✅ |
+| 1.4 | Katram laukam `<label>`; obligātie lauki apzīmēti ar tekstu "(obligāts)", ne tikai krāsu | 1.3.1, 3.3.2, 1.4.1 | ✅ |
+| 1.5 | Kļūdas tekstā pie lauka, saistītas ar `aria-describedby`; kļūda saka, kā labot | 3.3.1, 3.3.3 | ✅ |
+| 1.6 | Kļūdu kopsavilkums lapas sākumā ar saitēm uz laukiem; fokuss uz kopsavilkumu | 3.3.1 | ✅ |
+| 1.7 | Nav laika limita (sesija nebeidzas, kamēr aizpilda) | 2.2.1 | ✅ |
 
 ### US-2 · Apstiprinājums (MUST)
 
 | # | Kritērijs | WCAG | Statuss |
 |---|---|---|---|
-| 2.1 | POST → redirect → apstiprinājuma lapa; F5 nerada dubultu iesniegumu | — | ⬜ |
-| 2.2 | `<title>` sākas ar "Iesniegums reģistrēts" | 2.4.2 | ⬜ |
-| 2.3 | Numurs tekstā; paskaidrots, kas notiks tālāk; saite uz "Mans iesniegums" ar jau ievadītu numuru | 1.1.1, 3.3.7 | ⬜ |
+| 2.1 | POST → redirect → apstiprinājuma lapa; F5 nerada dubultu iesniegumu | — | ✅ |
+| 2.2 | `<title>` sākas ar "Iesniegums reģistrēts" | 2.4.2 | ✅ |
+| 2.3 | Numurs tekstā; paskaidrots, kas notiks tālāk; saite uz "Mans iesniegums" ar jau ievadītu numuru | 1.1.1, 3.3.7 | ✅ |
 
 ### US-3 · Iesniegumu saraksts (MUST)
 
@@ -135,10 +135,10 @@ Statusa apzīmējumi: ✅ izpildīts un notestēts · 🟡 daļēji · ⬜ nav s
 
 | # | Kritērijs | WCAG | Statuss |
 |---|---|---|---|
-| 8.1 | Forma ar vienu lauku (numurs); rezultāts: statuss, pēdējais notikums, atbilde | — | ⬜ |
-| 8.2 | Nav CAPTCHA vai puzles | 3.3.8 | ⬜ |
-| 8.3 | Kļūda "nav atrasts" tekstā, ar formāta paraugu | 3.3.1, 3.3.3 | ⬜ |
-| 8.4 | Netiek rādīti iesniedzēja personas dati (tikai statuss un atbilde) | VDAR | ⬜ |
+| 8.1 | Forma ar vienu lauku (numurs); rezultāts: statuss, pēdējais notikums, atbilde | — | ✅ |
+| 8.2 | Nav CAPTCHA vai puzles | 3.3.8 | ✅ |
+| 8.3 | Kļūda "nav atrasts" tekstā, ar formāta paraugu | 3.3.1, 3.3.3 | ✅ |
+| 8.4 | Netiek rādīti iesniedzēja personas dati (tikai statuss un atbilde) | VDAR | ✅ |
 
 ### US-9 · Pieejamības tests zaļš (SHOULD)
 

@@ -214,3 +214,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
   .facts dd { margin-bottom: 0.5rem; }
   .hero-inner { padding: 1.25rem; }
 }
+
+.big-number { font-size: 1.3rem; }
+.big-number strong { font-size: 1.6rem; color: var(--lake-900); letter-spacing: 0.02em; }
+h3 { font-size: 1.05rem; color: var(--lake-900); margin: 1rem 0 0.4rem; }

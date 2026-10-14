@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-14T09:58+00:00",
+  "checked_at": "2026-10-14T10:00+00:00",
   "axe_version": "4.12.1",
   "tags": [
     "wcag2a",
@@ -9,8 +9,8 @@
     "wcag22aa"
   ],
   "summary": {
-    "pages": 1,
-    "skipped": 9,
+    "pages": 7,
+    "skipped": 5,
     "blocking": 0,
     "other": 0,
     "overflow": 0,
@@ -33,7 +33,14 @@
     {
       "title": "2 Iesnieguma forma",
       "path": "/iesniegt",
-      "skipped": true
+      "skipped": false,
+      "violations": [],
+      "incomplete": 0,
+      "focus_not_visible": [],
+      "overflow_px": {
+        "320 px": 0,
+        "200 %": 0
+      }
     },
     {
       "title": "7 Piekļūstamības paziņojums",
@@ -43,17 +50,62 @@
     {
       "title": "8 Mans iesniegums",
       "path": "/mans-iesniegums",
-      "skipped": true
+      "skipped": false,
+      "violations": [],
+      "incomplete": 0,
+      "focus_not_visible": [],
+      "overflow_px": {
+        "320 px": 0,
+        "200 %": 0
+      }
     },
     {
       "title": "8 Mans iesniegums: rezultāts",
       "path": "/mans-iesniegums?numurs=2026-0001",
-      "skipped": true
+      "skipped": false,
+      "violations": [],
+      "incomplete": 0,
+      "focus_not_visible": [],
+      "overflow_px": {
+        "320 px": 0,
+        "200 %": 0
+      }
     },
     {
       "title": "8 Mans iesniegums: nav atrasts",
       "path": "/mans-iesniegums?numurs=2099-9999",
-      "skipped": true
+      "skipped": false,
+      "violations": [],
+      "incomplete": 0,
+      "focus_not_visible": [],
+      "overflow_px": {
+        "320 px": 0,
+        "200 %": 0
+      }
+    },
+    {
+      "title": "2 Iesnieguma forma ar kļūdām",
+      "path": "POST /iesniegt (tukša)",
+      "skipped": false,
+      "violations": [],
+      "incomplete": 0,
+      "focus_not_visible": [],
+      "overflow_px": {
+        "320 px": 0,
+        "200 %": 0
+      }
+    },
+    {
+      "title": "3 Apstiprinājums",
+      "path": "/iesniegts/<numurs>",
+      "skipped": false,
+      "violations": [],
+      "incomplete": 0,
+      "focus_not_visible": [],
+      "overflow_px": {
+        "320 px": 0,
+        "200 %": 0
+      }
     },
     {
       "title": "4 Saraksts",
@@ -85,7 +137,27 @@
     {
       "step": "Loma izvēlēta ar Enter",
       "ok": true,
-      "note": "http://127.0.0.1:46693/iesniegt"
+      "note": "http://127.0.0.1:38749/iesniegt"
+    },
+    {
+      "step": "Pēc kļūdas fokuss nonāk uz kļūdu kopsavilkumu",
+      "ok": true,
+      "note": "fokuss: #kludas"
+    },
+    {
+      "step": "Formu var aizpildīt un iesniegt ar tastatūru",
+      "ok": true,
+      "note": "http://127.0.0.1:38749/iesniegts/2026-0012"
+    },
+    {
+      "step": "No apstiprinājuma uz «Mans iesniegums» ar numuru",
+      "ok": true,
+      "note": "http://127.0.0.1:38749/mans-iesniegums?numurs=2026-0012"
+    },
+    {
+      "step": "Nav vietas, kur fokuss «iestrēgst» (var aiziet līdz kājenei)",
+      "ok": true,
+      "note": ""
     }
   ]
 }

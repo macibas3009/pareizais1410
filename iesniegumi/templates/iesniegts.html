@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}Iesniegums reģistrēts: {{ numurs }}{% endblock %}
+{% block content %}
+    <section class="card narrow" aria-labelledby="virsraksts">
+      <h1 id="virsraksts">Iesniegums reģistrēts</h1>
+      <p class="big-number">Jūsu iesnieguma numurs: <strong>{{ numurs }}</strong></p>
+      <p>Tēma: {{ tema }}</p>
+      <h2>Kas notiks tālāk</h2>
+      <ol>
+        <li>Darbinieks iesniegumu izskatīs un, ja vajag, sazināsies ar jums.</li>
+        <li>Atbildi nosūtīsim uz jūsu e-pastu ne vēlāk kā viena mēneša laikā.</li>
+        <li>Statusu jebkurā laikā varat pārbaudīt pēc numura.</li>
+      </ol>
+      <p class="actions">
+        <a class="btn" href="{{ url_for('mans_iesniegums', numurs=numurs) }}">Pārbaudīt iesnieguma {{ numurs }} statusu</a>
+        <a href="{{ url_for('iesniegt') }}">Iesniegt vēl vienu iesniegumu</a>
+      </p>
+    </section>
+{% endblock %}

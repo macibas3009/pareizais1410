@@ -139,7 +139,7 @@ def keyboard_citizen_path(page: Page, base: str) -> list[tuple[str, bool, str]]:
     if "/iesniegts/" not in page.url:
         return steps
 
-    ok = tab_to("e.tagName === 'A' && e.getAttribute('href').includes('mans-iesniegums')")
+    ok = tab_to("e.tagName === 'A' && e.getAttribute('href').includes('mans-iesniegums?numurs=')")
     if ok:
         with page.expect_navigation():
             page.keyboard.press("Enter")

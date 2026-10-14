@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}{% if errors %}Kļūda: {% endif %}Iesniegt iesniegumu{% endblock %}
+
+{% macro described(name, hint=false) -%}
+  {%- set ids = [] -%}
+  {%- if hint %}{% set _ = ids.append(name ~ "-hint") %}{% endif -%}
+  {%- if errors.get(name) %}{% set _ = ids.append(name ~ "-kluda") %}{% endif -%}
+  {%- if ids %} aria-describedby="{{ ids | join(' ') }}"{% endif -%}
+  {%- if errors.get(name) %} aria-invalid="true"{% endif -%}
+{%- endmacro %}
+
+{% macro error(name) -%}
+  {%- if errors.get(name) %}<p id="{{ name }}-kluda" class="field-error">{{ errors[name] }}</p>{% endif -%}
+{%- endmacro %}
+
+{% block content %}
+    <h1>Iesniegt iesniegumu</h1>
+    <p class="lead">Aizpildiet formu, un mēs iesniegumu reģistrēsim un atbildēsim uz jūsu e-pastu. Laika ierobežojuma nav.
+      Visi lauki ir obligāti.</p>
+
+    {% if errors %}
+    <div id="kludas" class="error-summary" role="alert" tabindex="-1">
+      <h2>{{ "Formā ir 1 kļūda" if errors|length == 1 else "Formā ir " ~ errors|length ~ " kļūdas" }}</h2>
+      <ul>
+        {% for name, message in errors.items() %}
+        <li><a href="#{{ name }}">{{ field_labels[name] }}: {{ message }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    <form id="iesniegums" method="post" action="{{ url_for('iesniegt_post') }}" class="card narrow" novalidate>
+      <div class="field">
+        <label for="vards">Vārds, uzvārds <span class="req">(obligāts)</span></label>
+        <input type="text" id="vards" name="vards" autocomplete="name" required value="{{ values.get('vards', '') }}"{{ described('vards') }}>
+        {{ error('vards') }}
+      </div>
+      <div class="field">
+        <label for="epasts">E-pasts <span class="req">(obligāts)</span></label>
+        <input type="email" id="epasts" name="epasts" autocomplete="email" required value="{{ values.get('epasts', '') }}"{{ described('epasts', true) }}>
+        <p id="epasts-hint" class="hint">Uz šo adresi nosūtīsim atbildi, piemēram, vards@domens.lv.</p>
+        {{ error('epasts') }}
+      </div>
+      <div class="field">
+        <label for="tema">Tēma <span class="req">(obligāts)</span></label>
+        <select id="tema" name="tema" required{{ described('tema') }}>
+          <option value="">— izvēlieties tēmu —</option>
+          {% for t in temas %}<option value="{{ t.id }}"{% if values.get('tema') == t.id|string %} selected{% endif %}>{{ t.nosaukums }}</option>{% endfor %}
+        </select>
+        {{ error('tema') }}
+      </div>
+      <div class="field">
+        <label for="vieta">Adrese vai vieta <span class="req">(obligāts)</span></label>
+        <input type="text" id="vieta" name="vieta" autocomplete="street-address" required value="{{ values.get('vieta', '') }}"{{ described('vieta', true) }}>
+        <p id="vieta-hint" class="hint">Piemēram, «Ezera iela 12» vai «pie stacijas stāvlaukuma».</p>
+        {{ error('vieta') }}
+      </div>
+      <div class="field">
+        <label for="apraksts">Apraksts <span class="req">(obligāts)</span></label>
+        <textarea id="apraksts" name="apraksts" rows="6" maxlength="3000" required{{ described('apraksts', true) }}>{{ values.get('apraksts', '') }}</textarea>
+        <p id="apraksts-hint" class="hint">Kas noticis vai ko lūdzat. Līdz 3000 rakstzīmēm. Lūdzu, nerakstiet personas kodu vai veselības datus, ja tas nav nepieciešams.</p>
+        {{ error('apraksts') }}
+      </div>
+      <div class="field">
+        <div class="check">
+          <input type="checkbox" id="piekrisana" name="piekrisana" value="1" required{% if values.get('piekrisana') %} checked{% endif %}{{ described('piekrisana', true) }}>
+          <label for="piekrisana">Piekrītu, ka pašvaldība apstrādā manus datus iesnieguma izskatīšanai <span class="req">(obligāts)</span></label>
+        </div>
+        <p id="piekrisana-hint" class="hint">Dati tiek izmantoti tikai šī iesnieguma izskatīšanai un atbildes nosūtīšanai.</p>
+        {{ error('piekrisana') }}
+      </div>
+      <button type="submit">Iesniegt iesniegumu</button>
+    </form>
+{% endblock %}
+
+{% block scripts %}
+{% if errors %}
+<script>
+  // Tikai uzlabojums (WCAG 3.3.1): fokuss uz kļūdu kopsavilkumu. Bez JS kopsavilkums tāpat ir lapas sākumā ar role="alert".
+  document.getElementById("kludas").focus();
+</script>
+{% endif %}
+{% endblock %}

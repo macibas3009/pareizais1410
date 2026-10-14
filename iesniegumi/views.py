@@ -2,9 +2,12 @@
 
 from __future__ import annotations
 
+import json
+import math
 import re
 import sqlite3
 from datetime import datetime, timezone
+from pathlib import Path
 
 from flask import Flask, abort, redirect, render_template, request, url_for
 
@@ -318,9 +321,64 @@ def register_views(app: Flask) -> None:
         db().commit()
         return back(numurs, "mi_tema")
 
-    # --- Vietturis nākamajam US -------------------------------------------------------
+    # --- US-5 · pārskats vadītājam ------------------------------------------------------
 
     @app.get("/vaditajs/parskats")
     def parskats():
         app.require("vaditajs")
-        return "US-5", 200
+        conn = db()
+        by_status = [{"label": st, "n": conn.execute("SELECT COUNT(*) FROM iesniegumi WHERE statuss = ?", (st,)).fetchone()[0]}
+                     for st in STATUSI]
+        by_topic = [dict(r) for r in conn.execute(
+            "SELECT t.nosaukums AS label, COUNT(i.id) AS n FROM temas t LEFT JOIN iesniegumi i ON i.tema_id = t.id "
+            "GROUP BY t.id ORDER BY t.id").fetchall()]
+        closed = conn.execute("SELECT izveidots, slegts FROM iesniegumi WHERE slegts IS NOT NULL").fetchall()
+        days = [(datetime.fromisoformat(r["slegts"]) - datetime.fromisoformat(r["izveidots"])).total_seconds() / 86400 for r in closed]
+        avg_days = round(sum(days) / len(days), 1) if days else None
+        total = sum(r["n"] for r in by_status)
+        return render_template("parskats.html", by_status=by_status, by_topic=by_topic, avg_days=avg_days,
+                               closed=len(days), total=total, chart=bar_chart(by_topic))
+
+    # --- US-6 · piekļūstamības paziņojums ---------------------------------------------------
+
+    @app.get("/pieklustamiba")
+    def pieklustamiba():
+        report_path = Path(app.root_path) / "a11y-report.json"
+        try:
+            report = json.loads(report_path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            report = None
+        return render_template("pieklustamiba.html", report=report)
+
+
+# --- US-5 diagramma: horizontāla joslu diagramma inline SVG (bez JS) ---------------------
+
+CHART = {"width": 640, "label_w": 170, "value_w": 40, "row_h": 32, "bar_h": 20, "top": 6, "axis_h": 24}
+
+
+def nice_step(max_value: int) -> int:
+    if max_value <= 5:
+        return 1
+    raw = max_value / 5
+    mag = 10 ** math.floor(math.log10(raw))
+    return next(m * mag for m in (1, 2, 5, 10) if m * mag >= raw)
+
+
+def bar_chart(rows: list[dict]) -> dict:
+    c = CHART
+    top = max((r["n"] for r in rows), default=0)
+    step = nice_step(top)
+    axis_max = max(step, math.ceil(top / step) * step)
+    plot_w = c["width"] - c["label_w"] - c["value_w"]
+    bars = []
+    for i, r in enumerate(rows):
+        y = c["top"] + i * c["row_h"]
+        w = r["n"] * plot_w / axis_max
+        by = y + (c["row_h"] - c["bar_h"]) / 2
+        x, h, rad = c["label_w"], c["bar_h"], min(4, w, c["bar_h"] / 2)
+        path = "" if w <= 0 else (f"M{x},{by} H{x + w - rad:.1f} Q{x + w:.1f},{by} {x + w:.1f},{by + rad:.1f} "
+                                   f"V{by + h - rad:.1f} Q{x + w:.1f},{by + h} {x + w - rad:.1f},{by + h} H{x} Z")
+        bars.append({"label": r["label"], "value": r["n"], "y": y, "w": w, "path": path})
+    plot_bottom = c["top"] + len(rows) * c["row_h"]
+    ticks = [{"value": v, "x": c["label_w"] + v * plot_w / axis_max} for v in range(0, axis_max + 1, step)]
+    return {**c, "bars": bars, "ticks": ticks, "plot_bottom": plot_bottom, "height": plot_bottom + c["axis_h"]}

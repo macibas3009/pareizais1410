@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% block title %}Pārskats vadītājam{% endblock %}
+{% block content %}
+    <h1>Pārskats vadītājam</h1>
+    <p class="lead">Iesniegumu skaits pa statusiem un tēmām un vidējais apstrādes laiks. Visi dati: no sistēmas sākuma.</p>
+
+    <ul class="stats">
+      <li class="stat"><span class="stat-value">{{ total }}</span> <span class="stat-label">iesniegumi kopā</span></li>
+      <li class="stat"><span class="stat-value">{{ by_status[0].n + by_status[1].n }}</span> <span class="stat-label">atvērti (Jauns un Apstrādē)</span></li>
+      <li class="stat"><span class="stat-value">{{ avg_days if avg_days is not none else "—" }}</span>
+        <span class="stat-label">vidējais apstrādes laiks dienās ({{ closed }} slēgti iesniegumi)</span></li>
+    </ul>
+
+    <div class="grid-2">
+      <section class="card" aria-labelledby="pa-statusiem">
+        <h2 id="pa-statusiem">Pa statusiem</h2>
+        <div class="table-wrap">
+          <table>
+            <caption>Iesniegumu skaits pa statusiem</caption>
+            <thead><tr><th scope="col">Statuss</th><th scope="col" class="num">Skaits</th></tr></thead>
+            <tbody>
+              {% for r in by_status %}<tr><th scope="row"><span class="status status-{{ status_class(r.label) }}">{{ r.label }}</span></th><td class="num">{{ r.n }}</td></tr>{% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+
+      <section class="card" aria-labelledby="pa-temam">
+        <h2 id="pa-temam">Pa tēmām</h2>
+        <div class="table-wrap">
+          <table>
+            <caption>Iesniegumu skaits pa tēmām (tie paši dati, kas diagrammā)</caption>
+            <thead><tr><th scope="col">Tēma</th><th scope="col" class="num">Skaits</th></tr></thead>
+            <tbody>
+              {% for r in by_topic %}<tr><th scope="row">{{ r.label }}</th><td class="num">{{ r.n }}</td></tr>{% endfor %}
+            </tbody>
+          </table>
+        </div>
+      </section>
+    </div>
+
+    <section class="card" aria-labelledby="diagramma">
+      <h2 id="diagramma">Diagramma: iesniegumi pa tēmām</h2>
+      {% set c = chart %}
+      <figure class="chart">
+        <svg viewBox="0 0 {{ c.width }} {{ c.height }}" role="img" aria-labelledby="chart-title chart-desc">
+          <title id="chart-title">Iesniegumu skaits pa tēmām</title>
+          <desc id="chart-desc">Joslu diagramma. {% for b in c.bars %}{{ b.label }}: {{ b.value }}. {% endfor %}Tie paši dati ir tabulā «Pa tēmām».</desc>
+          {% for t in c.ticks %}
+          <line x1="{{ t.x }}" x2="{{ t.x }}" y1="{{ c.top }}" y2="{{ c.plot_bottom }}" class="grid{% if loop.first %} baseline{% endif %}"/>
+          <text x="{{ t.x }}" y="{{ c.plot_bottom + 17 }}" class="tick" text-anchor="middle">{{ t.value }}</text>
+          {% endfor %}
+          {% for b in c.bars %}
+          <g>
+            <title>{{ b.label }}: {{ b.value }}</title>
+            <text x="{{ c.label_w - 8 }}" y="{{ b.y + c.row_h / 2 }}" class="bar-label" text-anchor="end" dominant-baseline="middle">{{ b.label }}</text>
+            {% if b.path %}<path d="{{ b.path }}" class="bar"/>{% endif %}
+            <text x="{{ c.label_w + b.w + 6 }}" y="{{ b.y + c.row_h / 2 }}" class="bar-value" dominant-baseline="middle">{{ b.value }}</text>
+          </g>
+          {% endfor %}
+        </svg>
+        <figcaption>Diagramma nav vienīgais informācijas avots: tie paši skaitļi ir tabulā «Pa tēmām».</figcaption>
+      </figure>
+    </section>
+{% endblock %}

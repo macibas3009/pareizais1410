@@ -1,0 +1,74 @@
+{% extends "base.html" %}
+{% block title %}Piekļūstamības paziņojums{% endblock %}
+{% block content %}
+    <h1>Piekļūstamības paziņojums</h1>
+    <p class="lead">Ezermalas novada pašvaldība apņemas nodrošināt tīmekļvietnes «Iesniegumi» piekļūstamību saskaņā ar
+      Ministru kabineta 14.07.2020. noteikumiem Nr. 445 «Kārtība, kādā iestādes ievieto informāciju internetā».
+      <span class="meta">(Mācību prototips; pašvaldība un kontakti ir izdomāti.)</span></p>
+
+    <section class="card" aria-labelledby="cik">
+      <h2 id="cik">Cik piekļūstama ir šī tīmekļvietne?</h2>
+      <p><strong>Daļēji atbilst</strong> EN 301 549 (WCAG 2.1 AA) prasībām. Mērķis ir WCAG 2.2 AA.
+        Automātiskās pārbaudes kritiskas vai nopietnas problēmas neatrod, bet manuālā pārbaude ar ekrānlasītāju vēl nav veikta,
+        tāpēc pilnu atbilstību nevaram apliecināt.</p>
+    </section>
+
+    <section class="card" aria-labelledby="nepiekl">
+      <h2 id="nepiekl">Nepiekļūstamais saturs</h2>
+      <ul>
+        <li>Ekrānlasītāja (NVDA) pārbaude nav veikta — visas lapas — WCAG 1.3.1, 4.1.2, 4.1.3 nav pārbaudīti ar palīgtehnoloģiju — iemesls: neatbilstība (nav pārbaudīts) — termiņš: līdz publicēšanai.</li>
+        <li>Teksts uz sākumlapas fotogrāfijas — sākumlapa — WCAG 1.4.3 — kontrastu automātiski nevar izmērīt (axe: «nepilnīgs»), tekstam ir tumšs pārklājums — iemesls: jāpārbauda manuāli — termiņš: līdz publicēšanai.</li>
+        <li>Datuma un laika formāts atkarīgs no pārlūka valodas (nav datuma lauku ievadē) — nav būtiski.</li>
+      </ul>
+    </section>
+
+    <section class="card" aria-labelledby="testi">
+      <h2 id="testi">Pārbaudes rezultāti</h2>
+      {% if report %}
+      {% set s = report.summary %}
+      <p>Automātiskā pārbaude {{ fmt_date(report.checked_at, true) }} (UTC), axe-core {{ report.axe_version }}, WCAG 2.0/2.1/2.2 A un AA,
+        {{ s.pages }} lapas un stāvokļi (arī forma ar kļūdām un lapa pēc statusa maiņas).</p>
+      <div class="table-wrap">
+        <table>
+          <caption>Automātiskās pārbaudes kopsavilkums</caption>
+          <thead><tr><th scope="col">Pārbaude</th><th scope="col" class="num">Rezultāts</th></tr></thead>
+          <tbody>
+            <tr><th scope="row">Kritiski vai nopietni pārkāpumi (axe)</th><td class="num">{{ s.blocking }}</td></tr>
+            <tr><th scope="row">Vidēji vai nelieli pārkāpumi (axe)</th><td class="num">{{ s.other }}</td></tr>
+            <tr><th scope="row">Lapas ar horizontālu ritināšanu 320 px vai 200 % mērogā</th><td class="num">{{ s.overflow }}</td></tr>
+            <tr><th scope="row">Lapas ar neredzamu fokusu</th><td class="num">{{ s.focus }}</td></tr>
+            <tr><th scope="row">Tastatūras ceļa soļi, kas neizdevās</th><td class="num">{{ s.keyboard_failed }}</td></tr>
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p>Automātiskā pārbaude vēl nav veikta.</p>
+      {% endif %}
+      <p class="meta">Pilna atskaite un atradumu reģistrs: <code>docs/pieejamibas-atskaite.md</code>, <code>a11y-report.md</code>.</p>
+    </section>
+
+    <section class="card" aria-labelledby="alternativas">
+      <h2 id="alternativas">Piekļūstamības alternatīvas</h2>
+      <p>Iesniegumu var iesniegt arī pa tālruni 60000000 (darba dienās 8.00–17.00), pa e-pastu iesniegumi@ezermala.example
+        vai klātienē pašvaldībā, Ezera ielā 1, Ezermalā. Darbinieks palīdzēs aizpildīt iesniegumu.</p>
+    </section>
+
+    <section class="card" aria-labelledby="atsauksmes">
+      <h2 id="atsauksmes">Atsauksmēm un saziņai</h2>
+      <p>Ja kādu sistēmas daļu nevarat izmantot, rakstiet uz pieklustamiba@ezermala.example vai zvaniet 60000000.
+        Atbildēsim 10 darba dienu laikā.</p>
+    </section>
+
+    <section class="card" aria-labelledby="sudzibas">
+      <h2 id="sudzibas">Sūdzību iesniegšana</h2>
+      <p>Ja atbilde nav saņemta vai neapmierina, varat vērsties Viedās administrācijas un reģionālās attīstības ministrijā
+        (VARAM), tālāk — pie Tiesībsarga.</p>
+    </section>
+
+    <section class="card" aria-labelledby="sagatavots">
+      <h2 id="sagatavots">Ziņas par paziņojuma sagatavošanu</h2>
+      <p>Sagatavots 14.10.2026. Metode: automātiskais tests (axe-core + Playwright: WCAG 2.2 AA, tastatūras ceļš, 320 px un 200 % mērogs)
+        un pašnovērtējums pēc kontrolsaraksta. Manuālā pārbaude ar ekrānlasītāju — nav veikta.
+        Apstiprināja: <strong>[jāaizpilda atbildīgajai personai]</strong>. Pārskatīts: —.</p>
+    </section>
+{% endblock %}

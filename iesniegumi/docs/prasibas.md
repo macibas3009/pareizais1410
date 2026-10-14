@@ -106,18 +106,18 @@ Statusa apzīmējumi: ✅ izpildīts un notestēts · 🟡 daļēji · ⬜ nav s
 
 | # | Kritērijs | WCAG | Statuss |
 |---|---|---|---|
-| 5.1 | Tabula: skaits pa statusiem; tabula: skaits pa tēmām | 1.3.1 | ⬜ |
-| 5.2 | Vidējais apstrādes laiks (dienās no iesniegšanas līdz atbildei/noraidījumam) | — | ⬜ |
-| 5.3 | Joslu diagramma (inline SVG); tā pati informācija tabulā | 1.1.1 | ⬜ |
-| 5.4 | Joslu kontrasts ≥ 3:1 pret fonu | 1.4.11 | ⬜ |
-| 5.5 | Tikai vadītājam (citiem 403) | — | ⬜ |
+| 5.1 | Tabula: skaits pa statusiem; tabula: skaits pa tēmām | 1.3.1 | ✅ |
+| 5.2 | Vidējais apstrādes laiks (dienās no iesniegšanas līdz atbildei/noraidījumam) | — | ✅ |
+| 5.3 | Joslu diagramma (inline SVG); tā pati informācija tabulā | 1.1.1 | ✅ |
+| 5.4 | Joslu kontrasts ≥ 3:1 pret fonu | 1.4.11 | ✅ |
+| 5.5 | Tikai vadītājam (citiem 403) | — | ✅ |
 
 ### US-6 · Piekļūstamības paziņojums (MUST)
 
 | # | Kritērijs | WCAG | Statuss |
 |---|---|---|---|
-| 6.1 | Lapa `/pieklustamiba` pēc veidnes (MK 445, ES 2018/1523) | — | ⬜ |
-| 6.2 | Saite kājenē katrā lapā vienā vietā | 3.2.3, 3.2.6 | ⬜ |
+| 6.1 | Lapa `/pieklustamiba` pēc veidnes (MK 445, ES 2018/1523) | — | ✅ |
+| 6.2 | Saite kājenē katrā lapā vienā vietā | 3.2.3, 3.2.6 | ✅ |
 | 6.3 | Saturs aizpildīts ar reāliem testu atradumiem (pēc testēšanas) | — | ⬜ |
 
 ### US-7 · MI ieteikums darbiniekam (SHOULD)

@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% block title %}{{ "Lapa nav atrasta" if kods == 404 else "Nav piekļuves" }}{% endblock %}
+{% block content %}
+    <section class="card narrow">
+      {% if kods == 404 %}
+      <h1>Lapa nav atrasta</h1>
+      <p>Šāda lapa neeksistē. Pārbaudiet adresi vai atgriezieties <a href="{{ url_for('sakums') }}">sākumlapā</a>.</p>
+      {% else %}
+      <h1>Nav piekļuves</h1>
+      <p>Jūsu izvēlētajai lomai šī lapa nav pieejama. <a href="{{ url_for('sakums') }}">Izvēlēties citu lomu</a>.</p>
+      {% endif %}
+    </section>
+{% endblock %}

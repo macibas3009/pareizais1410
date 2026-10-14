@@ -1,0 +1,91 @@
+{
+  "checked_at": "2026-10-14T09:58+00:00",
+  "axe_version": "4.12.1",
+  "tags": [
+    "wcag2a",
+    "wcag2aa",
+    "wcag21a",
+    "wcag21aa",
+    "wcag22aa"
+  ],
+  "summary": {
+    "pages": 1,
+    "skipped": 9,
+    "blocking": 0,
+    "other": 0,
+    "overflow": 0,
+    "focus": 0,
+    "keyboard_failed": 0
+  },
+  "pages": [
+    {
+      "title": "1 Sākumlapa: lomas izvēle",
+      "path": "/",
+      "skipped": false,
+      "violations": [],
+      "incomplete": 1,
+      "focus_not_visible": [],
+      "overflow_px": {
+        "320 px": 0,
+        "200 %": 0
+      }
+    },
+    {
+      "title": "2 Iesnieguma forma",
+      "path": "/iesniegt",
+      "skipped": true
+    },
+    {
+      "title": "7 Piekļūstamības paziņojums",
+      "path": "/pieklustamiba",
+      "skipped": true
+    },
+    {
+      "title": "8 Mans iesniegums",
+      "path": "/mans-iesniegums",
+      "skipped": true
+    },
+    {
+      "title": "8 Mans iesniegums: rezultāts",
+      "path": "/mans-iesniegums?numurs=2026-0001",
+      "skipped": true
+    },
+    {
+      "title": "8 Mans iesniegums: nav atrasts",
+      "path": "/mans-iesniegums?numurs=2099-9999",
+      "skipped": true
+    },
+    {
+      "title": "4 Saraksts",
+      "path": "/darbinieks/iesniegumi",
+      "skipped": true
+    },
+    {
+      "title": "4 Saraksts ar filtriem",
+      "path": "/darbinieks/iesniegumi?statuss=Jauns&tema=1&q=iela",
+      "skipped": true
+    },
+    {
+      "title": "5 Detaļas",
+      "path": "/darbinieks/iesniegumi/2026-0006",
+      "skipped": true
+    },
+    {
+      "title": "6 Pārskats vadītājam",
+      "path": "/vaditajs/parskats",
+      "skipped": true
+    }
+  ],
+  "keyboard": [
+    {
+      "step": "Pirmais Tab atver «Pāriet uz saturu»",
+      "ok": true,
+      "note": "Pāriet uz saturu"
+    },
+    {
+      "step": "Loma izvēlēta ar Enter",
+      "ok": true,
+      "note": "http://127.0.0.1:46693/iesniegt"
+    }
+  ]
+}

@@ -54,9 +54,9 @@ Statusa apzīmējumi: ✅ izpildīts un notestēts · 🟡 daļēji · ⬜ nav s
 
 | # | Kritērijs | Statuss |
 |---|---|---|
-| S0.1 | `python app.py` startē sistēmu, sākumlapa redzama | ⬜ |
-| S0.2 | `schema.sql` un 10 testa iesniegumi 5 tēmās `data.db` | ⬜ |
-| S0.3 | `python tests/a11y_check.py` strādā | ⬜ |
+| S0.1 | `python app.py` startē sistēmu, sākumlapa redzama | ✅ |
+| S0.2 | `schema.sql` un 10 testa iesniegumi 5 tēmās `data.db` | ✅ |
+| S0.3 | `python tests/a11y_check.py` strādā | ✅ |
 
 ### US-1 · Iesnieguma iesniegšana (MUST)
 

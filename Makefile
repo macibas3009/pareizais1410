@@ -1,4 +1,4 @@
-.PHONY: verify-setup test lint-contract run seed
+.PHONY: verify-setup test lint-contract run seed users role
 
 verify-setup:
 	@python --version
@@ -18,3 +18,10 @@ run:
 
 seed:
 	python -m app.seed
+
+users:
+	python -m app.roles list
+
+# Lietošana: make role EMAIL=vards@example.com ROLE=darbinieks
+role:
+	python -m app.roles set "$(EMAIL)" "$(ROLE)"

@@ -158,3 +158,18 @@ def test_due_label_and_plural():
     assert due_label("2026-10-14", today) == ("Termiņš šodien", "soon")
     assert due_label("2026-10-16", today) == ("Termiņš pēc 2 d.", "upcoming")
     assert plural(1, "a", "b") == "a" and plural(11, "a", "b") == "b" and plural(21, "a", "b") == "a"
+
+
+def test_role_command_gives_access(db_path):
+    from app import roles
+
+    client = TestClient(create_app(db_path=db_path))
+    client.post("/auth/register", json={"email": "jauns@example.com", "fullName": "Jauns Lietotājs", "password": "drosa-parole-123"})
+
+    conn = db.connect(db_path)
+    assert roles.set_role(conn, " Jauns@Example.com ", "darbinieks") is True
+    client.post("/auth/login", json={"email": "jauns@example.com", "password": "drosa-parole-123"})
+    assert "Konts gaida apstiprinājumu" not in client.get("/panelis").text
+
+    with pytest.raises(ValueError):
+        roles.set_role(conn, "jauns@example.com", "superadmins")

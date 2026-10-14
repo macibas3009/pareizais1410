@@ -155,7 +155,7 @@
           {% for i in interactions %}
           <li>
             <span class="meta">{{ fmt_date(i.date) }} · {{ i.kind }}</span>
-            <span class="feed-org">{{ i.organization }}</span>
+            <a class="feed-org" href="/organizacijas/{{ i.organization_id }}#mijiedarbibas">{{ i.organization }}</a>
             <span>{{ first_sentence(i.summary) }}</span>
           </li>
           {% endfor %}
@@ -163,6 +163,7 @@
         {% else %}
         <p class="empty">Mijiedarbību vēl nav.</p>
         {% endif %}
+        <p class="block-links"><a href="{{ '/organizacijas' if whole_institution else '/organizacijas?atbildigais=mani' }}">Skatīt visas organizācijas</a></p>
       </section>
     </div>
 {% endif %}

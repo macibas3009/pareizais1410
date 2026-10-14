@@ -16,8 +16,10 @@ ACTION_LABELS = {
     "delete": "Dzēsa",
     "deletion_request": "Reģistrēja dzēšanas pieprasījumu",
     "deletion_reject": "Noraidīja dzēšanas pieprasījumu",
+    "ai_generate": "Izveidoja MI kopsavilkumu",
+    "ai_approve": "Apstiprināja MI kopsavilkumu",
 }
-OBJECT_LABELS = {"organization": "Organizācija", "user": "Lietotājs", "contact": "Kontaktpersona"}
+OBJECT_LABELS = {"organization": "Organizācija", "user": "Lietotājs", "contact": "Kontaktpersona", "interaction": "Mijiedarbība"}
 
 
 def log(conn: sqlite3.Connection, user_id: int, action: str, object_type: str, object_id: int) -> None:

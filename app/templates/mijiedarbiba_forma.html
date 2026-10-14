@@ -1,0 +1,89 @@
+{% extends "base.html" %}
+{% import "_forms.html" as f %}
+{% block title %}{% if errors %}Kļūda: {% endif %}Jauna mijiedarbība{% endblock %}
+{% block content %}
+    <nav class="breadcrumbs" aria-label="Atrašanās vieta">
+      <a href="/organizacijas">Organizācijas</a> <span aria-hidden="true">›</span>
+      <a href="/organizacijas/{{ org.id }}">{{ org.name }}</a> <span aria-hidden="true">›</span>
+      <span aria-current="page">Jauna mijiedarbība</span>
+    </nav>
+
+    <div class="page-head">
+      <h1>Jauna mijiedarbība</h1>
+      <p class="sub">{{ org.name }} · zvans, e-pasts vai sanāksme</p>
+    </div>
+
+    <section class="block form-block form-wide">
+{{ f.error_summary(errors, labels) }}
+      <form method="post" action="/organizacijas/{{ org.id }}/mijiedarbibas/jauna" novalidate>
+        <input type="hidden" name="ai_source" value="{{ values.get('ai_source') or '' }}">
+
+        <fieldset class="field radios radios-row" id="kind"{% if errors.kind %} aria-describedby="kind-error" aria-invalid="true"{% endif %}>
+          <legend>{{ labels.kind }}</legend>
+          {% for k in kinds %}
+          <label class="radio"><input type="radio" name="kind" value="{{ k }}" required{% if values.get('kind') == k %} checked{% endif %}><span><strong>{{ k }}</strong></span></label>
+          {% endfor %}
+          {% if errors.kind %}<div id="kind-error" class="field-error">{{ errors.kind }}</div>{% endif %}
+        </fieldset>
+
+{{ f.input("date", labels.date, errors, values, type="date", max=today.isoformat()) }}
+
+        <fieldset class="field checks" id="participants"{% if errors.participants %} aria-describedby="participants-error" aria-invalid="true"{% endif %}>
+          <legend>{{ labels.participants }}</legend>
+          <div class="checks-cols">
+            <div>
+              <p class="group-label">Organizācijas kontaktpersonas</p>
+              {% for c in org_contacts %}
+              <label class="check"><input type="checkbox" name="contacts" value="{{ c.id }}"{% if c.id in values.get('contact_ids', []) %} checked{% endif %}> {{ c.full_name }} <span class="meta">{{ c.position }}</span></label>
+              {% else %}
+              <p class="meta">Kontaktpersonu nav. <a href="/organizacijas/{{ org.id }}/kontakti/jauns">Pievienot</a></p>
+              {% endfor %}
+            </div>
+            <div>
+              <p class="group-label">Darbinieki</p>
+              {% for s in staff %}
+              <label class="check"><input type="checkbox" name="staff" value="{{ s.id }}"{% if s.id in values.get('staff_ids', []) %} checked{% endif %}> {{ s.full_name }}{% if s.id == user.id %} <span class="meta">(es)</span>{% endif %}</label>
+              {% endfor %}
+            </div>
+          </div>
+          {% if errors.participants %}<div id="participants-error" class="field-error">{{ errors.participants }}</div>{% endif %}
+        </fieldset>
+
+        <div class="ai-box">
+          <h2 id="mi-virsraksts">Kopsavilkums ar MI <span class="id ai">MI-1</span> <span class="optional">(nav obligāts)</span></h2>
+          <label for="notes">Piezīmes no sarunas (brīvs teksts)</label>
+          <textarea id="notes" name="notes" rows="5" maxlength="4000" aria-describedby="notes-hint">{{ values.get('notes') or '' }}</textarea>
+          <p id="notes-hint" class="hint">
+            Piezīmes netiek saglabātas, saglabājas tikai jūsu apstiprinātais kopsavilkums.
+            {% if claude_enabled %}
+            <strong>Uzmanību:</strong> nospiežot pogu, teksts tiks nosūtīts MI pakalpojumam (Claude). Neiekļaujiet personas kodus, veselības vai citus sensitīvus datus.
+            {% else %}
+            MI darbojas imitācijas režīmā: teksts netiek sūtīts ārpus sistēmas.
+            {% endif %}
+          </p>
+          {% if ai_notice == "empty" %}<div class="alert error" role="alert">Ierakstiet piezīmes, no kurām veidot kopsavilkumu.</div>{% endif %}
+          <button type="submit" name="action" value="ai" class="btn-secondary-solid">Izveidot kopsavilkumu ar MI</button>
+        </div>
+
+        {% if values.get('ai_source') %}
+        <div class="alert ai-notice" role="status">
+          <strong>Ģenerēts ar MI</strong>{{ " (Claude)" if values.ai_source == "claude" else " (imitācija)" }}.
+          Pārbaudiet un, ja vajag, izlabojiet kopsavilkumu un nākamo soli. Saglabājot jūs to apstiprināt.
+        </div>
+        {% endif %}
+
+        <div class="field">
+          <label for="summary">{{ labels.summary }}</label>
+          <textarea id="summary" name="summary" rows="4" maxlength="2000" required
+                    {%- if errors.summary %} aria-describedby="summary-error" aria-invalid="true"{% endif %}>{{ values.get('summary') or '' }}</textarea>
+          {% if errors.summary %}<div id="summary-error" class="field-error">{{ errors.summary }}</div>{% endif %}
+        </div>
+{{ f.input("next_step", labels.next_step, errors, values, autocomplete="off", placeholder="piem., Nosūtīt semināra programmu līdz piektdienai", required=false) }}
+
+        <div class="form-actions">
+          <button type="submit" name="action" value="save">{{ "Apstiprināt un saglabāt" if values.get('ai_source') else "Saglabāt mijiedarbību" }}</button>
+          <a class="btn-link" href="/organizacijas/{{ org.id }}">Atcelt</a>
+        </div>
+      </form>
+    </section>
+{% endblock %}

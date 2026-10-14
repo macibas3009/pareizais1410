@@ -28,7 +28,7 @@
 | &nbsp;&nbsp;&nbsp;└ Labot organizāciju | `/organizacijas/<id>/labot` | F1 | ✅ |
 | &nbsp;&nbsp;&nbsp;└ Kontaktpersonas kartīte (atvēršana žurnālā) | `/kontakti/<id>` | F2, N2 | ✅ |
 | &nbsp;&nbsp;&nbsp;└ Kontaktpersonas forma | `/organizacijas/<id>/kontakti/jauns`, `/kontakti/<id>/labot` | F2 | ✅ |
-| &nbsp;&nbsp;&nbsp;└ Mijiedarbības forma + MI kopsavilkums | — | F3, MI-1 | ⬜ |
+| &nbsp;&nbsp;&nbsp;└ Mijiedarbības forma + MI kopsavilkums | `/organizacijas/<id>/mijiedarbibas/jauna` | F3, MI-1 | ✅ |
 | &nbsp;&nbsp;&nbsp;└ Pieprasījuma forma | — | F4 | ⬜ |
 | &nbsp;&nbsp;&nbsp;└ Uzdevuma forma | — | F5 | ⬜ |
 | Pieprasījumu saraksts (statuss, kavēti) | — | F4 | ⬜ |
@@ -56,7 +56,7 @@
 | Kļūdas lapa (404, 403) | — | ✅ |
 | MI-2 klasifikācija: tikai dokuments, ekrāna nav | MI-2 | ⬜ |
 
-**Kopā:** gatavi 15 · daļēji 1 · vēl nav 9.
+**Kopā:** gatavi 16 · daļēji 1 · vēl nav 8.
 
 ## Kā atjaunot attēlu
 

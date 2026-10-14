@@ -92,7 +92,7 @@ def urgent_requests(conn: sqlite3.Connection, scope: Scope, today: date) -> list
 def recent_interactions(conn: sqlite3.Connection, scope: Scope) -> list[sqlite3.Row]:
     where, params = scope.org_filter()
     return conn.execute(
-        f"SELECT i.date, i.kind, i.summary, o.name AS organization "
+        f"SELECT i.date, i.kind, i.summary, i.ai_source, o.id AS organization_id, o.name AS organization "
         f"FROM interactions i JOIN organizations o ON o.id = i.organization_id "
         f"WHERE {where} ORDER BY i.date DESC, i.id DESC LIMIT ?",
         (*params, LIST_LIMIT),

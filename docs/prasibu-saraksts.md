@@ -1,6 +1,6 @@
 # CRM mazai iestādei · prasību saraksts
 
-> Versija 1.5 · 2026-10-14 · Statuss: precizēts pēc intervijas ar produkta īpašnieku.
+> Versija 1.6 · 2026-10-14 · Statuss: precizēts pēc intervijas ar produkta īpašnieku.
 > Avots: uzdevums-starteris "CRM mazai iestādei" un konceptuālās arhitektūras shēma.
 > Mācību projekts. Visi dati ir sintētiski.
 
@@ -19,18 +19,18 @@ Statusu atjauno tajā pašā komitā, kurā prasība tiek īstenota.
 |---|---|---|---|
 | F0 | Pieslēgšanās un reģistrācija | ✅ DONE | zari `cr-4-auth`, `f9-panelis`, `n4-flask`; lomu apstiprināšana zarā `f0-lomas` |
 | F1 | Organizācijas: izveidot, rediģēt, meklēt | ✅ DONE | zars `f0-lomas`; `tests/test_organizations.py` |
-| F2 | Kontaktpersonas pie organizācijas | 🟡 DAĻĒJI (2 no 3) | zars `crm-2-kontakti`; pārrēķins pēc mijiedarbības nāks ar F3 |
-| F3 | Mijiedarbību žurnāls | ⬜ NAV SĀKTS | |
+| F2 | Kontaktpersonas pie organizācijas | ✅ DONE | zari `crm-2-kontakti`, `crm-3-mijiedarbibas` |
+| F3 | Mijiedarbību žurnāls | ✅ DONE | zars `crm-3-mijiedarbibas`; `tests/test_interactions.py` |
 | F4 | Pieprasījumi no organizācijām | ⬜ NAV SĀKTS | |
 | F5 | Uzdevumi un atgādinājumi | ⬜ NAV SĀKTS | |
 | F6 | Meklēšana | ⬜ NAV SĀKTS | |
 | F7 | Pārskats vadītājam | ⬜ NAV SĀKTS | |
 | F8 | Piekļūstamības paziņojums | ⬜ NAV SĀKTS | |
 | F9 | Vadības panelis pēc pieslēgšanās | 🟡 DAĻĒJI (3 no 7) | zars `f9-panelis`; Jinja2 šablons zarā `n4-flask` |
-| MI-1 | Mijiedarbības kopsavilkums un nākamais solis | ⬜ NAV SĀKTS | |
+| MI-1 | Mijiedarbības kopsavilkums un nākamais solis | ✅ DONE | zars `crm-3-mijiedarbibas`; `app/ai.py`; Claude ceļš nav pārbaudīts ar īstu API atslēgu |
 | MI-2 | Organizāciju prioritizācija: tikai klasifikācija | ⬜ NAV SĀKTS | |
 | N1 | Piekļūstamība | ⬜ NAV SĀKTS | |
-| N2 | Personas dati (VDAR) | 🟡 DAĻĒJI (4 no 6) | zars `crm-2-kontakti`; trūkst mijiedarbību anonimizācijas (F3) un meklēšanas ierobežojuma (F6) |
+| N2 | Personas dati (VDAR) | 🟡 DAĻĒJI (5 no 6) | zari `crm-2-kontakti`, `crm-3-mijiedarbibas`; trūkst meklēšanas ierobežojuma (F6) |
 | N3 | Lomas | 🟡 DAĻĒJI | lomu pieprasīšana un apstiprināšana, tiesības F1 un F9; pārējās tiesības nāks ar F2–F7 |
 | N4 | Tehnoloģijas un laiks | 🟡 DAĻĒJI | Flask + Jinja2 + SQLite un sākumdati: zars `n4-flask`; 1,5 h nav ievērots |
 
@@ -151,7 +151,7 @@ Meklēšana pēc nosaukuma būs F6. Kartītē kontakti, pieprasījumi, uzdevumi 
 | Saziņas pamata datums | ✔ | Līguma vai sadarbības sākuma datums |
 | Glabāt līdz | automātiski | Pēdējās mijiedarbības datums + 3 gadi (ja nav mijiedarbību, tad izveides datums + 3 gadi) |
 
-**Statuss: 🟡 DAĻĒJI (2 no 3).** Zars `crm-2-kontakti`. Lapas: `/organizacijas/<id>/kontakti/jauns`, `/kontakti/<id>`, `/kontakti/<id>/labot`. Testi: `tests/test_contacts.py`.
+**Statuss: ✅ DONE (3 no 3).** Zari `crm-2-kontakti`, `crm-3-mijiedarbibas`. Lapas: `/organizacijas/<id>/kontakti/jauns`, `/kontakti/<id>`, `/kontakti/<id>/labot`. Testi: `tests/test_contacts.py`.
 Kontaktus pievieno un labo organizācijas atbildīgais vai vadītājs. Organizācijas kartītē redzams tikai vārds un amats; e-pasts un tālrunis ir kontaktpersonas kartītē, kuras atvēršana tiek žurnalēta.
 
 **Pieņemšanas kritēriji**
@@ -159,7 +159,7 @@ Kontaktus pievieno un labo organizācijas atbildīgais vai vadītājs. Organizā
 | # | Kritērijs | Statuss |
 |---|---|---|
 | 1 | Formā ir tikai šie lauki, citu personas datu lauku nav (datu minimizācija). Nav lauka "piezīmes par personu" | ✅ DONE |
-| 2 | "Glabāt līdz" netiek ievadīts. Tas tiek pārrēķināts pēc katras mijiedarbības, kurā kontakts piedalās | 🟡 DAĻĒJI: tiek aprēķināts automātiski (izveide + 3 gadi); pārrēķins pēc mijiedarbības nāks ar F3 dalībniekiem |
+| 2 | "Glabāt līdz" netiek ievadīts. Tas tiek pārrēķināts pēc katras mijiedarbības, kurā kontakts piedalās | ✅ DONE: izveidojot = šodiena + 3 gadi; pēc mijiedarbības = pēdējās mijiedarbības datums + 3 gadi |
 | 3 | Kontaktu kartītes atvēršana tiek ierakstīta piekļuves žurnālā | ✅ DONE |
 
 ### F3 · Mijiedarbību žurnāls
@@ -172,11 +172,17 @@ Kontaktus pievieno un labo organizācijas atbildīgais vai vadītājs. Organizā
 | Kopsavilkums | ✔ | Līdz 2000 rakstzīmēm |
 | Nākamais solis | — | Līdz 500 rakstzīmēm |
 
+**Statuss: ✅ DONE (4 no 4).** Zars `crm-3-mijiedarbibas`. Lapa: `/organizacijas/<id>/mijiedarbibas/jauna`. Testi: `tests/test_interactions.py`.
+Dalībnieki var būt tikai šīs organizācijas kontaktpersonas un darbinieki. Dzēsta kontaktpersona hronoloģijā redzama kā "Dzēsta kontaktpersona" (N2).
+
 **Pieņemšanas kritēriji**
-1. Mijiedarbības ir redzamas organizācijas kartītē hronoloģiski, jaunākā augšā.
-2. Jebkurš darbinieks var pievienot mijiedarbību jebkurai organizācijai.
-3. Kopsavilkumu var izveidot ar MI-1. Šādam kopsavilkumam ir atzīme "Ģenerēts ar MI, apstiprināja <darbinieks>".
-4. Pēc saglabāšanas tiek pārrēķināts dalībnieku "Glabāt līdz" (F2).
+
+| # | Kritērijs | Statuss |
+|---|---|---|
+| 1 | Mijiedarbības ir redzamas organizācijas kartītē hronoloģiski, jaunākā augšā | ✅ DONE |
+| 2 | Jebkurš darbinieks var pievienot mijiedarbību jebkurai organizācijai | ✅ DONE |
+| 3 | Kopsavilkumu var izveidot ar MI-1. Šādam kopsavilkumam ir atzīme "Ģenerēts ar MI, apstiprināja <darbinieks>" | ✅ DONE |
+| 4 | Pēc saglabāšanas tiek pārrēķināts dalībnieku "Glabāt līdz" (F2) | ✅ DONE |
 
 ### F4 · Pieprasījumi no organizācijām
 
@@ -294,6 +300,19 @@ Testa lietotāji (sākumdati, `make seed`): `darbinieks@example.com`, `darbiniek
 | Žurnāls | Žurnālā tiek ierakstīts: kurš ģenerēja, kurš apstiprināja, laiks, `avots`. **Nekad** netiek ierakstīts teksts |
 | Kļūdas | API kļūdas vai noildzes gadījumā (> 10 s) tiek parādīts paziņojums un piedāvāta imitācija. Lietotājs nekad neredz 500 |
 | MI akta klase | Minimāls risks (pārredzamības pienākums: marķējums) |
+
+**Statuss: ✅ DONE.** `app/ai.py`, forma `/organizacijas/<id>/mijiedarbibas/jauna`. Testi: `tests/test_interactions.py`.
+
+| Lēmums | Kā īstenots |
+|---|---|
+| Darbības režīms | ✅ Claude API (`claude-opus-5-5`, maināms ar `MI_MODEL`, strukturēta JSON atbilde), ja ir `ANTHROPIC_API_KEY` un pakotne `anthropic`; citādi imitācija pēc atslēgvārdiem |
+| Kad teksts tiek nosūtīts ārēji | ✅ Tikai pēc pogas; formā brīdinājums. Imitācijas režīmā rakstīts, ka teksts netiek sūtīts ārpus sistēmas |
+| Rezultāts | ✅ Ne vairāk kā 3 teikumi + nākamais solis |
+| Marķējums | ✅ Formā "Ģenerēts ar MI (Claude/imitācija)", kartītē "Ģenerēts ar MI · apstiprināja …" |
+| Cilvēka kontrole | ✅ Kopsavilkums tiek ielikts formā rediģēšanai; saglabājas tikai pēc "Apstiprināt un saglabāt". Brīvās piezīmes netiek saglabātas |
+| Žurnāls | ✅ `ai_generate` (kurš, kad) un `ai_approve` (kurš apstiprināja); avots mijiedarbības ierakstā; teksts netiek žurnalēts |
+| Kļūdas | ✅ Noildze 10 s, API kļūda vai atteikums → automātiski imitācija, avots redzams marķējumā; lietotājs neredz 500 |
+| Pārbaude | 🟡 Claude ceļš testēts ar aizstājēju; ar īstu API atslēgu nav pārbaudīts |
 
 ### MI-2 · Organizāciju prioritizācija "pēc sadarbības potenciāla"
 

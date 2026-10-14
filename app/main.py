@@ -14,7 +14,7 @@ from typing import Any
 from flask import Flask, abort, g, jsonify, redirect, render_template, request
 from werkzeug.exceptions import HTTPException
 
-from app import accounts, audit, contacts, dashboard, db, organizations, users
+from app import accounts, ai, audit, contacts, dashboard, db, interactions, organizations, users
 
 VERSION = "0.1.0"
 API_PREFIXES = ("/auth/", "/health")
@@ -308,7 +308,8 @@ def create_app(db_path: Path | None = None, cookie_secure: bool | None = None) -
         audit.log(conn(), user["id"], "view", "organization", org_id)
         return render_template(
             "organizacija.html", user=user, org=org, can_edit=organizations.can_edit(user, org),
-            saved="saglabats" in request.args, today=date.today(), **organizations.card(conn(), org_id),
+            saved="saglabats" in request.args, interaction_saved="mijiedarbiba" in request.args,
+            today=date.today(), **organizations.card(conn(), org_id),
         )
 
     @app.get("/organizacijas/<int:org_id>/labot")
@@ -483,6 +484,51 @@ def create_app(db_path: Path | None = None, cookie_secure: bool | None = None) -
         if not contacts.handle_deletion_request(conn(), admin, request_id, approve=action == "izpildit"):
             abort(404)
         return redirect(f"/dzesanas-pieprasijumi?zinojums={action}", code=303)
+
+    # --- F3 · mijiedarbības, MI-1 · kopsavilkums --------------------------------
+
+    def interaction_form(user, org, values, details=(), status=200, ai_notice=None):
+        errors = {d["field"]: interactions.MESSAGES[(d["field"], d["issue"])] for d in details}
+        org_contacts, staff = interactions.options(conn(), org["id"])
+        return render_template(
+            "mijiedarbiba_forma.html", user=user, org=org, values=values, errors=errors,
+            labels=interactions.FIELD_LABELS, kinds=interactions.KINDS, org_contacts=org_contacts, staff=staff,
+            today=date.today(), claude_enabled=ai.claude_enabled(), ai_notice=ai_notice,
+        ), status
+
+    def visible_org(org_id: int):
+        org = organizations.get(conn(), org_id)
+        if org is None:
+            abort(404)
+        return org
+
+    @app.get("/organizacijas/<int:org_id>/mijiedarbibas/jauna")
+    def interaction_new(org_id: int):
+        user = require(*CRM_ROLES)
+        values = {"date": date.today().isoformat(), "staff_ids": [user["id"]], "contact_ids": []}
+        return interaction_form(user, visible_org(org_id), values)
+
+    @app.post("/organizacijas/<int:org_id>/mijiedarbibas/jauna")
+    def interaction_create(org_id: int):
+        user = require(*CRM_ROLES)
+        org = visible_org(org_id)
+        values = interactions.read_form(request.form)
+
+        if request.form.get("action") == "ai":
+            # MI-1: kopsavilkums no brīvā teksta; darbinieks to pārbauda un apstiprina, saglabājot
+            if not values["notes"].strip():
+                return interaction_form(user, org, values, ai_notice="empty", status=400)
+            result = ai.kopsavilkums(values["notes"])
+            values.update(summary=result["kopsavilkums"], next_step=result["nakamais_solis"], ai_source=result["avots"])
+            audit.log(conn(), user["id"], "ai_generate", "organization", org_id)
+            return interaction_form(user, org, values, ai_notice="generated")
+
+        org_contacts, staff = interactions.options(conn(), org_id)
+        details = interactions.validate(values, {c["id"] for c in org_contacts}, {s["id"] for s in staff}, date.today())
+        if details:
+            return interaction_form(user, org, values, details, status=400)
+        interactions.create(conn(), user, org_id, values, date.today())
+        return redirect(f"/organizacijas/{org_id}?mijiedarbiba=1#mijiedarbibas", code=303)
 
     # --- JSON API (docs/openapi.yaml) -----------------------------------------
 

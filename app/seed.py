@@ -126,26 +126,38 @@ def seed(conn: sqlite3.Connection, today: date | None = None) -> bool:
 
     # 2 kontakti katrai organizācijai; 3 kontaktiem glabāšanas termiņš ir beidzies (N2 "Jāpārskata")
     expired = {1, 6, 13}
+    first_contact: dict[int, int] = {}
     for i, (name, position) in enumerate(CONTACT_NAMES):
         org_index = i // 2
         basis = today - timedelta(days=400 + i * 30)
         retain = today - timedelta(days=10 + i) if i in expired else today + timedelta(days=3 * 365 - i * 20)
         email = f"kontakts{i + 1}@example.com"
-        conn.execute(
+        cur = conn.execute(
             "INSERT INTO contacts (organization_id, full_name, position, email, basis_date, retain_until) "
             "VALUES (?, ?, ?, ?, ?, ?)",
             (org_ids[org_index], name, position, email, basis.isoformat(), retain.isoformat()),
         )
+        first_contact.setdefault(org_index, cur.lastrowid)
 
     # 30 mijiedarbības, 3 katrai organizācijai, pēdējo 60 dienu laikā
     for i in range(30):
         org_index = i % 10
         kind, summary, next_step = INTERACTION_TEXTS[i % len(INTERACTION_TEXTS)]
         owner = ORGANIZATIONS[org_index][3]
-        conn.execute(
+        cur = conn.execute(
             "INSERT INTO interactions (organization_id, kind, date, summary, next_step, created_by) "
             "VALUES (?, ?, ?, ?, ?, ?)",
             (org_ids[org_index], kind, (today - timedelta(days=i * 2)).isoformat(), summary, next_step, user_ids[owner]),
+        )
+        # Dalībnieki: organizācijas pirmā kontaktpersona un atbildīgais darbinieks (F3).
+        # Kontaktu "glabāt līdz" sākumdatos paliek kā iepriekš, lai būtu ko pārskatīt (N2).
+        conn.execute(
+            "INSERT INTO interaction_participants (interaction_id, kind, contact_id) VALUES (?, 'contact', ?)",
+            (cur.lastrowid, first_contact[org_index]),
+        )
+        conn.execute(
+            "INSERT INTO interaction_participants (interaction_id, kind, user_id) VALUES (?, 'staff', ?)",
+            (cur.lastrowid, user_ids[owner]),
         )
 
     for org_index, subject, received_ago, due_in, status in REQUESTS:

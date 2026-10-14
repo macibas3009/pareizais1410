@@ -5,6 +5,8 @@ from __future__ import annotations
 import re
 import sqlite3
 
+from app import interactions
+
 KINDS = ("Uzņēmums", "NVO", "Pašvaldība")
 REG_NO_RE = re.compile(r"^\d{11}$")  # pieņēmums: 11 cipari (prasību saraksts, 10. nodaļa, #1)
 NAME_MIN, NAME_MAX = 2, 200
@@ -65,11 +67,7 @@ def card(conn: sqlite3.Connection, org_id: int) -> dict:
             "WHERE organization_id = ? ORDER BY full_name",
             (org_id,),
         ).fetchall(),
-        "interactions": conn.execute(
-            "SELECT i.date, i.kind, i.summary, i.next_step, u.full_name AS author FROM interactions i "
-            "JOIN users u ON u.id = i.created_by WHERE i.organization_id = ? ORDER BY i.date DESC, i.id DESC",
-            (org_id,),
-        ).fetchall(),
+        "interactions": interactions.for_organization(conn, org_id),
         "requests": conn.execute(
             "SELECT subject, received, due, status FROM requests WHERE organization_id = ? "
             "ORDER BY status = 'Atbildēts', due",

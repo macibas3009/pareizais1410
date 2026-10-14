@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Lietotāji{% endblock %}
+{% block content %}
+    <div class="page-head">
+      <h1>Lietotāji un lomas</h1>
+      <p class="sub">Apstipriniet jaunus kontus un mainiet lomas. Savu lomu mainīt nevar.</p>
+    </div>
+
+    {% if message == "saglabats" %}<div class="alert ok" role="status">Loma saglabāta.</div>{% endif %}
+    {% if error %}<div class="alert error" role="alert">{{ error }}</div>{% endif %}
+
+    <section class="block">
+      <div class="table-wrap">
+        <table>
+          <caption>Visi lietotāji ({{ people|length }})</caption>
+          <thead>
+            <tr><th scope="col">Vārds</th><th scope="col">E-pasts</th><th scope="col">Loma</th><th scope="col">Mainīt lomu</th></tr>
+          </thead>
+          <tbody>
+            {% for p in people %}
+            <tr>
+              <th scope="row">{{ p.full_name }}</th>
+              <td>{{ p.email }}</td>
+              <td>
+                {% if p.role %}{{ role_labels[p.role] }}
+                {% else %}<span class="tag soon">Gaida apstiprinājumu</span>
+                  {% if p.requested_role %}<span class="meta">pieprasa: {{ role_labels[p.requested_role] }}</span>{% endif %}
+                {% endif %}
+              </td>
+              <td>
+                {% if p.id == user.id %}
+                <span class="meta">Jūsu konts</span>
+                {% else %}
+                <form method="post" action="/lietotaji/{{ p.id }}/loma" class="inline-form">
+                  <label class="visually-hidden" for="role-{{ p.id }}">Loma lietotājam {{ p.full_name }}</label>
+                  <select id="role-{{ p.id }}" name="role">
+                    {% for value, text in role_labels.items() %}
+                    <option value="{{ value }}"{% if (p.role or p.requested_role) == value %} selected{% endif %}>{{ text }}</option>
+                    {% endfor %}
+                  </select>
+                  <button type="submit" class="btn-small">Saglabāt<span class="visually-hidden">: {{ p.full_name }}</span></button>
+                </form>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+{% endblock %}

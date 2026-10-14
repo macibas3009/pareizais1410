@@ -6,6 +6,8 @@ import sqlite3
 from dataclasses import dataclass
 from datetime import date, timedelta
 
+from app import users
+
 ROLE_LABELS = {
     "darbinieks": "Darbinieks",
     "vaditajs": "Vadītājs",
@@ -97,12 +99,6 @@ def recent_interactions(conn: sqlite3.Connection, scope: Scope) -> list[sqlite3.
     ).fetchall()
 
 
-def pending_users(conn: sqlite3.Connection) -> list[sqlite3.Row]:
-    return conn.execute(
-        "SELECT full_name, email, created_at FROM users WHERE role IS NULL ORDER BY created_at"
-    ).fetchall()
-
-
 def complete_task(conn: sqlite3.Connection, task_id: int, user: sqlite3.Row, now: str) -> bool:
     """Atzīmē uzdevumu kā izpildītu. Darbinieks var tikai savus, vadītājs jebkuru."""
     row = conn.execute("SELECT assignee_id FROM tasks WHERE id = ? AND done_at IS NULL", (task_id,)).fetchone()
@@ -156,7 +152,7 @@ def context(conn: sqlite3.Connection, user: sqlite3.Row, today: date) -> dict:
     if role is None:
         return {"view": "pending"}
     if role == "administrators":
-        return {"view": "admin", "pending_users": pending_users(conn)}
+        return {"view": "admin", "pending_users": users.pending(conn)}
     whole = role == "vaditajs"
     scope = Scope(user_id=user["id"], whole_institution=whole)
     return {

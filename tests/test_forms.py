@@ -19,6 +19,7 @@ def register_form(client, **overrides):
     data = {
         "fullName": "Līga Ozoliņa-Kalniņa",
         "email": "liga@example.com",
+        "requested_role": "darbinieks",
         "password": "drosa-parole-123",
         "password2": "drosa-parole-123",
     }

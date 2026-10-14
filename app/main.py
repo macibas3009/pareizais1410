@@ -11,16 +11,22 @@ from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from flask import Flask, g, jsonify, redirect, render_template, request
+from flask import Flask, abort, g, jsonify, redirect, render_template, request
 from werkzeug.exceptions import HTTPException
 
-from app import accounts, dashboard, db
+from app import accounts, audit, dashboard, db, organizations, users
 
 VERSION = "0.1.0"
 API_PREFIXES = ("/auth/", "/health")
 
 # Kļūdu teksti reģistrācijas formā (N1: pie lauka un kopsavilkumā)
-FIELD_LABELS = {"fullName": "Vārds, uzvārds", "email": "E-pasts", "password": "Parole", "password2": "Parole vēlreiz"}
+FIELD_LABELS = {
+    "fullName": "Vārds, uzvārds",
+    "email": "E-pasts",
+    "requested_role": "Pieprasītā loma",
+    "password": "Parole",
+    "password2": "Parole vēlreiz",
+}
 ISSUE_MESSAGES = {
     ("fullName", "REQUIRED"): "Ievadiet vārdu un uzvārdu.",
     ("fullName", "INVALID_FORMAT"): "Vārdā drīkst būt tikai burti, atstarpes, defise un apostrofs.",
@@ -31,6 +37,7 @@ ISSUE_MESSAGES = {
     ("password", "TOO_SHORT"): f"Parolei jābūt vismaz {accounts.PASSWORD_MIN} rakstzīmes garai.",
     ("password", "TOO_LONG"): f"Parole nedrīkst būt garāka par {accounts.PASSWORD_MAX} rakstzīmēm.",
     ("password2", "MISMATCH"): "Paroles nesakrīt.",
+    ("requested_role", "REQUIRED"): "Izvēlieties, kādu lomu pieprasāt.",
 }
 
 log = logging.getLogger("app")
@@ -65,6 +72,8 @@ def create_app(db_path: Path | None = None, cookie_secure: bool | None = None) -
         field_labels=FIELD_LABELS,
         password_min=accounts.PASSWORD_MIN,
         role_label=lambda role: dashboard.ROLE_LABELS.get(role or "", "Gaida apstiprinājumu"),
+        role_labels=dashboard.ROLE_LABELS,
+        requestable_roles=db.REQUESTABLE_ROLES,
     )
 
     # --- Datubāze un pašreizējais lietotājs -----------------------------------
@@ -106,6 +115,8 @@ def create_app(db_path: Path | None = None, cookie_secure: bool | None = None) -
 
     @app.errorhandler(HTTPException)
     def on_http_error(exc: HTTPException):
+        if exc.response is not None:  # abort(redirect(...)) no require()
+            return exc.response
         if wants_json():
             code = "NOT_FOUND" if exc.code == 404 else "HTTP_ERROR"
             message = "Resource not found" if exc.code == 404 else (exc.name or "HTTP error")
@@ -153,15 +164,19 @@ def create_app(db_path: Path | None = None, cookie_secure: bool | None = None) -
         values = {
             "fullName": request.form.get("fullName", "").strip(),
             "email": accounts.normalize_email(request.form.get("email", "")),
+            "requested_role": request.form.get("requested_role", ""),
         }
         password = request.form.get("password", "")
         details = accounts.validate_registration(values["email"], values["fullName"], password)
+        if values["requested_role"] not in db.REQUESTABLE_ROLES:
+            details.append({"field": "requested_role", "issue": "REQUIRED"})
         if password and password != request.form.get("password2", ""):
             details.append({"field": "password2", "issue": "MISMATCH"})
 
         status = 400
         if not details:
-            if accounts.register(conn(), values["email"], values["fullName"], password) is not None:
+            user_id = accounts.register(conn(), values["email"], values["fullName"], password, values["requested_role"])
+            if user_id is not None:
                 return redirect("/login?registered=1", code=303)
             details = [{"field": "email", "issue": "TAKEN"}]
             status = 409
@@ -196,6 +211,132 @@ def create_app(db_path: Path | None = None, cookie_secure: bool | None = None) -
         if not dashboard.complete_task(conn(), task_id, user, datetime.now(timezone.utc).isoformat()):
             return api_error(404, "NOT_FOUND", "Task not found")
         return redirect("/panelis", code=303)
+
+    # --- Lomu pārbaude (N3) ---------------------------------------------------
+
+    def require(*roles: str):
+        """Atgriež pieslēgto lietotāju ar atļautu lomu; citādi novirza uz /login vai 403."""
+        user = current_user()
+        if user is None:
+            abort(redirect("/login", code=303))
+        if user["role"] not in roles:
+            abort(403)
+        return user
+
+    # --- F0 #6 · lomu apstiprināšana (administrators) --------------------------
+
+    @app.get("/lietotaji")
+    def users_page():
+        admin = require("administrators")
+        return render_template("lietotaji.html", user=admin, people=users.all_users(conn()),
+                               message=request.args.get("zinojums"), error=None)
+
+    @app.post("/lietotaji/<int:user_id>/loma")
+    def users_set_role(user_id: int):
+        admin = require("administrators")
+        problem = users.set_role(conn(), admin, user_id, request.form.get("role", ""))
+        if problem:
+            return render_template("lietotaji.html", user=admin, people=users.all_users(conn()),
+                                   message=None, error=problem), 400
+        back = "/panelis" if request.form.get("back") == "panelis" else "/lietotaji?zinojums=saglabats"
+        return redirect(back, code=303)
+
+    @app.post("/lietotaji/<int:user_id>/noraidit")
+    def users_reject(user_id: int):
+        admin = require("administrators")
+        problem = users.reject(conn(), admin, user_id)
+        if problem:
+            return render_template("lietotaji.html", user=admin, people=users.all_users(conn()),
+                                   message=None, error=problem), 400
+        return redirect("/panelis", code=303)
+
+    @app.get("/zurnals")
+    def access_log_page():
+        admin = require("administrators")
+        return render_template("zurnals.html", user=admin, entries=audit.recent(conn()),
+                               action_labels=audit.ACTION_LABELS, object_labels=audit.OBJECT_LABELS)
+
+    # --- F1 · organizācijas -----------------------------------------------------
+
+    CRM_ROLES = ("darbinieks", "vaditajs")
+
+    def org_form(user, org=None, values=None, details=(), status=200):
+        errors = {d["field"]: organizations.MESSAGES[(d["field"], d["issue"])] for d in details}
+        return render_template(
+            "organizacija_forma.html", user=user, org=org, values=values or {}, errors=errors,
+            labels=organizations.FIELD_LABELS,
+            kinds_options=[(k, k) for k in organizations.KINDS],
+            staff_options=[(s["id"], s["full_name"]) for s in users.staff(conn())],
+        ), status
+
+    @app.get("/organizacijas")
+    def organizations_page():
+        user = require(*CRM_ROLES)
+        kind = request.args.get("veids", "")
+        responsible = request.args.get("atbildigais", "")
+        responsible_id = user["id"] if responsible == "mani" else (int(responsible) if responsible.isdigit() else None)
+        return render_template(
+            "organizacijas.html", user=user, kinds=organizations.KINDS, staff=users.staff(conn()),
+            rows=organizations.list_all(conn(), kind or None, responsible_id),
+            kind=kind, responsible=responsible, created=request.args.get("izveidota"),
+        )
+
+    @app.get("/organizacijas/jauna")
+    def organization_new():
+        user = require(*CRM_ROLES)
+        return org_form(user, values={"responsible_id": user["id"]})
+
+    @app.post("/organizacijas/jauna")
+    def organization_create():
+        user = require(*CRM_ROLES)
+        values = organizations.read_form(request.form, user)
+        staff_ids = {s["id"] for s in users.staff(conn())}
+        details = organizations.validate(conn(), values, staff_ids)
+        if details:
+            return org_form(user, values=values, details=details, status=400)
+        org_id = organizations.create(conn(), values)
+        audit.log(conn(), user["id"], "create", "organization", org_id)
+        return redirect(f"/organizacijas/{org_id}?saglabats=1", code=303)
+
+    @app.get("/organizacijas/<int:org_id>")
+    def organization_card(org_id: int):
+        user = require(*CRM_ROLES)
+        org = organizations.get(conn(), org_id)
+        if org is None:
+            abort(404)
+        # N2: katra kartītes atvēršana tiek ierakstīta žurnālā
+        audit.log(conn(), user["id"], "view", "organization", org_id)
+        return render_template(
+            "organizacija.html", user=user, org=org, can_edit=organizations.can_edit(user, org),
+            saved="saglabats" in request.args, today=date.today(), **organizations.card(conn(), org_id),
+        )
+
+    @app.get("/organizacijas/<int:org_id>/labot")
+    def organization_edit(org_id: int):
+        user = require(*CRM_ROLES)
+        org = organizations.get(conn(), org_id)
+        if org is None:
+            abort(404)
+        if not organizations.can_edit(user, org):
+            abort(403)
+        return org_form(user, org=org, values=dict(org))
+
+    @app.post("/organizacijas/<int:org_id>/labot")
+    def organization_update(org_id: int):
+        user = require(*CRM_ROLES)
+        org = organizations.get(conn(), org_id)
+        if org is None:
+            abort(404)
+        if not organizations.can_edit(user, org):
+            abort(403)
+        values = organizations.read_form(request.form, user, current_responsible=org["responsible_id"])
+        staff_ids = {s["id"] for s in users.staff(conn())}
+        details = organizations.validate(conn(), values, staff_ids, org_id=org_id)
+        if details:
+            return org_form(user, org=org, values=values, details=details, status=400)
+        organizations.update(conn(), org_id, values)
+        audit.log(conn(), user["id"], "update", "organization", org_id)
+        return redirect(f"/organizacijas/{org_id}?saglabats=1", code=303)
 
     # --- JSON API (docs/openapi.yaml) -----------------------------------------
 

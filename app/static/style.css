@@ -566,3 +566,115 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
 .error-summary a { color: var(--danger); font-weight: 600; text-decoration: underline; }
 
 .panel:focus { outline: none; }
+
+/* ==========================================================================
+   F1 · organizācijas, F0 #6 · lietotāji, N2 · žurnāls
+   ========================================================================== */
+
+.page-head { margin: 1.75rem 0 1.25rem; }
+.page-head h1 { margin: 0 0 0.25rem; }
+.page-head .sub { margin: 0; }
+.page-head-row { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+
+.breadcrumbs { margin-top: 1.25rem; font-size: 0.9rem; color: var(--muted); }
+.breadcrumbs a { font-weight: 500; }
+
+a.btn {
+  display: inline-block;
+  padding: 0.65rem 1.1rem;
+  border-radius: 8px;
+  background: var(--lake-600);
+  color: #fff;
+  font-weight: 600;
+  text-decoration: none;
+}
+
+a.btn:hover { background: var(--lake-700); text-decoration: none; }
+
+.btn-link { font-weight: 600; }
+
+button.btn-danger { background: #fff; color: var(--danger); border: 1px solid #e7b7b2; }
+button.btn-danger:hover { background: var(--danger-bg); }
+
+select {
+  width: 100%;
+  padding: 0.65rem 0.7rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  font: inherit;
+  color: inherit;
+}
+
+select:focus { outline: none; border-color: var(--lake-500); box-shadow: 0 0 0 3px rgba(31, 138, 166, 0.2); }
+select[aria-invalid="true"] { border-color: var(--danger); }
+
+.filters {
+  display: flex;
+  align-items: flex-end;
+  gap: 1rem;
+  flex-wrap: wrap;
+  margin-bottom: 1.25rem;
+}
+
+.filters .field { margin: 0; min-width: 12rem; }
+.filters button { margin: 0; }
+
+table caption { text-align: left; font-weight: 600; padding-bottom: 0.5rem; color: var(--lake-900); }
+
+.facts { display: grid; grid-template-columns: max-content 1fr; gap: 0.5rem 1.25rem; margin: 0; }
+.facts dt { color: var(--muted); font-size: 0.9rem; }
+.facts dd { margin: 0; font-weight: 600; }
+
+.contact-list { list-style: none; margin: 0 0 0.75rem; padding: 0; }
+.contact-list li { padding: 0.6rem 0; border-top: 1px solid var(--sand-200); }
+.contact-list li:first-child { border-top: 0; padding-top: 0; }
+
+.timeline { list-style: none; margin: 0; padding: 0; border-left: 3px solid var(--lake-100); }
+.timeline li { position: relative; padding: 0 0 1rem 1.25rem; }
+.timeline li::before {
+  content: "";
+  position: absolute;
+  left: -8px;
+  top: 0.35rem;
+  width: 13px;
+  height: 13px;
+  border-radius: 50%;
+  background: var(--lake-500);
+  border: 2px solid #fff;
+}
+.timeline p { margin: 0.2rem 0 0; }
+
+.form-block { max-width: 640px; }
+.form-actions { display: flex; align-items: center; gap: 1.25rem; margin-top: 0.5rem; }
+.form-actions button { width: auto; margin: 0; padding-inline: 1.5rem; }
+.label { display: block; margin-bottom: 0.35rem; font-size: 0.9rem; font-weight: 600; }
+.readonly { margin: 0; padding: 0.65rem 0; font-weight: 600; }
+
+.radios { border: 0; padding: 0; margin: 0 0 1.15rem; }
+.radios legend { padding: 0; margin-bottom: 0.4rem; font-size: 0.9rem; font-weight: 600; }
+.radio {
+  display: flex;
+  gap: 0.7rem;
+  align-items: flex-start;
+  padding: 0.7rem 0.85rem;
+  margin: 0 0 0.5rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  background: #fff;
+  font-weight: 400;
+  cursor: pointer;
+}
+.radio:has(input:checked) { border-color: var(--lake-500); background: var(--lake-100); }
+.radio input { width: auto; margin-top: 0.25rem; accent-color: var(--lake-600); }
+.radio small { display: block; color: var(--muted); font-size: 0.82rem; }
+.radios[aria-invalid="true"] .radio { border-color: var(--danger); }
+
+.inline-form { display: flex; gap: 0.5rem; align-items: center; margin: 0; }
+.inline-form select { width: auto; padding: 0.4rem 0.5rem; }
+td.actions { display: flex; gap: 0.5rem; align-items: center; flex-wrap: wrap; }
+td.actions form { margin: 0; }
+.block-links { margin: 1rem 0 0; font-size: 0.92rem; }
+
+.stat-link { display: flex; flex-direction: column; gap: 0.15rem; color: inherit; font-weight: inherit; text-decoration: none; }
+.stat-link:hover .stat-label { text-decoration: underline; }

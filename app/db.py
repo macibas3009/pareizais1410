@@ -6,6 +6,7 @@ import sqlite3
 from pathlib import Path
 
 ROLES = ("darbinieks", "vaditajs", "administrators")
+REQUESTABLE_ROLES = ("darbinieks", "vaditajs")  # administratora lomu reģistrācijā pieprasīt nevar
 
 SCHEMA = """
 CREATE TABLE IF NOT EXISTS users (
@@ -14,7 +15,8 @@ CREATE TABLE IF NOT EXISTS users (
     full_name     TEXT    NOT NULL,
     password_hash TEXT    NOT NULL,
     created_at    TEXT    NOT NULL,
-    role          TEXT    CHECK (role IN ('darbinieks', 'vaditajs', 'administrators'))
+    role          TEXT    CHECK (role IN ('darbinieks', 'vaditajs', 'administrators')),
+    requested_role TEXT   CHECK (requested_role IN ('darbinieks', 'vaditajs'))
 );
 
 CREATE TABLE IF NOT EXISTS sessions (
@@ -72,15 +74,26 @@ CREATE TABLE IF NOT EXISTS tasks (
     request_id      INTEGER REFERENCES requests(id),
     done_at         TEXT
 );
+
+-- N2 · piekļuves žurnāls: kas, ko, kad. Bez personas datiem, tikai ID
+CREATE TABLE IF NOT EXISTS access_log (
+    id          INTEGER PRIMARY KEY AUTOINCREMENT,
+    user_id     INTEGER NOT NULL REFERENCES users(id),
+    action      TEXT    NOT NULL,
+    object_type TEXT    NOT NULL,
+    object_id   INTEGER NOT NULL,
+    at          TEXT    NOT NULL
+);
 """
 
 
 def _migrate(conn: sqlite3.Connection) -> None:
-    """CR-4 datubāzēm vēl nav kolonnas `role`."""
+    """Agrākām datubāzēm trūkst kolonnu `role` (CR-4) un `requested_role` (F0 #6)."""
     columns = {row["name"] for row in conn.execute("PRAGMA table_info(users)")}
-    if "role" not in columns:
-        conn.execute("ALTER TABLE users ADD COLUMN role TEXT")
-        conn.commit()
+    for column in ("role", "requested_role"):
+        if column not in columns:
+            conn.execute(f"ALTER TABLE users ADD COLUMN {column} TEXT")
+    conn.commit()
 
 
 def open_db(path: Path) -> sqlite3.Connection:

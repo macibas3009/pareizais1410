@@ -19,8 +19,13 @@
       <span>Ezermalas novada pašvaldība<small>Pieteikumu sistēma</small></span>
     </a>
     {% if user %}
+    {% set links = [("/panelis", "Sākums")] %}
+    {% if user.role in ("darbinieks", "vaditajs") %}{% set links = links + [("/organizacijas", "Organizācijas")] %}{% endif %}
+    {% if user.role == "administrators" %}{% set links = links + [("/lietotaji", "Lietotāji"), ("/zurnals", "Piekļuves žurnāls")] %}{% endif %}
     <nav aria-label="Galvenā navigācija">
-      <a href="/panelis"{% if request.path == "/panelis" %} aria-current="page"{% endif %}>Sākums</a>
+      {% for href, text in links %}
+      <a href="{{ href }}"{% if request.path == href or (href != "/panelis" and request.path.startswith(href ~ "/")) %} aria-current="page"{% endif %}>{{ text }}</a>
+      {% endfor %}
     </nav>
     <div class="topbar-user">
       <span class="topbar-name">{{ user.full_name }}<small>{{ role_label(user.role) }}</small></span>

@@ -41,15 +41,18 @@ def validate_registration(email: str, full_name: str, password: str) -> list[dic
     return details
 
 
-def register(conn: sqlite3.Connection, email: str, full_name: str, password: str) -> int | None:
-    """Izveido kontu bez lomas. Atgriež None, ja e-pasts jau ir reģistrēts."""
+def register(
+    conn: sqlite3.Connection, email: str, full_name: str, password: str, requested_role: str | None = None
+) -> int | None:
+    """Izveido kontu bez lomas; pieprasīto lomu apstiprina administrators (F0 #6).
+    Atgriež None, ja e-pasts jau ir reģistrēts."""
     password_hash = security.hash_password(password)
     if conn.execute("SELECT 1 FROM users WHERE email = ?", (email,)).fetchone():
         return None
     try:
         cur = conn.execute(
-            "INSERT INTO users (email, full_name, password_hash, created_at) VALUES (?, ?, ?, ?)",
-            (email, full_name, password_hash, datetime.now(timezone.utc).isoformat()),
+            "INSERT INTO users (email, full_name, password_hash, created_at, requested_role) VALUES (?, ?, ?, ?, ?)",
+            (email, full_name, password_hash, datetime.now(timezone.utc).isoformat(), requested_role),
         )
     except sqlite3.IntegrityError:  # vienlaicīga reģistrācija ar to pašu e-pastu
         return None

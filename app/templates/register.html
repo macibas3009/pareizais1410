@@ -1,48 +1,23 @@
 {% extends "auth_base.html" %}
+{% import "_forms.html" as f %}
 {% block title %}{% if errors %}Kļūda: {% endif %}Reģistrēties{% endblock %}
-
-{% macro field(name, label, type="text", autocomplete="", placeholder="", hint="") %}
-        <div class="field">
-          <label for="{{ name }}">{{ label }}</label>
-          {%- set described = [] %}
-          {%- if hint %}{% set _ = described.append(name ~ "-hint") %}{% endif %}
-          {%- if errors.get(name) %}{% set _ = described.append(name ~ "-error") %}{% endif %}
-          <input id="{{ name }}" name="{{ name }}" type="{{ type }}" required
-                 {%- if autocomplete %} autocomplete="{{ autocomplete }}"{% endif %}
-                 {%- if placeholder %} placeholder="{{ placeholder }}"{% endif %}
-                 {%- if type != "password" %} value="{{ values.get(name, '') }}"{% endif %}
-                 {%- if described %} aria-describedby="{{ described | join(' ') }}"{% endif %}
-                 {%- if errors.get(name) %} aria-invalid="true"{% endif %}>
-          {%- if hint %}
-          <div id="{{ name }}-hint" class="hint"><span class="dot" aria-hidden="true"></span>{{ hint }}</div>
-          {%- endif %}
-          {%- if errors.get(name) %}
-          <div id="{{ name }}-error" class="field-error">{{ errors[name] }}</div>
-          {%- endif %}
-        </div>
-{% endmacro %}
 
 {% block card %}
       <h1>Izveidot kontu</h1>
       <p class="sub">Reģistrējieties, lai iesniegtu iesniegumus pašvaldībai.</p>
 
-      {% if errors %}
-      <div class="alert error error-summary" role="alert">
-        <h2>{{ "Lūdzu, izlabojiet kļūdu" if errors|length == 1 else "Lūdzu, izlabojiet " ~ errors|length ~ " kļūdas" }}</h2>
-        <ul>
-          {% for name, message in errors.items() %}
-          <li><a href="#{{ name }}">{{ field_labels[name] }}: {{ message }}</a></li>
-          {% endfor %}
-        </ul>
-      </div>
-      {% endif %}
+{{ f.error_summary(errors, field_labels) }}
 
       <form method="post" action="/register" novalidate>
-{{ field("fullName", "Vārds, uzvārds", autocomplete="name", placeholder="Jānis Bērziņš") }}
-{{ field("email", "E-pasts", type="email", autocomplete="email", placeholder="vards@example.com") }}
-{{ field("password", "Parole", type="password", autocomplete="new-password",
-         hint="Parolei jābūt vismaz " ~ password_min ~ " rakstzīmes garai") }}
-{{ field("password2", "Parole vēlreiz", type="password", autocomplete="new-password") }}
+{{ f.input("fullName", "Vārds, uzvārds", errors, values, autocomplete="name", placeholder="Jānis Bērziņš") }}
+{{ f.input("email", "E-pasts", errors, values, type="email", autocomplete="email", placeholder="vards@example.com") }}
+{{ f.radios("requested_role", "Kādu lomu pieprasāt?", errors, values, [
+     ("darbinieks", "Darbinieks", "Strādāju ar savām organizācijām un pieprasījumiem"),
+     ("vaditajs", "Vadītājs", "Redzu visu iestādi un pārskatu"),
+   ], hint="Lomu apstiprina administrators. Līdz tam konts gaida apstiprinājumu.") }}
+{{ f.input("password", "Parole", errors, values, type="password", autocomplete="new-password",
+           hint="Parolei jābūt vismaz " ~ password_min ~ " rakstzīmes garai") }}
+{{ f.input("password2", "Parole vēlreiz", errors, values, type="password", autocomplete="new-password") }}
         <button type="submit">Izveidot kontu</button>
       </form>
 

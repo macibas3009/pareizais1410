@@ -11,8 +11,12 @@
     </section>
 {% endmacro %}
 
-{% macro stat(value, one, many, warn=false) %}
-        <li class="stat{% if warn and value %} warn{% endif %}"><span class="stat-value">{{ value }}</span> <span class="stat-label">{{ plural(value, one, many) }}</span></li>
+{% macro stat(value, one, many, warn=false, href="") %}
+        <li class="stat{% if warn and value %} warn{% endif %}">
+          {%- if href %}<a class="stat-link" href="{{ href }}">{% endif -%}
+          <span class="stat-value">{{ value }}</span> <span class="stat-label">{{ plural(value, one, many) }}</span>
+          {%- if href %}</a>{% endif -%}
+        </li>
 {%- endmacro %}
 
 {% block content %}
@@ -21,6 +25,10 @@
       <h1>Konts gaida apstiprinājumu</h1>
       <p>Paldies, {{ user.full_name }}! Jūsu konts ir izveidots, bet administrators vēl nav piešķīris tam lomu.
       Kad loma būs piešķirta, šeit redzēsiet savu vadības paneli.</p>
+      {% if user.requested_role %}
+      <p>Jūs pieprasījāt lomu: <strong>{{ role_labels[user.requested_role] }}</strong>.</p>
+      {% endif %}
+      <p class="meta">Atsvaidziniet lapu, kad administrators būs apstiprinājis kontu. No jauna pieslēgties nevajag.</p>
     </section>
 
 {% elif view == "admin" %}
@@ -35,17 +43,37 @@
         <div class="table-wrap">
           <table>
             <caption class="visually-hidden">Lietotāji, kas gaida lomas piešķiršanu</caption>
-            <thead><tr><th scope="col">Vārds</th><th scope="col">E-pasts</th><th scope="col">Reģistrējies</th></tr></thead>
+            <thead><tr><th scope="col">Vārds</th><th scope="col">E-pasts</th><th scope="col">Pieprasītā loma</th><th scope="col">Reģistrējies</th><th scope="col">Darbības</th></tr></thead>
             <tbody>
               {% for u in pending_users %}
-              <tr><th scope="row">{{ u.full_name }}</th><td>{{ u.email }}</td><td>{{ fmt_date(u.created_at) }}</td></tr>
+              <tr>
+                <th scope="row">{{ u.full_name }}</th>
+                <td>{{ u.email }}</td>
+                <td>{{ role_labels[u.requested_role] if u.requested_role else "— nav norādīta —" }}</td>
+                <td>{{ fmt_date(u.created_at) }}</td>
+                <td class="actions">
+                  {% if u.requested_role %}
+                  <form method="post" action="/lietotaji/{{ u.id }}/loma">
+                    <input type="hidden" name="role" value="{{ u.requested_role }}">
+                    <input type="hidden" name="back" value="panelis">
+                    <button type="submit" class="btn-small">Apstiprināt<span class="visually-hidden">: {{ u.full_name }} kā {{ role_labels[u.requested_role] }}</span></button>
+                  </form>
+                  {% endif %}
+                  <a class="btn-link" href="/lietotaji">Cita loma<span class="visually-hidden">: {{ u.full_name }}</span></a>
+                  <form method="post" action="/lietotaji/{{ u.id }}/noraidit">
+                    <button type="submit" class="btn-small btn-danger">Noraidīt<span class="visually-hidden">: {{ u.full_name }}</span></button>
+                  </form>
+                </td>
+              </tr>
               {% endfor %}
             </tbody>
           </table>
         </div>
+        <p class="meta">"Noraidīt" dzēš kontu, kas vēl nav apstiprināts.</p>
         {% else %}
         <p class="empty">Neviens lietotājs negaida apstiprinājumu.</p>
         {% endif %}
+        <p class="block-links"><a href="/lietotaji">Visi lietotāji un lomas</a> · <a href="/zurnals">Piekļuves žurnāls</a></p>
       </section>
     </div>
 
@@ -55,9 +83,9 @@
       <h2 id="kopsavilkums" class="visually-hidden">Kopsavilkums</h2>
       <ul class="stats">
 {% if whole_institution %}
-{{ stat(stats.organizations, "organizācija iestādē", "organizācijas iestādē") }}
+{{ stat(stats.organizations, "organizācija iestādē", "organizācijas iestādē", href="/organizacijas") }}
 {% else %}
-{{ stat(stats.organizations, "mana organizācija", "manas organizācijas") }}
+{{ stat(stats.organizations, "mana organizācija", "manas organizācijas", href="/organizacijas?atbildigais=mani") }}
 {% endif %}
 {{ stat(stats.open_requests, "atvērts pieprasījums", "atvērti pieprasījumi") }}
 {{ stat(stats.tasks_today, "uzdevums šodien", "uzdevumi šodien", warn=true) }}

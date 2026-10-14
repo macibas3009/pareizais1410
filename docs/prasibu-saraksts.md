@@ -1,6 +1,6 @@
 # CRM mazai iestādei · prasību saraksts
 
-> Versija 1.3 · 2026-10-14 · Statuss: precizēts pēc intervijas ar produkta īpašnieku.
+> Versija 1.4 · 2026-10-14 · Statuss: precizēts pēc intervijas ar produkta īpašnieku.
 > Avots: uzdevums-starteris "CRM mazai iestādei" un konceptuālās arhitektūras shēma.
 > Mācību projekts. Visi dati ir sintētiski.
 
@@ -17,8 +17,8 @@ Statusu atjauno tajā pašā komitā, kurā prasība tiek īstenota.
 
 | ID | Prasība | Statuss | Kur īstenots |
 |---|---|---|---|
-| F0 | Pieslēgšanās un reģistrācija | 🟡 DAĻĒJI (6 no 7) | zari `cr-4-auth`, `f9-panelis`; Flask un formas bez JS zarā `n4-flask` |
-| F1 | Organizācijas: izveidot, rediģēt, meklēt | ⬜ NAV SĀKTS | |
+| F0 | Pieslēgšanās un reģistrācija | ✅ DONE | zari `cr-4-auth`, `f9-panelis`, `n4-flask`; lomu apstiprināšana zarā `f0-lomas` |
+| F1 | Organizācijas: izveidot, rediģēt, meklēt | ✅ DONE | zars `f0-lomas`; `tests/test_organizations.py` |
 | F2 | Kontaktpersonas pie organizācijas | ⬜ NAV SĀKTS | |
 | F3 | Mijiedarbību žurnāls | ⬜ NAV SĀKTS | |
 | F4 | Pieprasījumi no organizācijām | ⬜ NAV SĀKTS | |
@@ -30,8 +30,8 @@ Statusu atjauno tajā pašā komitā, kurā prasība tiek īstenota.
 | MI-1 | Mijiedarbības kopsavilkums un nākamais solis | ⬜ NAV SĀKTS | |
 | MI-2 | Organizāciju prioritizācija: tikai klasifikācija | ⬜ NAV SĀKTS | |
 | N1 | Piekļūstamība | ⬜ NAV SĀKTS | |
-| N2 | Personas dati (VDAR) | ⬜ NAV SĀKTS | |
-| N3 | Lomas | ⬜ NAV SĀKTS | |
+| N2 | Personas dati (VDAR) | 🟡 DAĻĒJI | piekļuves žurnāls (organizāciju kartītes, lomu izmaiņas) un tā skatīšana administratoram; trūkst "Jāpārskata" saraksta un dzēšanas (F2) |
+| N3 | Lomas | 🟡 DAĻĒJI | lomu pieprasīšana un apstiprināšana, tiesības F1 un F9; pārējās tiesības nāks ar F2–F7 |
 | N4 | Tehnoloģijas un laiks | 🟡 DAĻĒJI | Flask + Jinja2 + SQLite un sākumdati: zars `n4-flask`; 1,5 h nav ievērots |
 
 ## 1. Situācija un mērķis
@@ -60,7 +60,7 @@ kontaktpersonas, mijiedarbības, pieprasījumi un uzdevumi.
 
 ## 3. Lomas un piekļuve (N3)
 
-Pieslēgšanās: **ar e-pastu un paroli** (F0). Lomu lietotājam piešķir administrators.
+Pieslēgšanās: **ar e-pastu un paroli** (F0). Reģistrējoties lietotājs **pieprasa** lomu (Darbinieks vai Vadītājs); administrators to apstiprina, maina vai noraida. Administratora lomu pieprasīt nevar.
 Jauns reģistrēts lietotājs bez lomas redz tikai paziņojumu "Konts gaida apstiprinājumu"
 un nekādus CRM datus. Loma tiek nolasīta no datubāzes katrā pieprasījumā, nevis no
 sīkdatnes.
@@ -93,7 +93,7 @@ Administrators ikdienā CRM datus neapstrādā: viņa ekrāni ir lietotāji, pie
 
 ### F0 · Pieslēgšanās un reģistrācija
 
-**Statuss: 🟡 DAĻĒJI (6 no 7).** Flask + Jinja2 (zars `n4-flask`). JSON API no `docs/openapi.yaml` (`/auth/*`) saglabāts.
+**Statuss: ✅ DONE (7 no 7).** Flask + Jinja2. JSON API no `docs/openapi.yaml` (`/auth/*`) saglabāts.
 
 | Lauks | Obligāts | Noteikumi |
 |---|:-:|---|
@@ -110,7 +110,7 @@ Administrators ikdienā CRM datus neapstrādā: viņa ekrāni ir lietotāji, pie
 | 3 | Parole glabājas tikai kā jaucējvērtība (scrypt). Sesija tiek glabāta HttpOnly sīkdatnē (8 h). Žurnālā nav e-pasta, vārda un paroles | ✅ DONE |
 | 4 | Poga "Iziet" beidz sesiju. Vecā sesijas sīkdatne vairs nedarbojas | ✅ DONE |
 | 5 | Pēc pieslēgšanās lietotājs nonāk vadības panelī (F9) | ✅ DONE (`f9-panelis`) |
-| 6 | Jauns lietotājs bez lomas redz "Konts gaida apstiprinājumu". Lomu piešķir administrators (N3) | 🟡 DAĻĒJI: paziņojums un administratora saraksts ir; lomas piešķiršanas ekrāna vēl nav, lomas ir sākumdatos |
+| 6 | Jauns lietotājs bez lomas redz "Konts gaida apstiprinājumu". Lomu piešķir administrators (N3) | ✅ DONE (`f0-lomas`): reģistrācijā pieprasa lomu; administrators panelī apstiprina ar vienu pogu, lapā `/lietotaji` maina lomu, var noraidīt (konts tiek dzēsts); izmaiņas žurnālā; `tests/test_roles_flow.py` |
 | 7 | Formas strādā bez JavaScript (N1: POST → redirect → GET). Kļūdu kopsavilkums ar saitēm uz laukiem, ievadītās vērtības saglabājas | ✅ DONE (`n4-flask`, `tests/test_forms.py`) |
 
 Saskarne: ezera fotogrāfija ("Usmas ezers, 2015", WikedKentaur, CC BY-SA 4.0) kreisajā pusē.
@@ -123,15 +123,21 @@ Virsraksts atrodas virs horizonta, paskaidrojums zem tā. Autorība ir redzama k
 | Nosaukums | ✔ | 2–200 rakstzīmes |
 | Reģistrācijas nr. | ✔ | Unikāls. Formāts: sk. 10. nodaļu (atvērts) |
 | Veids | ✔ | `Uzņēmums` / `NVO` / `Pašvaldība` |
-| Atbildīgais darbinieks | ✔ | Lietotājs ar lomu Darbinieks vai Vadītājs |
+| Atbildīgais darbinieks | ✔ | Lietotājs ar lomu Darbinieks vai Vadītājs. Darbiniekam tas ir viņš pats; izvēlēties var tikai vadītājs |
+
+**Statuss: ✅ DONE (6 no 6).** Zars `f0-lomas`. Lapas: `/organizacijas`, `/organizacijas/jauna`, `/organizacijas/<id>`, `/organizacijas/<id>/labot`. Testi: `tests/test_organizations.py`.
+Meklēšana pēc nosaukuma būs F6. Kartītē kontakti, pieprasījumi, uzdevumi un mijiedarbības pagaidām ir tikai skatāmi; pievienošana būs F2–F5.
 
 **Pieņemšanas kritēriji**
-1. Saraksts ir tabula ar `<caption>` un `<th scope="col">`; to var filtrēt pēc veida un atbildīgā.
-2. Formā katram laukam ir `<label>`. Kļūdu gadījumā lapas augšā ir kļūdu kopsavilkums ar saitēm uz laukiem, un pie katra lauka ir kļūdas teksts (`aria-describedby`). Ievadītās vērtības tiek saglabātas.
-3. Ja reģistrācijas nr. dublējas, parādās kļūda "Organizācija ar šo reģ. nr. jau ir reģistrēta".
-4. Organizācijas kartītē ir pamatdati, kontaktpersonas, mijiedarbību hronoloģija (jaunākā augšā), pieprasījumi un uzdevumi.
-5. Katra kartītes atvēršana tiek ierakstīta piekļuves žurnālā (N2).
-6. Darbinieks, kurš nav atbildīgais, kartītē neredz pogu "Labot". Tieša pieeja labošanas URL atgriež 403.
+
+| # | Kritērijs | Statuss |
+|---|---|---|
+| 1 | Saraksts ir tabula ar `<caption>` un `<th scope="col">`; to var filtrēt pēc veida un atbildīgā | ✅ DONE |
+| 2 | Formā katram laukam ir `<label>`. Kļūdu gadījumā lapas augšā ir kļūdu kopsavilkums ar saitēm uz laukiem, un pie katra lauka ir kļūdas teksts (`aria-describedby`). Ievadītās vērtības tiek saglabātas | ✅ DONE |
+| 3 | Ja reģistrācijas nr. dublējas, parādās kļūda "Organizācija ar šo reģ. nr. jau ir reģistrēta" | ✅ DONE |
+| 4 | Organizācijas kartītē ir pamatdati, kontaktpersonas, mijiedarbību hronoloģija (jaunākā augšā), pieprasījumi un uzdevumi | ✅ DONE |
+| 5 | Katra kartītes atvēršana tiek ierakstīta piekļuves žurnālā (N2) | ✅ DONE |
+| 6 | Darbinieks, kurš nav atbildīgais, kartītē neredz pogu "Labot". Tieša pieeja labošanas URL atgriež 403 | ✅ DONE |
 
 ### F2 · Kontaktpersonas pie organizācijas
 
@@ -257,9 +263,9 @@ Trūkstošās daļas ir atkarīgas no sarakstiem un pārskata, kas vēl nav uzta
 |---|---|---|
 | 1 | Pēc veiksmīgas pieslēgšanās lietotājs tiek novirzīts uz `/panelis`. Bez sesijas `/panelis` novirza uz `/login` | ✅ DONE |
 | 2 | Katram blokam ir virsraksts (`h2`). Saraksti ir tabulas ar `<caption>` vai saraksti (`ul`). Katrā blokā ir saite "Skatīt visus" uz pilno sarakstu | 🟡 DAĻĒJI: virsraksti un tabulas ir; saites "Skatīt visus" nav, jo nav sarakstu (F3, F4, F5) |
-| 3 | Skaitļi ir teksts ar paskaidrojumu (piem., "3 kavēti pieprasījumi"), nevis tikai krāsa vai ikona. Katrs skaitlis ir saite uz atfiltrētu sarakstu | 🟡 DAĻĒJI: teksts ir; saišu nav, jo nav sarakstu |
+| 3 | Skaitļi ir teksts ar paskaidrojumu (piem., "3 kavēti pieprasījumi"), nevis tikai krāsa vai ikona. Katrs skaitlis ir saite uz atfiltrētu sarakstu | 🟡 DAĻĒJI: teksts ir; organizāciju karte ir saite uz sarakstu (F1); pārējās kartes gaida F2, F4, F5 |
 | 4 | Ja blokā nav datu, tiek parādīts teksts, piem., "Šodien uzdevumu nav" | ✅ DONE |
-| 5 | Darbinieks redz tikai savu organizāciju datus. Vadītājs redz visas iestādes datus (N3) | 🟡 DAĻĒJI: darbinieka un vadītāja tvērums ir; vadītājam nav saites uz F7; administratoram nav dzēšanas pieprasījumu un piekļuves žurnāla bloka |
+| 5 | Darbinieks redz tikai savu organizāciju datus. Vadītājs redz visas iestādes datus (N3) | 🟡 DAĻĒJI: darbinieka un vadītāja tvērums ir; administratoram ir apstiprināšana un saite uz piekļuves žurnālu; trūkst vadītāja saites uz F7 un dzēšanas pieprasījumu bloka |
 | 6 | Paneļa atvēršana netiek ierakstīta piekļuves žurnālā. Žurnālā tiek ierakstīta kartītes atvēršana no paneļa saitēm (N2) | ✅ DONE paneļa daļā (kartītes nāks ar F1) |
 | 7 | Panelis atbilst N1: 320 px platumā bloki izkārtojas vienā kolonnā, un tas strādā bez JavaScript | 🟡 DAĻĒJI: bez JS ir notestēts; 320 px izkārtojums ir CSS, bet nav pārbaudīts pārlūkā |
 

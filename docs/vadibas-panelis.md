@@ -115,8 +115,12 @@ Krāsa ir tikai papildu norāde. Nozīme vienmēr ir saprotama no teksta.
 ### 5.5. Administratora panelis
 
 - Karte: cik lietotāju gaida lomu.
-- Tabula "Lietotāji, kas gaida lomu": vārds, e-pasts, reģistrācijas datums.
-- Lomu piešķiršana pagaidām notiek terminālī (sk. 8. nodaļu).
+- Tabula "Lietotāji, kas gaida lomu": vārds, e-pasts, **pieprasītā loma**, reģistrācijas datums un darbības:
+  - **Apstiprināt**: piešķir pieprasīto lomu ar vienu klikšķi;
+  - **Cita loma**: atver lapu `/lietotaji`, kur var izvēlēties citu lomu;
+  - **Noraidīt**: dzēš kontu, kas vēl nav apstiprināts.
+- Saites uz lapām "Visi lietotāji un lomas" (`/lietotaji`) un "Piekļuves žurnāls" (`/zurnals`).
+- Visas lomu izmaiņas tiek ierakstītas piekļuves žurnālā. Savu lomu administrators mainīt nevar.
 
 ## 6. Piekļūstamība (N1)
 
@@ -130,7 +134,7 @@ Krāsa ir tikai papildu norāde. Nozīme vienmēr ir saprotama no teksta.
 ## 7. Personas dati (N2)
 
 - Panelī ir tikai organizāciju nosaukumi, darbinieku vārdi un mijiedarbību pirmais teikums. Kontaktpersonu vārdi un e-pasti panelī netiek rādīti, ir tikai to skaits kartē "jāpārskata".
-- Paneļa atvēršana netiek ierakstīta piekļuves žurnālā. Žurnālā tiek ierakstīta kartītes atvēršana (sāksies ar F1).
+- Paneļa atvēršana netiek ierakstīta piekļuves žurnālā. Žurnālā tiek ierakstīta organizācijas kartītes atvēršana (F1), ko administrators redz lapā `/zurnals`.
 - Lietotnes žurnālā netiek rakstīti personas dati.
 
 ## 8. Testa lietotāji un lomu piešķiršana
@@ -151,20 +155,18 @@ Parole visiem: `Ezermala-2026!`. Citu paroli var uzdot ar vides mainīgo `SEED_P
 
 ### Lomas piešķiršana jaunam lietotājam
 
-1. Lietotājs reģistrējas lapā `/register` un pēc pieslēgšanās redz "Konts gaida apstiprinājumu".
-2. Terminālī apskata lietotājus:
-   ```bash
-   make users
-   ```
-3. Piešķir lomu (`darbinieks`, `vaditajs` vai `administrators`):
-   ```bash
-   make role EMAIL=vards@example.com ROLE=darbinieks
-   ```
+1. Lietotājs reģistrējas lapā `/register` un izvēlas, kādu lomu pieprasa: **Darbinieks** vai **Vadītājs**.
+2. Pēc pieslēgšanās viņš redz "Konts gaida apstiprinājumu" un pieprasīto lomu.
+3. Administrators (`admin@example.com`) savā panelī redz pieprasījumu un nospiež **Apstiprināt**. Ja vajag citu lomu, izmanto **Cita loma**.
 4. Lietotājs atsvaidzina lapu un redz savu paneli. No jauna pieslēgties nevajag.
 
-Noņemt lomu var ar `python -m app.roles clear vards@example.com`.
+Rezerves variants terminālī, piemēram, ja nav neviena administratora:
+```bash
+make users
+make role EMAIL=vards@example.com ROLE=administrators
+```
 
-Jaunam darbiniekam sākumā nav organizāciju, tāpēc viņa panelī būs nulles un teksti "… nav". Organizācijas viņam varēs piešķirt, kad būs F1.
+Jaunam darbiniekam sākumā nav organizāciju, tāpēc viņa panelī būs nulles. Vadītājs var viņu norādīt kā atbildīgo organizācijas labošanas formā (F1).
 
 ## 9. Tehniskā informācija
 
@@ -183,8 +185,7 @@ Jaunam darbiniekam sākumā nav organizāciju, tāpēc viņa panelī būs nulles
 
 | Trūkst | Kāpēc | Kad būs |
 |---|---|---|
-| Saites "Skatīt visus" un saites no kartēm uz sarakstiem | Sarakstu lapas vēl nav | F3, F4, F5 |
+| Saites "Skatīt visus" un saites no kartēm uz sarakstiem (izņemot organizācijas) | Sarakstu lapas vēl nav | F2, F4, F5 |
 | Vadītājam saite "Atvērt pilno pārskatu" | Pārskata vēl nav | F7 |
-| Administratoram dzēšanas pieprasījumi un piekļuves žurnāls | Vēl nav uztaisīti | N2 |
-| Lomu piešķiršana ekrānā | Administratora ekrāna vēl nav | F0 #6 / N3 |
+| Administratoram dzēšanas pieprasījumu bloks | Vēl nav uztaisīts | F2 / N2 |
 | 320 px izkārtojums | Uzrakstīts, bet nav pārbaudīts pārlūkā | N1 testi |

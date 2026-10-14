@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+{% block title %}Dzēšanas pieprasījumi{% endblock %}
+{% block content %}
+    <div class="page-head">
+      <h1>Dzēšanas pieprasījumi</h1>
+      <p class="sub">Kontaktpersonas lūgumi dzēst savus datus (N2). Izpildot kontaktpersona tiek dzēsta neatgriezeniski; mijiedarbībās tā tiek parādīta kā "Dzēsta kontaktpersona".</p>
+    </div>
+
+    {% if notice == "izpildit" %}<div class="alert ok" role="status">Kontaktpersona dzēsta.</div>{% endif %}
+    {% if notice == "noraidit" %}<div class="alert ok" role="status">Pieprasījums noraidīts.</div>{% endif %}
+
+    <section class="block">
+      {% if rows %}
+      <div class="table-wrap">
+        <table>
+          <caption>Pieprasījumi (atvērtie augšā)</caption>
+          <thead>
+            <tr><th scope="col">Kontaktpersona</th><th scope="col">Organizācija</th><th scope="col">Reģistrēja</th><th scope="col">Statuss</th><th scope="col">Darbības</th></tr>
+          </thead>
+          <tbody>
+            {% for r in rows %}
+            <tr>
+              <th scope="row">{{ r.contact or "Dzēsta kontaktpersona" }}</th>
+              <td>{{ r.organization }}</td>
+              <td>{{ r.requested_by }}<br><span class="meta">{{ fmt_date(r.requested_at) }}</span></td>
+              <td>
+                {% if r.status == "open" %}<span class="tag soon">Gaida</span>
+                {% elif r.status == "done" %}<span class="tag upcoming">Izpildīts</span><br><span class="meta">{{ r.handled_by }}, {{ fmt_date(r.handled_at) }}</span>
+                {% else %}<span class="tag">Noraidīts</span><br><span class="meta">{{ r.handled_by }}, {{ fmt_date(r.handled_at) }}</span>{% endif %}
+              </td>
+              <td class="actions">
+                {% if r.status == "open" %}
+                <a class="btn-small btn-danger" href="/dzesanas-pieprasijumi/{{ r.id }}/izpildit">Dzēst datus<span class="visually-hidden">: {{ r.contact }}</span></a>
+                <form method="post" action="/dzesanas-pieprasijumi/{{ r.id }}/noraidit">
+                  <button type="submit" class="btn-small btn-ghost">Noraidīt<span class="visually-hidden">: {{ r.contact }}</span></button>
+                </form>
+                {% endif %}
+              </td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="empty">Dzēšanas pieprasījumu nav.</p>
+      {% endif %}
+    </section>
+{% endblock %}

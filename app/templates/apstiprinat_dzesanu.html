@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Apstipriniet dzēšanu{% endblock %}
+{% block content %}
+    <section class="notice-page confirm">
+      <h1>Dzēst kontaktpersonu?</h1>
+      <p><strong>{{ name }}</strong> · {{ organization }}</p>
+      <p>Kontaktpersonas dati tiks dzēsti <strong>neatgriezeniski</strong>. Mijiedarbībās tā tiks parādīta kā "Dzēsta kontaktpersona". Žurnālā paliks tikai dzēšanas fakts bez personas datiem.</p>
+      <div class="form-actions">
+        <form method="post" action="{{ action }}">
+          <button type="submit" class="btn-danger-solid">Jā, dzēst neatgriezeniski</button>
+        </form>
+        <a class="btn-link" href="{{ back }}">Atcelt</a>
+      </div>
+    </section>
+{% endblock %}

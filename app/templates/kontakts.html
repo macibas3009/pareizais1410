@@ -1,0 +1,56 @@
+{% extends "base.html" %}
+{% block title %}{{ contact.full_name }}{% endblock %}
+{% block content %}
+    <nav class="breadcrumbs" aria-label="Atrašanās vieta">
+      <a href="/organizacijas">Organizācijas</a> <span aria-hidden="true">›</span>
+      <a href="/organizacijas/{{ contact.organization_id }}">{{ contact.organization }}</a> <span aria-hidden="true">›</span>
+      <span aria-current="page">{{ contact.full_name }}</span>
+    </nav>
+
+    <div class="page-head page-head-row">
+      <div>
+        <h1>{{ contact.full_name }}</h1>
+        <p class="sub">{{ contact.position }} · {{ contact.organization }}</p>
+      </div>
+      {% if can_edit %}<a class="btn" href="/kontakti/{{ contact.id }}/labot">Labot<span class="visually-hidden"> kontaktpersonu {{ contact.full_name }}</span></a>{% endif %}
+    </div>
+
+    {% if saved %}<div class="alert ok" role="status">Izmaiņas saglabātas.</div>{% endif %}
+    {% if notice == "dzesana" %}<div class="alert ok" role="status">Dzēšanas pieprasījums reģistrēts. To izpildīs administrators.</div>{% endif %}
+
+    <div class="blocks">
+      <section class="block" aria-labelledby="dati">
+        <h2 id="dati">Kontaktinformācija</h2>
+        <dl class="facts">
+          <dt>Vārds, uzvārds</dt><dd>{{ contact.full_name }}</dd>
+          <dt>Amats</dt><dd>{{ contact.position }}</dd>
+          <dt>E-pasts</dt><dd>{{ contact.email or "—" }}</dd>
+          <dt>Tālrunis</dt><dd>{{ contact.phone or "—" }}</dd>
+          <dt>Organizācija</dt><dd><a href="/organizacijas/{{ contact.organization_id }}">{{ contact.organization }}</a></dd>
+        </dl>
+      </section>
+
+      <section class="block" aria-labelledby="vdar">
+        <h2 id="vdar">Datu apstrāde</h2>
+        <dl class="facts">
+          <dt>Saziņas pamats</dt><dd>{{ contact.legal_basis }}, kopš {{ fmt_date(contact.basis_date) }}</dd>
+          <dt>Glabāt līdz</dt>
+          <dd>{{ fmt_date(contact.retain_until) }}
+            {% if contact.retain_until < today.isoformat() %}<span class="tag late">Termiņš beidzies — jāpārskata</span>{% endif %}
+          </dd>
+        </dl>
+        {% if can_edit %}
+        <div class="danger-zone">
+          {% if pending_deletion %}
+          <p class="meta">Dzēšanas pieprasījums reģistrēts {{ fmt_date(pending_deletion.requested_at) }}. Gaida administratoru.</p>
+          {% else %}
+          <p class="meta">Ja persona lūdz dzēst savus datus, reģistrējiet pieprasījumu. Dzēšanu izpilda administrators.</p>
+          <form method="post" action="/kontakti/{{ contact.id }}/dzesanas-pieprasijums">
+            <button type="submit" class="btn-small btn-danger">Reģistrēt dzēšanas pieprasījumu</button>
+          </form>
+          {% endif %}
+        </div>
+        {% endif %}
+      </section>
+    </div>
+{% endblock %}

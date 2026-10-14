@@ -32,8 +32,7 @@
         <ul class="contact-list">
           {% for c in contacts %}
           <li>
-            <strong>{{ c.full_name }}</strong> <span class="meta">{{ c.position }}</span><br>
-            {% if c.email %}<span>{{ c.email }}</span>{% endif %}{% if c.phone %} · <span>{{ c.phone }}</span>{% endif %}
+            <a href="/kontakti/{{ c.id }}"><strong>{{ c.full_name }}</strong></a> <span class="meta">{{ c.position }}</span>
             {% if c.retain_until < today.isoformat() %}<br><span class="tag late">Glabāšanas termiņš beidzies — jāpārskata</span>{% endif %}
           </li>
           {% endfor %}
@@ -41,7 +40,8 @@
         {% else %}
         <p class="empty">Kontaktpersonu nav.</p>
         {% endif %}
-        <p class="meta">Kontaktpersonu pievienošana un labošana būs F2.</p>
+        <p class="meta">Kontaktinformācija redzama kontaktpersonas kartītē (atvēršana tiek ierakstīta žurnālā).</p>
+        {% if can_edit %}<p><a class="btn-link" href="/organizacijas/{{ org.id }}/kontakti/jauns">+ Pievienot kontaktpersonu</a></p>{% endif %}
       </section>
 
       <section class="block" aria-labelledby="pieprasijumi">

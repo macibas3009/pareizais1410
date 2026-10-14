@@ -1,4 +1,4 @@
-.PHONY: verify-setup test lint-contract run seed users role
+.PHONY: verify-setup test lint-contract install run seed users role
 
 verify-setup:
 	@python --version
@@ -13,8 +13,11 @@ test:
 lint-contract:
 	python tools/lint_contract.py docs/openapi.yaml
 
+install:
+	pip install -r requirements.txt
+
 run:
-	uvicorn --factory app.main:create_app --host 0.0.0.0 --port 8000 --reload
+	flask --app app.main:create_app run --host 0.0.0.0 --port 8000 --reload
 
 seed:
 	python -m app.seed

@@ -1,0 +1,2 @@
+# CRM lietotnes atkarības (N4: Flask + Jinja2 + SQLite). SQLite ir Python standarta bibliotēkā.
+flask==3.1.3

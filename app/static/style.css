@@ -558,3 +558,11 @@ tbody tr:last-child th, tbody tr:last-child td { border-bottom: 0; }
   body.app main { padding: 0 1rem 2rem; }
   .hero-inner { padding: 1.25rem; }
 }
+
+/* --- Kļūdu kopsavilkums formās (N1) -------------------------------------- */
+
+.error-summary h2 { margin: 0 0 0.4rem; font-size: 1rem; color: var(--danger); }
+.error-summary ul { margin: 0; padding-left: 1.2rem; }
+.error-summary a { color: var(--danger); font-weight: 600; text-decoration: underline; }
+
+.panel:focus { outline: none; }

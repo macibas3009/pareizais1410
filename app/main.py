@@ -1,255 +1,258 @@
-"""Ezermalas pieteikumu sistēma · lietotāju reģistrācija un pieslēgšanās (CR-4).
+"""Ezermalas pieteikumu sistēma · CRM (Flask + Jinja2 + SQLite, N4).
 
-Palaišana: `make run` (uvicorn --factory app.main:create_app),
-tad atver http://localhost:8000/login
+Palaišana: `make run`, tad atver http://localhost:8000/login
 """
 
 from __future__ import annotations
 
 import logging
 import os
-import re
-import threading
-from datetime import date, datetime, timedelta, timezone
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import Any
 
-from fastapi import FastAPI, Request, Response
-from fastapi.exceptions import RequestValidationError
-from fastapi.responses import FileResponse, HTMLResponse, JSONResponse, RedirectResponse
-from fastapi.staticfiles import StaticFiles
-from pydantic import BaseModel
-from starlette.exceptions import HTTPException as StarletteHTTPException
+from flask import Flask, g, jsonify, redirect, render_template, request
+from werkzeug.exceptions import HTTPException
 
-from app import dashboard, db, security
+from app import accounts, dashboard, db
 
 VERSION = "0.1.0"
-STATIC = Path(__file__).parent / "static"
-SESSION_COOKIE = "session"
-SESSION_TTL = timedelta(hours=8)
-PASSWORD_MIN, PASSWORD_MAX = 12, 128
+API_PREFIXES = ("/auth/", "/health")
 
-# Visi latviešu burti; vārdus var atdalīt ar atstarpi, defisi vai apostrofu
-FULL_NAME_RE = re.compile(r"^[^\W\d_]+(?:[ '\-][^\W\d_]+)*$")
-EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
+# Kļūdu teksti reģistrācijas formā (N1: pie lauka un kopsavilkumā)
+FIELD_LABELS = {"fullName": "Vārds, uzvārds", "email": "E-pasts", "password": "Parole", "password2": "Parole vēlreiz"}
+ISSUE_MESSAGES = {
+    ("fullName", "REQUIRED"): "Ievadiet vārdu un uzvārdu.",
+    ("fullName", "INVALID_FORMAT"): "Vārdā drīkst būt tikai burti, atstarpes, defise un apostrofs.",
+    ("email", "REQUIRED"): "Ievadiet e-pasta adresi.",
+    ("email", "INVALID_FORMAT"): "Ievadiet derīgu e-pasta adresi, piemēram, vards@example.com.",
+    ("email", "TAKEN"): "Šis e-pasts jau ir reģistrēts.",
+    ("password", "REQUIRED"): "Ievadiet paroli.",
+    ("password", "TOO_SHORT"): f"Parolei jābūt vismaz {accounts.PASSWORD_MIN} rakstzīmes garai.",
+    ("password", "TOO_LONG"): f"Parole nedrīkst būt garāka par {accounts.PASSWORD_MAX} rakstzīmēm.",
+    ("password2", "MISMATCH"): "Paroles nesakrīt.",
+}
 
 log = logging.getLogger("app")
 
 
-class RegisterIn(BaseModel):
-    email: str
-    fullName: str
-    password: str
-
-
-class LoginIn(BaseModel):
-    email: str
-    password: str
-
-
-def error(status: int, code: str, message: str, details: list[dict] | None = None) -> JSONResponse:
+def api_error(status: int, code: str, message: str, details: list[dict] | None = None):
+    """Vienotā Error shēma (docs/openapi.yaml)."""
     body: dict[str, Any] = {"code": code, "message": message}
     if details:
         body["details"] = details
-    return JSONResponse({"error": body}, status_code=status)
+    return jsonify({"error": body}), status
 
 
-def validation_error(details: list[dict]) -> JSONResponse:
-    return error(400, "VALIDATION_ERROR", "Request validation failed", details)
+def wants_json() -> bool:
+    return request.path.startswith(API_PREFIXES) or "text/html" not in request.headers.get("Accept", "")
 
 
-def user_out(row) -> dict:
-    return {"id": row["id"], "email": row["email"], "fullName": row["full_name"]}
-
-
-def create_app(db_path: Path | None = None, cookie_secure: bool | None = None) -> FastAPI:
-    db_path = db_path or Path(os.environ.get("APP_DB_PATH", "data/app.db"))
+def create_app(db_path: Path | None = None, cookie_secure: bool | None = None) -> Flask:
+    db_path = Path(db_path or os.environ.get("APP_DB_PATH", "data/app.db"))
     if cookie_secure is None:
         cookie_secure = os.environ.get("COOKIE_SECURE", "0") == "1"
 
-    conn = db.connect(db_path)
-    lock = threading.Lock()
+    db.connect(db_path).close()
 
-    app = FastAPI(title="Ezermalas pieteikumu sistēma", version=VERSION)
-    app.mount("/static", StaticFiles(directory=STATIC), name="static")
+    app = Flask(__name__)
+    app.jinja_env.globals.update(
+        fmt_date=dashboard.fmt_date,
+        long_date=dashboard.long_date,
+        due_label=dashboard.due_label,
+        first_sentence=dashboard.first_sentence,
+        plural=dashboard.plural,
+        field_labels=FIELD_LABELS,
+        password_min=accounts.PASSWORD_MIN,
+        role_label=lambda role: dashboard.ROLE_LABELS.get(role or "", "Gaida apstiprinājumu"),
+    )
 
-    # --- Kļūdas vienotā Error shēmā -------------------------------------------
+    # --- Datubāze un pašreizējais lietotājs -----------------------------------
 
-    @app.exception_handler(RequestValidationError)
-    async def on_validation_error(_: Request, exc: RequestValidationError) -> JSONResponse:
-        details = []
-        for err in exc.errors():
-            loc = [str(part) for part in err["loc"] if part != "body"]
-            issue = "REQUIRED" if err["type"] == "missing" else "INVALID_FORMAT"
-            details.append({"field": ".".join(loc) or "body", "issue": issue})
-        return validation_error(details)
+    def conn():
+        if "db" not in g:
+            g.db = db.open_db(db_path)
+        return g.db
 
-    @app.exception_handler(StarletteHTTPException)
-    async def on_http_error(_: Request, exc: StarletteHTTPException) -> JSONResponse:
-        if exc.status_code == 404:
-            return error(404, "NOT_FOUND", "Resource not found")
-        return error(exc.status_code, "HTTP_ERROR", str(exc.detail))
+    @app.teardown_appcontext
+    def close_db(_exc):
+        connection = g.pop("db", None)
+        if connection is not None:
+            connection.close()
 
-    @app.exception_handler(Exception)
-    async def on_unexpected(_: Request, exc: Exception) -> JSONResponse:
-        # Tikai kļūdas tips, nekad pieprasījuma saturs (CR-4 #10)
-        log.error("Unhandled error: %s", type(exc).__name__)
-        return error(500, "INTERNAL_ERROR", "Internal server error")
+    def current_user():
+        if "user" not in g:
+            # Loma tiek nolasīta no datubāzes katrā pieprasījumā (N3)
+            g.user = accounts.user_by_session(conn(), request.cookies.get(accounts.SESSION_COOKIE))
+        return g.user
 
-    # --- Sesiju palīgfunkcijas ------------------------------------------------
-
-    def current_user(request: Request):
-        token = request.cookies.get(SESSION_COOKIE)
-        if not token:
-            return None
-        now = datetime.now(timezone.utc).isoformat()
-        with lock:
-            return conn.execute(
-                "SELECT u.* FROM sessions s JOIN users u ON u.id = s.user_id "
-                "WHERE s.token_hash = ? AND s.expires_at > ?",
-                (security.token_hash(token), now),
-            ).fetchone()
-
-    def end_session(request: Request) -> None:
-        token = request.cookies.get(SESSION_COOKIE)
-        if token:
-            with lock:
-                conn.execute("DELETE FROM sessions WHERE token_hash = ?", (security.token_hash(token),))
-                conn.commit()
-
-    # --- Lapas ----------------------------------------------------------------
-
-    @app.get("/", include_in_schema=False)
-    def index() -> RedirectResponse:
-        return RedirectResponse("/login")
-
-    @app.get("/login", include_in_schema=False)
-    def login_page() -> FileResponse:
-        return FileResponse(STATIC / "login.html")
-
-    @app.get("/register", include_in_schema=False)
-    def register_page() -> FileResponse:
-        return FileResponse(STATIC / "register.html")
-
-    @app.get("/profile", include_in_schema=False)
-    def profile_page() -> RedirectResponse:
-        return RedirectResponse("/panelis")
-
-    # --- F9 · vadības panelis (servera pusē renderēts, bez JavaScript) --------
-
-    @app.get("/panelis", include_in_schema=False)
-    def dashboard_page(request: Request):
-        user = current_user(request)
-        if user is None:
-            return RedirectResponse("/login", status_code=303)
-        with lock:
-            html = dashboard.render_dashboard(conn, user, date.today())
-        return HTMLResponse(html)
-
-    @app.post("/uzdevumi/{task_id}/izpildits", include_in_schema=False)
-    def complete_task(task_id: int, request: Request):
-        user = current_user(request)
-        if user is None:
-            return RedirectResponse("/login", status_code=303)
-        if user["role"] not in ("darbinieks", "vaditajs"):
-            return error(403, "FORBIDDEN", "Not allowed")
-        with lock:
-            done = dashboard.complete_task(conn, task_id, user, datetime.now(timezone.utc).isoformat())
-        if not done:
-            return error(404, "NOT_FOUND", "Task not found")
-        return RedirectResponse("/panelis", status_code=303)
-
-    @app.post("/iziet", include_in_schema=False)
-    def logout_form(request: Request) -> RedirectResponse:
-        """Iziešana no HTML formas (bez JavaScript); API variants ir /auth/logout."""
-        end_session(request)
-        response = RedirectResponse("/login", status_code=303)
-        response.delete_cookie(SESSION_COOKIE)
-        return response
-
-    # --- API ------------------------------------------------------------------
-
-    @app.get("/health", tags=["Sistēma"])
-    def health() -> dict:
-        return {"status": "ok", "version": VERSION}
-
-    @app.post("/auth/register", tags=["Autentifikācija"], status_code=201)
-    def register(payload: RegisterIn):
-        email = payload.email.strip().lower()
-        full_name = payload.fullName.strip()
-        password = payload.password
-
-        details = []
-        if not email:
-            details.append({"field": "email", "issue": "REQUIRED"})
-        elif not EMAIL_RE.fullmatch(email) or len(email) > 254:
-            details.append({"field": "email", "issue": "INVALID_FORMAT"})
-        if not full_name:
-            details.append({"field": "fullName", "issue": "REQUIRED"})
-        elif not FULL_NAME_RE.fullmatch(full_name) or len(full_name) > 100:
-            details.append({"field": "fullName", "issue": "INVALID_FORMAT"})
-        if not password:
-            details.append({"field": "password", "issue": "REQUIRED"})
-        elif len(password) < PASSWORD_MIN:
-            details.append({"field": "password", "issue": "TOO_SHORT"})
-        elif len(password) > PASSWORD_MAX:
-            details.append({"field": "password", "issue": "TOO_LONG"})
-        if details:
-            return validation_error(details)
-
-        password_hash = security.hash_password(password)
-        with lock:
-            if conn.execute("SELECT 1 FROM users WHERE email = ?", (email,)).fetchone():
-                return error(409, "EMAIL_TAKEN", "Email is already registered")
-            cur = conn.execute(
-                "INSERT INTO users (email, full_name, password_hash, created_at) VALUES (?, ?, ?, ?)",
-                (email, full_name, password_hash, datetime.now(timezone.utc).isoformat()),
-            )
-            conn.commit()
-        log.info("User registered: id=%s", cur.lastrowid)
-        return {"id": cur.lastrowid, "email": email, "fullName": full_name}
-
-    @app.post("/auth/login", tags=["Autentifikācija"])
-    def login(payload: LoginIn, response: Response):
-        email = payload.email.strip().lower()
-        with lock:
-            row = conn.execute("SELECT * FROM users WHERE email = ?", (email,)).fetchone()
-        stored = row["password_hash"] if row else security.DUMMY_HASH
-        if not security.verify_password(payload.password, stored) or row is None:
-            log.warning("Failed login attempt")
-            return error(401, "INVALID_CREDENTIALS", "Invalid email or password")
-
-        token = security.new_session_token()
-        expires = datetime.now(timezone.utc) + SESSION_TTL
-        with lock:
-            conn.execute(
-                "INSERT INTO sessions (token_hash, user_id, expires_at) VALUES (?, ?, ?)",
-                (security.token_hash(token), row["id"], expires.isoformat()),
-            )
-            conn.commit()
+    def start_session(response, user_id: int):
         response.set_cookie(
-            SESSION_COOKIE,
-            token,
-            max_age=int(SESSION_TTL.total_seconds()),
+            accounts.SESSION_COOKIE,
+            accounts.create_session(conn(), user_id),
+            max_age=int(accounts.SESSION_TTL.total_seconds()),
             httponly=True,
-            samesite="lax",
+            samesite="Lax",
             secure=cookie_secure,
         )
-        return user_out(row)
-
-    @app.post("/auth/logout", tags=["Autentifikācija"], status_code=204)
-    def logout(request: Request) -> Response:
-        end_session(request)
-        response = Response(status_code=204)
-        response.delete_cookie(SESSION_COOKIE)
         return response
 
-    @app.get("/auth/me", tags=["Autentifikācija"])
-    def me(request: Request):
-        user = current_user(request)
+    def finish_session(response):
+        accounts.end_session(conn(), request.cookies.get(accounts.SESSION_COOKIE))
+        response.delete_cookie(accounts.SESSION_COOKIE)
+        return response
+
+    # --- Kļūdas ---------------------------------------------------------------
+
+    @app.errorhandler(HTTPException)
+    def on_http_error(exc: HTTPException):
+        if wants_json():
+            code = "NOT_FOUND" if exc.code == 404 else "HTTP_ERROR"
+            message = "Resource not found" if exc.code == 404 else (exc.name or "HTTP error")
+            return api_error(exc.code or 500, code, message)
+        return render_template("error.html", status=exc.code, user=current_user()), exc.code
+
+    @app.errorhandler(Exception)
+    def on_unexpected(exc: Exception):
+        # Tikai kļūdas tips, nekad pieprasījuma saturs (F0, N2)
+        log.error("Unhandled error: %s", type(exc).__name__)
+        if wants_json():
+            return api_error(500, "INTERNAL_ERROR", "Internal server error")
+        return render_template("error.html", status=500, user=None), 500
+
+    # --- F0 · pieslēgšanās un reģistrācija (HTML formas, bez JavaScript) ------
+
+    @app.get("/")
+    def index():
+        return redirect("/panelis" if current_user() else "/login")
+
+    @app.get("/login")
+    def login_page():
+        if current_user():
+            return redirect("/panelis")
+        return render_template("login.html", registered="registered" in request.args, email="")
+
+    @app.post("/login")
+    def login_submit():
+        email = request.form.get("email", "")
+        password = request.form.get("password", "")
+        if not email.strip() or not password:
+            return render_template("login.html", error="Ievadiet e-pastu un paroli.", email=email), 400
+        user = accounts.authenticate(conn(), email, password)
         if user is None:
-            return error(401, "UNAUTHENTICATED", "Not logged in")
-        return user_out(user)
+            log.warning("Failed login attempt")
+            return render_template("login.html", error="Nepareizs e-pasts vai parole.", email=email), 401
+        return start_session(redirect("/panelis", code=303), user["id"])
+
+    @app.get("/register")
+    def register_page():
+        return render_template("register.html", errors={}, values={})
+
+    @app.post("/register")
+    def register_submit():
+        values = {
+            "fullName": request.form.get("fullName", "").strip(),
+            "email": accounts.normalize_email(request.form.get("email", "")),
+        }
+        password = request.form.get("password", "")
+        details = accounts.validate_registration(values["email"], values["fullName"], password)
+        if password and password != request.form.get("password2", ""):
+            details.append({"field": "password2", "issue": "MISMATCH"})
+
+        status = 400
+        if not details:
+            if accounts.register(conn(), values["email"], values["fullName"], password) is not None:
+                return redirect("/login?registered=1", code=303)
+            details = [{"field": "email", "issue": "TAKEN"}]
+            status = 409
+
+        errors = {d["field"]: ISSUE_MESSAGES[(d["field"], d["issue"])] for d in details}
+        return render_template("register.html", errors=errors, values=values), status
+
+    @app.post("/iziet")
+    def logout_form():
+        return finish_session(redirect("/login", code=303))
+
+    @app.get("/profile")
+    def profile_page():
+        return redirect("/panelis")
+
+    # --- F9 · vadības panelis -------------------------------------------------
+
+    @app.get("/panelis")
+    def dashboard_page():
+        user = current_user()
+        if user is None:
+            return redirect("/login", code=303)
+        return render_template("panelis.html", user=user, today=date.today(), **dashboard.context(conn(), user, date.today()))
+
+    @app.post("/uzdevumi/<int:task_id>/izpildits")
+    def complete_task(task_id: int):
+        user = current_user()
+        if user is None:
+            return redirect("/login", code=303)
+        if user["role"] not in ("darbinieks", "vaditajs"):
+            return api_error(403, "FORBIDDEN", "Not allowed")
+        if not dashboard.complete_task(conn(), task_id, user, datetime.now(timezone.utc).isoformat()):
+            return api_error(404, "NOT_FOUND", "Task not found")
+        return redirect("/panelis", code=303)
+
+    # --- JSON API (docs/openapi.yaml) -----------------------------------------
+
+    @app.get("/health")
+    def health():
+        return {"status": "ok", "version": VERSION}
+
+    def json_fields(*names: str) -> tuple[dict[str, str], list[dict]]:
+        payload = request.get_json(silent=True)
+        if not isinstance(payload, dict):
+            return {}, [{"field": "body", "issue": "INVALID_FORMAT"}]
+        values, details = {}, []
+        for name in names:
+            if name not in payload:
+                details.append({"field": name, "issue": "REQUIRED"})
+            elif not isinstance(payload[name], str):
+                details.append({"field": name, "issue": "INVALID_FORMAT"})
+            else:
+                values[name] = payload[name]
+        return values, details
+
+    @app.post("/auth/register")
+    def api_register():
+        values, details = json_fields("email", "fullName", "password")
+        if details:
+            return api_error(400, "VALIDATION_ERROR", "Request validation failed", details)
+        email = accounts.normalize_email(values["email"])
+        full_name = values["fullName"].strip()
+        details = accounts.validate_registration(email, full_name, values["password"])
+        if details:
+            return api_error(400, "VALIDATION_ERROR", "Request validation failed", details)
+        user_id = accounts.register(conn(), email, full_name, values["password"])
+        if user_id is None:
+            return api_error(409, "EMAIL_TAKEN", "Email is already registered")
+        log.info("User registered: id=%s", user_id)
+        return {"id": user_id, "email": email, "fullName": full_name}, 201
+
+    @app.post("/auth/login")
+    def api_login():
+        values, details = json_fields("email", "password")
+        if details:
+            return api_error(400, "VALIDATION_ERROR", "Request validation failed", details)
+        user = accounts.authenticate(conn(), values["email"], values["password"])
+        if user is None:
+            log.warning("Failed login attempt")
+            return api_error(401, "INVALID_CREDENTIALS", "Invalid email or password")
+        return start_session(jsonify(accounts.user_out(user)), user["id"])
+
+    @app.post("/auth/logout")
+    def api_logout():
+        return finish_session(app.response_class(status=204))
+
+    @app.get("/auth/me")
+    def api_me():
+        user = current_user()
+        if user is None:
+            return api_error(401, "UNAUTHENTICATED", "Not logged in")
+        return accounts.user_out(user)
 
     return app
-

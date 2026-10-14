@@ -83,11 +83,18 @@ def _migrate(conn: sqlite3.Connection) -> None:
         conn.commit()
 
 
-def connect(path: Path) -> sqlite3.Connection:
-    path.parent.mkdir(parents=True, exist_ok=True)
-    conn = sqlite3.connect(path, check_same_thread=False)
+def open_db(path: Path) -> sqlite3.Connection:
+    """Savienojums vienam pieprasījumam (Flask `g`), bez shēmas izveides."""
+    conn = sqlite3.connect(path)
     conn.row_factory = sqlite3.Row
     conn.execute("PRAGMA foreign_keys = ON")
+    return conn
+
+
+def connect(path: Path) -> sqlite3.Connection:
+    """Izveido datubāzi, ja tās nav, un atjauno shēmu. Izsauc lietotnes startā un skriptos."""
+    path.parent.mkdir(parents=True, exist_ok=True)
+    conn = open_db(path)
     conn.executescript(SCHEMA)
     _migrate(conn)
     return conn

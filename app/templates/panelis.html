@@ -1,0 +1,140 @@
+{% extends "base.html" %}
+{% block title %}{{ "Konts gaida apstiprinājumu" if view == "pending" else "Vadības panelis" }}{% endblock %}
+
+{% macro hero(subtitle) %}
+    <section class="hero" aria-labelledby="sveiciens">
+      <div class="hero-inner">
+        <p class="hero-date">{{ long_date(today) }}</p>
+        <h1 id="sveiciens">Labdien, {{ user.full_name.split(" ")[0] }}!</h1>
+        <p class="hero-sub">{{ subtitle }}</p>
+      </div>
+    </section>
+{% endmacro %}
+
+{% macro stat(value, one, many, warn=false) %}
+        <li class="stat{% if warn and value %} warn{% endif %}"><span class="stat-value">{{ value }}</span> <span class="stat-label">{{ plural(value, one, many) }}</span></li>
+{%- endmacro %}
+
+{% block content %}
+{% if view == "pending" %}
+    <section class="notice-page">
+      <h1>Konts gaida apstiprinājumu</h1>
+      <p>Paldies, {{ user.full_name }}! Jūsu konts ir izveidots, bet administrators vēl nav piešķīris tam lomu.
+      Kad loma būs piešķirta, šeit redzēsiet savu vadības paneli.</p>
+    </section>
+
+{% elif view == "admin" %}
+{{ hero("Sistēmas pārvaldība") }}
+    <ul class="stats">
+{{ stat(pending_users|length, "lietotājs gaida lomu", "lietotāji gaida lomu", warn=true) }}
+    </ul>
+    <div class="blocks">
+      <section class="block block-wide" aria-labelledby="gaida">
+        <h2 id="gaida">Lietotāji, kas gaida lomu</h2>
+        {% if pending_users %}
+        <div class="table-wrap">
+          <table>
+            <caption class="visually-hidden">Lietotāji, kas gaida lomas piešķiršanu</caption>
+            <thead><tr><th scope="col">Vārds</th><th scope="col">E-pasts</th><th scope="col">Reģistrējies</th></tr></thead>
+            <tbody>
+              {% for u in pending_users %}
+              <tr><th scope="row">{{ u.full_name }}</th><td>{{ u.email }}</td><td>{{ fmt_date(u.created_at) }}</td></tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="empty">Neviens lietotājs negaida apstiprinājumu.</p>
+        {% endif %}
+      </section>
+    </div>
+
+{% else %}
+{{ hero("Pārskats par visu iestādi" if whole_institution else "Jūsu organizācijas, uzdevumi un termiņi") }}
+    <section aria-labelledby="kopsavilkums">
+      <h2 id="kopsavilkums" class="visually-hidden">Kopsavilkums</h2>
+      <ul class="stats">
+{% if whole_institution %}
+{{ stat(stats.organizations, "organizācija iestādē", "organizācijas iestādē") }}
+{% else %}
+{{ stat(stats.organizations, "mana organizācija", "manas organizācijas") }}
+{% endif %}
+{{ stat(stats.open_requests, "atvērts pieprasījums", "atvērti pieprasījumi") }}
+{{ stat(stats.tasks_today, "uzdevums šodien", "uzdevumi šodien", warn=true) }}
+{{ stat(stats.contacts_to_review, "kontakts jāpārskata", "kontakti jāpārskata", warn=true) }}
+      </ul>
+    </section>
+
+    <div class="blocks">
+      <section class="block" aria-labelledby="uzdevumi">
+        <h2 id="uzdevumi">Uzdevumi šodien</h2>
+        {% if tasks %}
+        <ul class="task-list">
+          {% for t in tasks %}
+          {% set late = due_label(t.due, today)[1] == "late" %}
+          <li class="task">
+            <div>
+              <span class="tag {{ 'late' if late else 'soon' }}">{{ "Nokavēts" if late else "Šodien" }}</span>
+              <span class="task-title">{{ t.description }}</span>
+              <span class="meta">
+                {%- if t.organization %}{{ t.organization }}{% endif %}
+                {%- if whole_institution %}{% if t.organization %} · {% endif %}{{ t.assignee }}{% endif -%}
+              </span>
+            </div>
+            <form method="post" action="/uzdevumi/{{ t.id }}/izpildits">
+              <button type="submit" class="btn-small">Izpildīts<span class="visually-hidden">: {{ t.description }}</span></button>
+            </form>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="empty">Šodien uzdevumu nav.</p>
+        {% endif %}
+      </section>
+
+      <section class="block" aria-labelledby="pieprasijumi">
+        <h2 id="pieprasijumi">Kavētie un tuvojošies pieprasījumi</h2>
+        {% if requests %}
+        <div class="table-wrap">
+          <table>
+            <caption class="visually-hidden">Kavētie pieprasījumi un pieprasījumi ar termiņu nākamajās {{ upcoming_days }} dienās</caption>
+            <thead>
+              <tr><th scope="col">Temats</th><th scope="col">Organizācija</th><th scope="col">Statuss</th><th scope="col">Termiņš</th></tr>
+            </thead>
+            <tbody>
+              {% for r in requests %}
+              {% set label, cls = due_label(r.due, today) %}
+              <tr>
+                <th scope="row">{{ r.subject }}</th>
+                <td>{{ r.organization }}</td>
+                <td>{{ r.status }}</td>
+                <td><span class="tag {{ cls }}">{{ label }}</span> <span class="meta">{{ fmt_date(r.due) }}</span></td>
+              </tr>
+              {% endfor %}
+            </tbody>
+          </table>
+        </div>
+        {% else %}
+        <p class="empty">Kavētu vai tuvojošos pieprasījumu nav.</p>
+        {% endif %}
+      </section>
+
+      <section class="block block-wide" aria-labelledby="mijiedarbibas">
+        <h2 id="mijiedarbibas">Pēdējās mijiedarbības</h2>
+        {% if interactions %}
+        <ul class="feed">
+          {% for i in interactions %}
+          <li>
+            <span class="meta">{{ fmt_date(i.date) }} · {{ i.kind }}</span>
+            <span class="feed-org">{{ i.organization }}</span>
+            <span>{{ first_sentence(i.summary) }}</span>
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="empty">Mijiedarbību vēl nav.</p>
+        {% endif %}
+      </section>
+    </div>
+{% endif %}
+{% endblock %}

@@ -4,7 +4,6 @@ import re
 from datetime import date
 
 import pytest
-from fastapi.testclient import TestClient
 
 from app import db, seed
 from app.dashboard import due_label, plural
@@ -20,7 +19,7 @@ def db_path(tmp_path):
 
 @pytest.fixture
 def client(db_path):
-    return TestClient(create_app(db_path=db_path))
+    return create_app(db_path=db_path).test_client()
 
 
 def login(client, email):
@@ -36,14 +35,14 @@ def stat(html, label):
 
 # 1
 def test_panel_requires_session(client):
-    res = client.get("/panelis", follow_redirects=False)
+    res = client.get("/panelis")
     assert res.status_code == 303
-    assert res.headers["location"] == "/login"
+    assert res.headers["Location"] == "/login"
 
 
 def test_old_profile_url_redirects_to_panel(client):
-    res = client.get("/profile", follow_redirects=False)
-    assert res.headers["location"] == "/panelis"
+    res = client.get("/profile")
+    assert res.headers["Location"] == "/panelis"
 
 
 # 2, 4
@@ -115,7 +114,7 @@ def test_complete_task_with_form(client):
     before = stat(html, "uzdevumi šodien")
     task_id = re.search(r'action="/uzdevumi/(\d+)/izpildits"', html).group(1)
 
-    res = client.post(f"/uzdevumi/{task_id}/izpildits", follow_redirects=False)
+    res = client.post(f"/uzdevumi/{task_id}/izpildits")
     assert res.status_code == 303
     assert stat(client.get("/panelis").text, "uzdevum(?:s|i) šodien") == before - 1
 
@@ -134,10 +133,10 @@ def test_cannot_complete_colleagues_task(client):
 
 def test_logout_form_without_js(client):
     login(client, "darbinieks@example.com")
-    res = client.post("/iziet", follow_redirects=False)
+    res = client.post("/iziet")
     assert res.status_code == 303
-    assert res.headers["location"] == "/login"
-    assert client.get("/panelis", follow_redirects=False).status_code == 303
+    assert res.headers["Location"] == "/login"
+    assert client.get("/panelis").status_code == 303
 
 
 def test_panel_has_no_scripts(client):
@@ -163,7 +162,7 @@ def test_due_label_and_plural():
 def test_role_command_gives_access(db_path):
     from app import roles
 
-    client = TestClient(create_app(db_path=db_path))
+    client = create_app(db_path=db_path).test_client()
     client.post("/auth/register", json={"email": "jauns@example.com", "fullName": "Jauns Lietotājs", "password": "drosa-parole-123"})
 
     conn = db.connect(db_path)

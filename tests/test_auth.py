@@ -4,7 +4,6 @@ import logging
 import sqlite3
 
 import pytest
-from fastapi.testclient import TestClient
 
 from app.main import create_app
 
@@ -18,7 +17,7 @@ def db_path(tmp_path):
 
 @pytest.fixture
 def client(db_path):
-    return TestClient(create_app(db_path=db_path, cookie_secure=False))
+    return create_app(db_path=db_path, cookie_secure=False).test_client()
 
 
 def register(client, email="janis@example.com", full_name="Jānis Bērziņš", password=PASSWORD):
@@ -28,14 +27,14 @@ def register(client, email="janis@example.com", full_name="Jānis Bērziņš", p
 
 
 def details(response):
-    return [(d["field"], d["issue"]) for d in response.json()["error"]["details"]]
+    return [(d["field"], d["issue"]) for d in response.get_json()["error"]["details"]]
 
 
 # 1
 def test_register_returns_user_without_password(client):
     res = register(client, full_name="Līga Ozoliņa-Kalniņa")
     assert res.status_code == 201
-    body = res.json()
+    body = res.get_json()
     assert set(body) == {"id", "email", "fullName"}
     assert body["fullName"] == "Līga Ozoliņa-Kalniņa"
 
@@ -45,14 +44,14 @@ def test_register_duplicate_email_case_insensitive(client):
     assert register(client).status_code == 201
     res = register(client, email="  Janis@Example.COM ")
     assert res.status_code == 409
-    assert res.json()["error"]["code"] == "EMAIL_TAKEN"
+    assert res.get_json()["error"]["code"] == "EMAIL_TAKEN"
 
 
 # 3
 def test_register_invalid_email(client):
     res = register(client, email="janis@")
     assert res.status_code == 400
-    assert res.json()["error"]["code"] == "VALIDATION_ERROR"
+    assert res.get_json()["error"]["code"] == "VALIDATION_ERROR"
     assert ("email", "INVALID_FORMAT") in details(res)
 
 
@@ -81,11 +80,11 @@ def test_login_sets_httponly_cookie_and_me_works(client):
     register(client)
     res = client.post("/auth/login", json={"email": "JANIS@example.com", "password": PASSWORD})
     assert res.status_code == 200
-    assert "httponly" in res.headers["set-cookie"].lower()
+    assert "httponly" in res.headers["Set-Cookie"].lower()
 
     me = client.get("/auth/me")
     assert me.status_code == 200
-    assert me.json()["email"] == "janis@example.com"
+    assert me.get_json()["email"] == "janis@example.com"
 
 
 # 6
@@ -94,25 +93,25 @@ def test_wrong_password_and_unknown_email_look_the_same(client):
     wrong = client.post("/auth/login", json={"email": "janis@example.com", "password": "nepareiza-parole"})
     unknown = client.post("/auth/login", json={"email": "nav@example.com", "password": PASSWORD})
     assert wrong.status_code == unknown.status_code == 401
-    assert wrong.json() == unknown.json()
-    assert wrong.json()["error"]["code"] == "INVALID_CREDENTIALS"
+    assert wrong.get_json() == unknown.get_json()
+    assert wrong.get_json()["error"]["code"] == "INVALID_CREDENTIALS"
 
 
 # 7
 def test_me_without_session(client):
     res = client.get("/auth/me")
     assert res.status_code == 401
-    assert res.json()["error"]["code"] == "UNAUTHENTICATED"
+    assert res.get_json()["error"]["code"] == "UNAUTHENTICATED"
 
 
 # 8
 def test_logout_invalidates_session(client):
     register(client)
     client.post("/auth/login", json={"email": "janis@example.com", "password": PASSWORD})
-    token = client.cookies.get("session")
+    token = client.get_cookie("session").value
 
     assert client.post("/auth/logout").status_code == 204
-    client.cookies.set("session", token)  # vecais marķieris vairs nedrīkst darboties
+    client.set_cookie("session", token)  # vecais marķieris vairs nedrīkst darboties
     assert client.get("/auth/me").status_code == 401
 
 
@@ -126,8 +125,8 @@ def test_password_stored_only_as_hash(client, db_path):
 
 
 def test_users_survive_restart(db_path):
-    register(TestClient(create_app(db_path=db_path)))
-    fresh = TestClient(create_app(db_path=db_path))
+    register(create_app(db_path=db_path).test_client())
+    fresh = create_app(db_path=db_path).test_client()
     res = fresh.post("/auth/login", json={"email": "janis@example.com", "password": PASSWORD})
     assert res.status_code == 200
 
@@ -153,4 +152,4 @@ def test_pages_are_served(client, path):
 def test_unknown_path_uses_error_schema(client):
     res = client.get("/nav-tadas-lapas")
     assert res.status_code == 404
-    assert res.json()["error"]["code"] == "NOT_FOUND"
+    assert res.get_json()["error"]["code"] == "NOT_FOUND"

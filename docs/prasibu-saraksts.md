@@ -1,6 +1,6 @@
 # CRM mazai iestādei · prasību saraksts
 
-> Versija 1.2 · 2026-10-14 · Statuss: precizēts pēc intervijas ar produkta īpašnieku.
+> Versija 1.3 · 2026-10-14 · Statuss: precizēts pēc intervijas ar produkta īpašnieku.
 > Avots: uzdevums-starteris "CRM mazai iestādei" un konceptuālās arhitektūras shēma.
 > Mācību projekts. Visi dati ir sintētiski.
 
@@ -17,7 +17,7 @@ Statusu atjauno tajā pašā komitā, kurā prasība tiek īstenota.
 
 | ID | Prasība | Statuss | Kur īstenots |
 |---|---|---|---|
-| F0 | Pieslēgšanās un reģistrācija | 🟡 DAĻĒJI (5 no 7) | zars `cr-4-auth` (`dd373cf`, `2b938ed`); #5 zarā `f9-panelis` (`cac0a0e`) |
+| F0 | Pieslēgšanās un reģistrācija | 🟡 DAĻĒJI (6 no 7) | zari `cr-4-auth`, `f9-panelis`; Flask un formas bez JS zarā `n4-flask` |
 | F1 | Organizācijas: izveidot, rediģēt, meklēt | ⬜ NAV SĀKTS | |
 | F2 | Kontaktpersonas pie organizācijas | ⬜ NAV SĀKTS | |
 | F3 | Mijiedarbību žurnāls | ⬜ NAV SĀKTS | |
@@ -26,13 +26,13 @@ Statusu atjauno tajā pašā komitā, kurā prasība tiek īstenota.
 | F6 | Meklēšana | ⬜ NAV SĀKTS | |
 | F7 | Pārskats vadītājam | ⬜ NAV SĀKTS | |
 | F8 | Piekļūstamības paziņojums | ⬜ NAV SĀKTS | |
-| F9 | Vadības panelis pēc pieslēgšanās | 🟡 DAĻĒJI (3 no 7) | zars `f9-panelis` (`cac0a0e`) |
+| F9 | Vadības panelis pēc pieslēgšanās | 🟡 DAĻĒJI (3 no 7) | zars `f9-panelis`; Jinja2 šablons zarā `n4-flask` |
 | MI-1 | Mijiedarbības kopsavilkums un nākamais solis | ⬜ NAV SĀKTS | |
 | MI-2 | Organizāciju prioritizācija: tikai klasifikācija | ⬜ NAV SĀKTS | |
 | N1 | Piekļūstamība | ⬜ NAV SĀKTS | |
 | N2 | Personas dati (VDAR) | ⬜ NAV SĀKTS | |
 | N3 | Lomas | ⬜ NAV SĀKTS | |
-| N4 | Tehnoloģijas un laiks | ⬜ NAV SĀKTS | |
+| N4 | Tehnoloģijas un laiks | 🟡 DAĻĒJI | Flask + Jinja2 + SQLite un sākumdati: zars `n4-flask`; 1,5 h nav ievērots |
 
 ## 1. Situācija un mērķis
 
@@ -93,7 +93,7 @@ Administrators ikdienā CRM datus neapstrādā: viņa ekrāni ir lietotāji, pie
 
 ### F0 · Pieslēgšanās un reģistrācija
 
-**Statuss: 🟡 DAĻĒJI (5 no 7).** Īstenots zarā `cr-4-auth` ar FastAPI. Sk. 10. nodaļas 8. jautājumu par Flask.
+**Statuss: 🟡 DAĻĒJI (6 no 7).** Flask + Jinja2 (zars `n4-flask`). JSON API no `docs/openapi.yaml` (`/auth/*`) saglabāts.
 
 | Lauks | Obligāts | Noteikumi |
 |---|:-:|---|
@@ -111,7 +111,7 @@ Administrators ikdienā CRM datus neapstrādā: viņa ekrāni ir lietotāji, pie
 | 4 | Poga "Iziet" beidz sesiju. Vecā sesijas sīkdatne vairs nedarbojas | ✅ DONE |
 | 5 | Pēc pieslēgšanās lietotājs nonāk vadības panelī (F9) | ✅ DONE (`f9-panelis`) |
 | 6 | Jauns lietotājs bez lomas redz "Konts gaida apstiprinājumu". Lomu piešķir administrators (N3) | 🟡 DAĻĒJI: paziņojums un administratora saraksts ir; lomas piešķiršanas ekrāna vēl nav, lomas ir sākumdatos |
-| 7 | Formas strādā bez JavaScript (N1: POST → redirect → GET) | ⬜ NAV SĀKTS (pieslēgšanās un reģistrācijas formas tiek nosūtītas ar JavaScript; "Iziet" jau strādā bez JS) |
+| 7 | Formas strādā bez JavaScript (N1: POST → redirect → GET). Kļūdu kopsavilkums ar saitēm uz laukiem, ievadītās vērtības saglabājas | ✅ DONE (`n4-flask`, `tests/test_forms.py`) |
 
 Saskarne: ezera fotogrāfija ("Usmas ezers, 2015", WikedKentaur, CC BY-SA 4.0) kreisajā pusē.
 Virsraksts atrodas virs horizonta, paskaidrojums zem tā. Autorība ir redzama katrā lapā.
@@ -377,7 +377,7 @@ Katrai prasībai atsevišķs komits, kura ziņojums sākas ar prasības ID (piem
 | 5 | Saziņas pamats ir tikai "Līgums". Vai kontaktiem bez līguma (piem., semināra dalībniekiem) nav vietas sistēmā? | Jā, šādus kontaktus nereģistrē |
 | 6 | Vai pagarinot glabāšanas termiņu vajag pamatojumu no saraksta vai brīvu tekstu? | Brīvs teksts, līdz 200 rakstzīmēm |
 | 7 | Kurš Claude modelis MI-1? | Konfigurējams ar vides mainīgo |
-| 8 | F0 ir īstenots ar FastAPI, bet N4 prasa Flask. Pārnest F0 uz Flask vai mainīt N4? | Pārnest uz Flask, saglabājot dizainu, datubāzes shēmu un testus |
+| ~~8~~ | ~~F0 ir īstenots ar FastAPI, bet N4 prasa Flask~~ | **Atrisināts:** pārnests uz Flask (sk. lēmumu žurnālu) |
 | 9 | Vai reģistrēties var jebkurš, vai kontus izveido tikai administrators? | Reģistrēties var jebkurš, bet bez lomas CRM datus neredz (N3) |
 | 10 | Vai vajag paroles atjaunošanu un pieslēgšanās mēģinājumu ierobežošanu? | Ārpus apjoma prototipā, obligāti ražošanā |
 
@@ -410,3 +410,4 @@ Katrai prasībai atsevišķs komits, kura ziņojums sākas ar prasības ID (piem
 | MI-2 | Tikai klasifikācija, nebūvēt | Produkta īpašnieks, 2026-10-14 |
 | Pārskata periods | 7/30/90 d., noklusēti 30; top 5 pēc mijiedarbībām | Produkta īpašnieks, 2026-10-14 |
 | Meklēšanas apjoms | Organizācijas, kontakti, pieprasījumi; bez mijiedarbību teksta | Produkta īpašnieks, 2026-10-14 |
+| Tehnoloģija (N4) | Lietotni pārnest no FastAPI uz Flask + Jinja2 atbilstoši prasībām; JSON API saglabāt | Produkta īpašnieks, 2026-10-14 |

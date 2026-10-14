@@ -1,0 +1,61 @@
+{% extends "auth_base.html" %}
+{% block title %}{% if errors %}Kļūda: {% endif %}Reģistrēties{% endblock %}
+
+{% macro field(name, label, type="text", autocomplete="", placeholder="", hint="") %}
+        <div class="field">
+          <label for="{{ name }}">{{ label }}</label>
+          {%- set described = [] %}
+          {%- if hint %}{% set _ = described.append(name ~ "-hint") %}{% endif %}
+          {%- if errors.get(name) %}{% set _ = described.append(name ~ "-error") %}{% endif %}
+          <input id="{{ name }}" name="{{ name }}" type="{{ type }}" required
+                 {%- if autocomplete %} autocomplete="{{ autocomplete }}"{% endif %}
+                 {%- if placeholder %} placeholder="{{ placeholder }}"{% endif %}
+                 {%- if type != "password" %} value="{{ values.get(name, '') }}"{% endif %}
+                 {%- if described %} aria-describedby="{{ described | join(' ') }}"{% endif %}
+                 {%- if errors.get(name) %} aria-invalid="true"{% endif %}>
+          {%- if hint %}
+          <div id="{{ name }}-hint" class="hint"><span class="dot" aria-hidden="true"></span>{{ hint }}</div>
+          {%- endif %}
+          {%- if errors.get(name) %}
+          <div id="{{ name }}-error" class="field-error">{{ errors[name] }}</div>
+          {%- endif %}
+        </div>
+{% endmacro %}
+
+{% block card %}
+      <h1>Izveidot kontu</h1>
+      <p class="sub">Reģistrējieties, lai iesniegtu iesniegumus pašvaldībai.</p>
+
+      {% if errors %}
+      <div class="alert error error-summary" role="alert">
+        <h2>{{ "Lūdzu, izlabojiet kļūdu" if errors|length == 1 else "Lūdzu, izlabojiet " ~ errors|length ~ " kļūdas" }}</h2>
+        <ul>
+          {% for name, message in errors.items() %}
+          <li><a href="#{{ name }}">{{ field_labels[name] }}: {{ message }}</a></li>
+          {% endfor %}
+        </ul>
+      </div>
+      {% endif %}
+
+      <form method="post" action="/register" novalidate>
+{{ field("fullName", "Vārds, uzvārds", autocomplete="name", placeholder="Jānis Bērziņš") }}
+{{ field("email", "E-pasts", type="email", autocomplete="email", placeholder="vards@example.com") }}
+{{ field("password", "Parole", type="password", autocomplete="new-password",
+         hint="Parolei jābūt vismaz " ~ password_min ~ " rakstzīmes garai") }}
+{{ field("password2", "Parole vēlreiz", type="password", autocomplete="new-password") }}
+        <button type="submit">Izveidot kontu</button>
+      </form>
+
+      <p class="switch">Jau ir konts? <a href="/login">Pieslēgties</a></p>
+{% endblock %}
+
+{% block scripts %}
+<script>
+  // Tikai uzlabojums (N1): forma strādā arī bez JavaScript
+  const password = document.getElementById("password");
+  const rule = document.getElementById("password-hint");
+  password.addEventListener("input", () => {
+    rule.classList.toggle("met", password.value.length >= {{ password_min }});
+  });
+</script>
+{% endblock %}

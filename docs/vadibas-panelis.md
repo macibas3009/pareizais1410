@@ -19,7 +19,7 @@ citās lapās (F3–F7). Panelis rāda tikai svarīgāko.
 | Klikšķis uz zīmola vai "Sākums" augšējā joslā | Atveras `/panelis` |
 | Vecā adrese `/profile` | Novirza uz `/panelis` |
 
-Lokāli: `make run`, tad http://localhost:8000/login. Codespace vidē: cilne **Ports** → ports 8000.
+Lokāli: `make install` (vienreiz), `make run`, tad http://localhost:8000/login. Codespace vidē: cilne **Ports** → ports 8000.
 
 ## 3. Ko redz katra loma
 
@@ -170,8 +170,9 @@ Jaunam darbiniekam sākumā nav organizāciju, tāpēc viņa panelī būs nulles
 
 | Daļa | Fails |
 |---|---|
-| Maršruti `/panelis`, `/uzdevumi/{id}/izpildits`, `/iziet` | `app/main.py` |
-| Vaicājumi un HTML | `app/dashboard.py` |
+| Lietotne (Flask) un maršruti `/panelis`, `/uzdevumi/<id>/izpildits`, `/iziet` | `app/main.py` |
+| Vaicājumi un formatēšana | `app/dashboard.py` |
+| HTML (Jinja2) | `app/templates/panelis.html`, `base.html` |
 | Datubāzes tabulas | `app/db.py` |
 | Sākumdati | `app/seed.py` |
 | Lomu komanda | `app/roles.py` |
@@ -187,4 +188,3 @@ Jaunam darbiniekam sākumā nav organizāciju, tāpēc viņa panelī būs nulles
 | Administratoram dzēšanas pieprasījumi un piekļuves žurnāls | Vēl nav uztaisīti | N2 |
 | Lomu piešķiršana ekrānā | Administratora ekrāna vēl nav | F0 #6 / N3 |
 | 320 px izkārtojums | Uzrakstīts, bet nav pārbaudīts pārlūkā | N1 testi |
-| Lietotne ir FastAPI, nevis Flask | Atvērtais jautājums 8 | Pēc lēmuma |

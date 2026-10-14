@@ -1,6 +1,6 @@
 # CRM mazai iestādei · prasību saraksts
 
-> Versija 1.6 · 2026-10-14 · Statuss: precizēts pēc intervijas ar produkta īpašnieku.
+> Versija 1.7 · 2026-10-14 · Statuss: precizēts pēc intervijas ar produkta īpašnieku.
 > Avots: uzdevums-starteris "CRM mazai iestādei" un konceptuālās arhitektūras shēma.
 > Mācību projekts. Visi dati ir sintētiski.
 
@@ -21,12 +21,12 @@ Statusu atjauno tajā pašā komitā, kurā prasība tiek īstenota.
 | F1 | Organizācijas: izveidot, rediģēt, meklēt | ✅ DONE | zars `f0-lomas`; `tests/test_organizations.py` |
 | F2 | Kontaktpersonas pie organizācijas | ✅ DONE | zari `crm-2-kontakti`, `crm-3-mijiedarbibas` |
 | F3 | Mijiedarbību žurnāls | ✅ DONE | zars `crm-3-mijiedarbibas`; `tests/test_interactions.py` |
-| F4 | Pieprasījumi no organizācijām | ⬜ NAV SĀKTS | |
-| F5 | Uzdevumi un atgādinājumi | ⬜ NAV SĀKTS | |
+| F4 | Pieprasījumi no organizācijām | ✅ DONE | zars `crm-4-pieprasijumi`; `tests/test_requests_tasks.py` |
+| F5 | Uzdevumi un atgādinājumi | ✅ DONE | zars `crm-4-pieprasijumi`; `tests/test_requests_tasks.py` |
 | F6 | Meklēšana | ⬜ NAV SĀKTS | |
 | F7 | Pārskats vadītājam | ⬜ NAV SĀKTS | |
 | F8 | Piekļūstamības paziņojums | ⬜ NAV SĀKTS | |
-| F9 | Vadības panelis pēc pieslēgšanās | 🟡 DAĻĒJI (3 no 7) | zars `f9-panelis`; Jinja2 šablons zarā `n4-flask` |
+| F9 | Vadības panelis pēc pieslēgšanās | 🟡 DAĻĒJI (5 no 7) | zari `f9-panelis` … `crm-4-pieprasijumi`; trūkst saites uz F7 un 320 px pārbaudes pārlūkā |
 | MI-1 | Mijiedarbības kopsavilkums un nākamais solis | ✅ DONE | zars `crm-3-mijiedarbibas`; `app/ai.py`; Claude ceļš nav pārbaudīts ar īstu API atslēgu |
 | MI-2 | Organizāciju prioritizācija: tikai klasifikācija | ⬜ NAV SĀKTS | |
 | N1 | Piekļūstamība | ⬜ NAV SĀKTS | |
@@ -195,11 +195,16 @@ Dalībnieki var būt tikai šīs organizācijas kontaktpersonas un darbinieki. D
 | Termiņš | ✔ | Noklusēti saņemšanas datums + 1 mēnesis; var mainīt |
 | Statuss | ✔ | `Jauns` → `Darbā` → `Atbildēts` |
 
+**Statuss: ✅ DONE (4 no 4).** Zars `crm-4-pieprasijumi`. Lapas: `/pieprasijumi`, `/pieprasijumi/<id>`, `/organizacijas/<id>/pieprasijumi/jauns`, `/pieprasijumi/<id>/labot`. Testi: `tests/test_requests_tasks.py`.
+
 **Pieņemšanas kritēriji**
-1. Statuss mainās tikai uz priekšu: Jauns → Darbā → Atbildēts.
-2. **Kavēts** = termiņš ir pagājis un statuss nav `Atbildēts`. To aprēķina, nevis glabā.
-3. Kavētie pieprasījumi ir izcelti ar **tekstu** "KAVĒTS (N d.)" un ikonu ar tekstuālu alternatīvu, ne tikai ar krāsu.
-4. Sarakstu var filtrēt pēc statusa un pēc tā, vai pieprasījums ir kavēts.
+
+| # | Kritērijs | Statuss |
+|---|---|---|
+| 1 | Statuss mainās tikai uz priekšu: Jauns → Darbā → Atbildēts | ✅ DONE |
+| 2 | **Kavēts** = termiņš ir pagājis un statuss nav `Atbildēts`. To aprēķina, nevis glabā | ✅ DONE |
+| 3 | Kavētie pieprasījumi ir izcelti ar **tekstu** "KAVĒTS (N d.)" un ikonu ar tekstuālu alternatīvu, ne tikai ar krāsu | ✅ DONE |
+| 4 | Sarakstu var filtrēt pēc statusa un pēc tā, vai pieprasījums ir kavēts | ✅ DONE |
 
 ### F5 · Uzdevumi un atgādinājumi
 
@@ -211,11 +216,16 @@ Dalībnieki var būt tikai šīs organizācijas kontaktpersonas un darbinieki. D
 | Saistīts ar | ✔ | Organizācija **vai** pieprasījums |
 | Izpildīts | — | Atzīme + izpildes laiks |
 
+**Statuss: ✅ DONE (4 no 4).** Zars `crm-4-pieprasijumi`. Lapas: `/uzdevumi` (vadītājam filtrs pēc izpildītāja), `/uzdevumi/jauns`; poga "Izpildīts" arī panelī un pieprasījuma kartītē. Testi: `tests/test_requests_tasks.py`.
+
 **Pieņemšanas kritēriji**
-1. Lapā "Mani uzdevumi šodien" ir izpildītāja uzdevumi ar datumu ≤ šodiena, kas nav izpildīti. Nokavētie ir augšā ar teksta atzīmi "Nokavēts".
-2. Atzīmēt "Izpildīts" var ar vienu pogu (POST formu), bez JS.
-3. Vadītājs redz visu darbinieku uzdevumus.
-4. Atgādinājumi ir tikai sistēmā (sākumlapā un sarakstā). E-pasta paziņojumi ir ārpus apjoma.
+
+| # | Kritērijs | Statuss |
+|---|---|---|
+| 1 | Lapā "Mani uzdevumi šodien" ir izpildītāja uzdevumi ar datumu ≤ šodiena, kas nav izpildīti. Nokavētie ir augšā ar teksta atzīmi "Nokavēts" | ✅ DONE |
+| 2 | Atzīmēt "Izpildīts" var ar vienu pogu (POST formu), bez JS | ✅ DONE |
+| 3 | Vadītājs redz visu darbinieku uzdevumus | ✅ DONE |
+| 4 | Atgādinājumi ir tikai sistēmā (sākumlapā un sarakstā). E-pasta paziņojumi ir ārpus apjoma | ✅ DONE |
 
 ### F6 · Meklēšana
 
@@ -266,7 +276,7 @@ noklikšķina uz zīmola vai saites "Sākums". Saturs ir atkarīgs no lomas.
 **Vadītājam** ir tie paši bloki par **visu iestādi**, nevis tikai par savām organizācijām, kā arī saite "Atvērt pilno pārskatu" uz F7.
 **Administratoram** panelī ir: lietotāji, kas gaida lomas piešķiršanu, atvērtie dzēšanas pieprasījumi un saite uz piekļuves žurnālu.
 
-**Statuss: 🟡 DAĻĒJI (3 no 7).** Zars `f9-panelis`, komits `cac0a0e`. Testi: `tests/test_dashboard.py`.
+**Statuss: 🟡 DAĻĒJI (5 no 7).** Sākts zarā `f9-panelis`, papildināts līdz `crm-4-pieprasijumi`. Testi: `tests/test_dashboard.py`, `tests/test_requests_tasks.py`.
 Trūkstošās daļas ir atkarīgas no sarakstiem un pārskata, kas vēl nav uztaisīti (F3, F4, F5, F7).
 
 **Pieņemšanas kritēriji**
@@ -274,11 +284,11 @@ Trūkstošās daļas ir atkarīgas no sarakstiem un pārskata, kas vēl nav uzta
 | # | Kritērijs | Statuss |
 |---|---|---|
 | 1 | Pēc veiksmīgas pieslēgšanās lietotājs tiek novirzīts uz `/panelis`. Bez sesijas `/panelis` novirza uz `/login` | ✅ DONE |
-| 2 | Katram blokam ir virsraksts (`h2`). Saraksti ir tabulas ar `<caption>` vai saraksti (`ul`). Katrā blokā ir saite "Skatīt visus" uz pilno sarakstu | 🟡 DAĻĒJI: virsraksti un tabulas ir; saites "Skatīt visus" nav, jo nav sarakstu (F3, F4, F5) |
-| 3 | Skaitļi ir teksts ar paskaidrojumu (piem., "3 kavēti pieprasījumi"), nevis tikai krāsa vai ikona. Katrs skaitlis ir saite uz atfiltrētu sarakstu | 🟡 DAĻĒJI: teksts ir; saites: organizācijas (F1), jāpārskata (F2), administratoram lietotāji un dzēšanas pieprasījumi; gaida F4, F5 |
+| 2 | Katram blokam ir virsraksts (`h2`). Saraksti ir tabulas ar `<caption>` vai saraksti (`ul`). Katrā blokā ir saite "Skatīt visus" uz pilno sarakstu | ✅ DONE: "Skatīt visus uzdevumus", "Skatīt visus pieprasījumus", "Skatīt visas organizācijas" |
+| 3 | Skaitļi ir teksts ar paskaidrojumu (piem., "3 kavēti pieprasījumi"), nevis tikai krāsa vai ikona. Katrs skaitlis ir saite uz atfiltrētu sarakstu | ✅ DONE: visas kartes ir saites uz atfiltrētiem sarakstiem |
 | 4 | Ja blokā nav datu, tiek parādīts teksts, piem., "Šodien uzdevumu nav" | ✅ DONE |
 | 5 | Darbinieks redz tikai savu organizāciju datus. Vadītājs redz visas iestādes datus (N3) | 🟡 DAĻĒJI: darbinieka un vadītāja tvērums ir; administratoram lomu apstiprināšana, dzēšanas pieprasījumi un žurnāls; trūkst vadītāja saites uz F7 |
-| 6 | Paneļa atvēršana netiek ierakstīta piekļuves žurnālā. Žurnālā tiek ierakstīta kartītes atvēršana no paneļa saitēm (N2) | ✅ DONE paneļa daļā (kartītes nāks ar F1) |
+| 6 | Paneļa atvēršana netiek ierakstīta piekļuves žurnālā. Žurnālā tiek ierakstīta kartītes atvēršana no paneļa saitēm (N2) | ✅ DONE |
 | 7 | Panelis atbilst N1: 320 px platumā bloki izkārtojas vienā kolonnā, un tas strādā bez JavaScript | 🟡 DAĻĒJI: bez JS ir notestēts; 320 px izkārtojums ir CSS, bet nav pārbaudīts pārlūkā |
 
 **Papildus īstenots:** uzdevumu var atzīmēt kā izpildītu tieši no paneļa (POST forma). Darbinieks to var tikai saviem uzdevumiem, vadītājs jebkuram.

@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "_ui.html" as ui %}
 {% block title %}{{ "Konts gaida apstiprinājumu" if view == "pending" else "Vadības panelis" }}{% endblock %}
 
 {% macro hero(subtitle) %}
@@ -88,8 +89,8 @@
 {% else %}
 {{ stat(stats.organizations, "mana organizācija", "manas organizācijas", href="/organizacijas?atbildigais=mani") }}
 {% endif %}
-{{ stat(stats.open_requests, "atvērts pieprasījums", "atvērti pieprasījumi") }}
-{{ stat(stats.tasks_today, "uzdevums šodien", "uzdevumi šodien", warn=true) }}
+{{ stat(stats.open_requests, "atvērts pieprasījums", "atvērti pieprasījumi", href="/pieprasijumi?statuss=atverti" ~ ("" if whole_institution else "&mani=1")) }}
+{{ stat(stats.tasks_today, "uzdevums šodien", "uzdevumi šodien", warn=true, href="/uzdevumi") }}
 {{ stat(stats.contacts_to_review, "kontakts jāpārskata", "kontakti jāpārskata", warn=true, href="/kontakti/japarskata") }}
       </ul>
     </section>
@@ -111,6 +112,7 @@
               </span>
             </div>
             <form method="post" action="/uzdevumi/{{ t.id }}/izpildits">
+              <input type="hidden" name="atpakal" value="/panelis">
               <button type="submit" class="btn-small">Izpildīts<span class="visually-hidden">: {{ t.description }}</span></button>
             </form>
           </li>
@@ -119,6 +121,7 @@
         {% else %}
         <p class="empty">Šodien uzdevumu nav.</p>
         {% endif %}
+        <p class="block-links"><a href="/uzdevumi">Skatīt visus uzdevumus</a></p>
       </section>
 
       <section class="block" aria-labelledby="pieprasijumi">
@@ -132,12 +135,11 @@
             </thead>
             <tbody>
               {% for r in requests %}
-              {% set label, cls = due_label(r.due, today) %}
               <tr>
-                <th scope="row">{{ r.subject }}</th>
+                <th scope="row"><a href="/pieprasijumi/{{ r.id }}">{{ r.subject }}</a></th>
                 <td>{{ r.organization }}</td>
                 <td>{{ r.status }}</td>
-                <td><span class="tag {{ cls }}">{{ label }}</span> <span class="meta">{{ fmt_date(r.due) }}</span></td>
+                <td>{{ ui.due_tag(r.due, today) }}</td>
               </tr>
               {% endfor %}
             </tbody>
@@ -146,6 +148,7 @@
         {% else %}
         <p class="empty">Kavētu vai tuvojošos pieprasījumu nav.</p>
         {% endif %}
+        <p class="block-links"><a href="/pieprasijumi?statuss=atverti{{ '' if whole_institution else '&mani=1' }}">Skatīt visus pieprasījumus</a></p>
       </section>
 
       <section class="block block-wide" aria-labelledby="mijiedarbibas">

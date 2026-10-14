@@ -1,0 +1,36 @@
+{% extends "base.html" %}
+{% import "_forms.html" as f %}
+{% set editing = row is not none %}
+{% block title %}{% if errors %}Kļūda: {% endif %}{{ "Labot pieprasījumu" if editing else "Jauns pieprasījums" }}{% endblock %}
+{% block content %}
+    <nav class="breadcrumbs" aria-label="Atrašanās vieta">
+      <a href="/organizacijas">Organizācijas</a> <span aria-hidden="true">›</span>
+      <a href="/organizacijas/{{ org.id }}">{{ org.name }}</a> <span aria-hidden="true">›</span>
+      {% if editing %}<a href="/pieprasijumi/{{ row.id }}">{{ row.subject }}</a> <span aria-hidden="true">›</span> <span aria-current="page">Labot</span>
+      {% else %}<span aria-current="page">Jauns pieprasījums</span>{% endif %}
+    </nav>
+
+    <div class="page-head">
+      <h1>{{ "Labot pieprasījumu" if editing else "Jauns pieprasījums" }}</h1>
+      <p class="sub">{{ org.name }}{% if not editing %} · statuss būs "Jauns"{% endif %}</p>
+    </div>
+
+    <section class="block form-block">
+{{ f.error_summary(errors, labels) }}
+      <form method="post" action="{{ '/pieprasijumi/' ~ row.id ~ '/labot' if editing else '/organizacijas/' ~ org.id ~ '/pieprasijumi/jauns' }}" novalidate>
+{{ f.input("subject", labels.subject, errors, values, autocomplete="off", placeholder="piem., Atbalsts talkas organizēšanai") }}
+        <div class="field">
+          <label for="description">{{ labels.description }} <span class="optional">(nav obligāts)</span></label>
+          <textarea id="description" name="description" rows="4" maxlength="2000"
+                    {%- if errors.description %} aria-describedby="description-error" aria-invalid="true"{% endif %}>{{ values.get('description') or '' }}</textarea>
+          {% if errors.description %}<div id="description-error" class="field-error">{{ errors.description }}</div>{% endif %}
+        </div>
+{{ f.input("received", labels.received, errors, values, type="date", max=today.isoformat()) }}
+{{ f.input("due", labels.due, errors, values, type="date", hint="Noklusēti saņemšanas datums + 1 mēnesis. Ja atstāj tukšu, tiek aprēķināts automātiski.") }}
+        <div class="form-actions">
+          <button type="submit">{{ "Saglabāt izmaiņas" if editing else "Izveidot pieprasījumu" }}</button>
+          <a class="btn-link" href="{{ '/pieprasijumi/' ~ row.id if editing else '/organizacijas/' ~ org.id }}">Atcelt</a>
+        </div>
+      </form>
+    </section>
+{% endblock %}

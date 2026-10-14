@@ -1,0 +1,13 @@
+{# Kopīgi saskarnes elementi. Termiņa statuss vienmēr ir teksts, ikonai ir tekstuāla alternatīva (F4 #3, N1). #}
+{% macro due_tag(due, today, done=false, show_date=true, task=false) -%}
+  {%- if done -%}
+  <span class="tag upcoming">Izpildīts</span>
+  {%- else -%}
+  {%- set label, cls = due_label(due, today) -%}
+  {%- if task and cls == "late" %}{% set label = label.replace("KAVĒTS", "Nokavēts") %}{% elif task and cls == "soon" %}{% set label = "Šodien" %}{% endif -%}
+  <span class="tag {{ cls }}">
+    {%- if cls == "late" %}<svg class="tag-icon" viewBox="0 0 16 16" role="img" aria-label="Brīdinājums"><path d="M8 1 15 14H1z" fill="currentColor"/><path d="M8 6v4M8 11.5v1" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/></svg>{% endif -%}
+    {{ label }}</span>
+  {%- endif -%}
+  {%- if show_date %} <span class="meta">{{ fmt_date(due) }}</span>{% endif -%}
+{%- endmacro %}

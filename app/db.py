@@ -69,6 +69,7 @@ CREATE TABLE IF NOT EXISTS requests (
     id              INTEGER PRIMARY KEY AUTOINCREMENT,
     organization_id INTEGER NOT NULL REFERENCES organizations(id),
     subject         TEXT    NOT NULL,
+    description     TEXT,
     received        TEXT    NOT NULL,
     due             TEXT    NOT NULL,
     status          TEXT    NOT NULL CHECK (status IN ('Jauns', 'Darbā', 'Atbildēts'))
@@ -129,6 +130,8 @@ def _migrate(conn: sqlite3.Connection) -> None:
     for column, kind in (("ai_source", "TEXT"), ("approved_by", "INTEGER")):  # F3/MI-1
         if column not in columns:
             conn.execute(f"ALTER TABLE interactions ADD COLUMN {column} {kind}")
+    if "description" not in {row["name"] for row in conn.execute("PRAGMA table_info(requests)")}:  # F4
+        conn.execute("ALTER TABLE requests ADD COLUMN description TEXT")
     conn.commit()
 
 

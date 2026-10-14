@@ -1,0 +1,50 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui %}
+{% block title %}Pieprasījumi{% endblock %}
+{% block content %}
+    <div class="page-head">
+      <h1>Pieprasījumi</h1>
+      <p class="sub">Organizāciju pieprasījumi un to termiņi. Jaunu pieprasījumu pievieno organizācijas kartītē.</p>
+    </div>
+
+    <form method="get" action="/pieprasijumi" class="filters" aria-label="Filtrēt pieprasījumus">
+      <div class="field">
+        <label for="statuss">Statuss</label>
+        <select id="statuss" name="statuss">
+          <option value="">Visi statusi</option>
+          <option value="atverti"{% if status == "atverti" %} selected{% endif %}>Atvērtie (Jauns un Darbā)</option>
+          {% for s in statuses %}<option value="{{ s }}"{% if status == s %} selected{% endif %}>{{ s }}</option>{% endfor %}
+        </select>
+      </div>
+      <label class="check filter-check"><input type="checkbox" name="kaveti" value="1"{% if overdue %} checked{% endif %}> Tikai kavētie</label>
+      <label class="check filter-check"><input type="checkbox" name="mani" value="1"{% if mine %} checked{% endif %}> Tikai manas organizācijas</label>
+      <button type="submit" class="btn-small">Filtrēt</button>
+      {% if status or overdue or mine %}<a class="btn-link" href="/pieprasijumi">Notīrīt filtrus</a>{% endif %}
+    </form>
+
+    <section class="block">
+      {% if rows %}
+      <div class="table-wrap">
+        <table>
+          <caption>Pieprasījumi: {{ rows|length }}{% if status or overdue or mine %} (filtrēts){% endif %}</caption>
+          <thead>
+            <tr><th scope="col">Temats</th><th scope="col">Organizācija</th><th scope="col">Statuss</th><th scope="col">Saņemts</th><th scope="col">Termiņš</th></tr>
+          </thead>
+          <tbody>
+            {% for r in rows %}
+            <tr>
+              <th scope="row"><a href="/pieprasijumi/{{ r.id }}">{{ r.subject }}</a></th>
+              <td><a href="/organizacijas/{{ r.organization_id }}">{{ r.organization }}</a>{% if r.responsible_id == user.id %} <span class="meta">(mana)</span>{% endif %}</td>
+              <td>{{ r.status }}</td>
+              <td>{{ fmt_date(r.received) }}</td>
+              <td>{% if r.status == "Atbildēts" %}<span class="meta">{{ fmt_date(r.due) }}</span>{% else %}{{ ui.due_tag(r.due, today) }}{% endif %}</td>
+            </tr>
+            {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      {% else %}
+      <p class="empty">Neviens pieprasījums neatbilst filtriem.</p>
+      {% endif %}
+    </section>
+{% endblock %}

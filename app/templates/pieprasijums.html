@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui %}
+{% block title %}{{ row.subject }}{% endblock %}
+{% block content %}
+    <nav class="breadcrumbs" aria-label="Atrašanās vieta">
+      <a href="/pieprasijumi">Pieprasījumi</a> <span aria-hidden="true">›</span> <span aria-current="page">{{ row.subject }}</span>
+    </nav>
+
+    <div class="page-head page-head-row">
+      <div>
+        <h1>{{ row.subject }}</h1>
+        <p class="sub"><a href="/organizacijas/{{ row.organization_id }}">{{ row.organization }}</a> · atbildīgais {{ row.responsible }}</p>
+      </div>
+      {% if can_edit %}<a class="btn" href="/pieprasijumi/{{ row.id }}/labot">Labot<span class="visually-hidden"> pieprasījumu</span></a>{% endif %}
+    </div>
+
+    {% if saved %}<div class="alert ok" role="status">Pieprasījums saglabāts.</div>{% endif %}
+
+    <div class="blocks">
+      <section class="block" aria-labelledby="statuss">
+        <h2 id="statuss">Statuss un termiņš</h2>
+        <ol class="status-steps" aria-label="Statusa gaita">
+          {% for s in ["Jauns", "Darbā", "Atbildēts"] %}
+          <li class="{{ 'current' if s == row.status else ('past' if loop.index0 < ["Jauns", "Darbā", "Atbildēts"].index(row.status) else '') }}"
+              {%- if s == row.status %} aria-current="step"{% endif %}>{{ s }}</li>
+          {% endfor %}
+        </ol>
+        <dl class="facts">
+          <dt>Saņemts</dt><dd>{{ fmt_date(row.received) }}</dd>
+          <dt>Termiņš</dt><dd>{% if row.status == "Atbildēts" %}{{ fmt_date(row.due) }}{% else %}{{ ui.due_tag(row.due, today) }}{% endif %}</dd>
+        </dl>
+        {% if can_edit and next_status %}
+        <form method="post" action="/pieprasijumi/{{ row.id }}/statuss" class="status-form">
+          <input type="hidden" name="status" value="{{ next_status }}">
+          <button type="submit" class="btn-small">{{ next_action }} → {{ next_status }}</button>
+        </form>
+        {% endif %}
+        <p class="meta">Statuss mainās tikai uz priekšu: Jauns → Darbā → Atbildēts.</p>
+      </section>
+
+      <section class="block" aria-labelledby="apraksts">
+        <h2 id="apraksts">Apraksts</h2>
+        {% if row.description %}<p class="prewrap">{{ row.description }}</p>{% else %}<p class="empty">Apraksta nav.</p>{% endif %}
+      </section>
+
+      <section class="block block-wide" aria-labelledby="uzdevumi">
+        <h2 id="uzdevumi">Uzdevumi ({{ request_tasks|length }})</h2>
+        {% if request_tasks %}
+        <ul class="task-list">
+          {% for t in request_tasks %}
+          <li class="task">
+            <div>
+              {{ ui.due_tag(t.due, today, done=t.done_at is not none, show_date=false, task=true) }}
+              <span class="task-title">{{ t.description }}</span>
+              <span class="meta">{{ t.assignee }} · {{ fmt_date(t.due) }}</span>
+            </div>
+            {% if not t.done_at and (t.assignee_id == user.id or user.role == "vaditajs") %}
+            <form method="post" action="/uzdevumi/{{ t.id }}/izpildits">
+              <input type="hidden" name="atpakal" value="/pieprasijumi/{{ row.id }}">
+              <button type="submit" class="btn-small">Izpildīts<span class="visually-hidden">: {{ t.description }}</span></button>
+            </form>
+            {% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="empty">Uzdevumu nav.</p>
+        {% endif %}
+        <p><a class="btn-link" href="/uzdevumi/jauns?pieprasijums={{ row.id }}">+ Pievienot uzdevumu</a></p>
+      </section>
+    </div>
+{% endblock %}

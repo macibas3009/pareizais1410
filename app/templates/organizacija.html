@@ -1,4 +1,5 @@
 {% extends "base.html" %}
+{% import "_ui.html" as ui %}
 {% block title %}{{ org.name }}{% endblock %}
 {% block content %}
     <nav class="breadcrumbs" aria-label="Atrašanās vieta">
@@ -54,12 +55,9 @@
             <tbody>
               {% for r in requests %}
               <tr>
-                <th scope="row">{{ r.subject }}</th>
+                <th scope="row"><a href="/pieprasijumi/{{ r.id }}">{{ r.subject }}</a></th>
                 <td>{{ r.status }}</td>
-                <td>
-                  {% if r.status != "Atbildēts" %}{% set label, cls = due_label(r.due, today) %}<span class="tag {{ cls }}">{{ label }}</span> {% endif %}
-                  <span class="meta">{{ fmt_date(r.due) }}</span>
-                </td>
+                <td>{% if r.status != "Atbildēts" %}{{ ui.due_tag(r.due, today) }}{% else %}<span class="meta">{{ fmt_date(r.due) }}</span>{% endif %}</td>
               </tr>
               {% endfor %}
             </tbody>
@@ -68,6 +66,7 @@
         {% else %}
         <p class="empty">Pieprasījumu nav.</p>
         {% endif %}
+        {% if can_edit %}<p><a class="btn-link" href="/organizacijas/{{ org.id }}/pieprasijumi/jauns">+ Pievienot pieprasījumu</a></p>{% endif %}
       </section>
 
       <section class="block" aria-labelledby="uzdevumi">
@@ -77,8 +76,7 @@
           {% for t in tasks %}
           <li class="task">
             <div>
-              {% if t.done_at %}<span class="tag upcoming">Izpildīts</span>
-              {% else %}{% set label, cls = due_label(t.due, today) %}<span class="tag {{ cls }}">{{ label }}</span>{% endif %}
+              {{ ui.due_tag(t.due, today, done=t.done_at is not none, show_date=false, task=true) }}
               <span class="task-title">{{ t.description }}</span>
               <span class="meta">{{ t.assignee }} · {{ fmt_date(t.due) }}</span>
             </div>
@@ -88,6 +86,7 @@
         {% else %}
         <p class="empty">Uzdevumu nav.</p>
         {% endif %}
+        <p><a class="btn-link" href="/uzdevumi/jauns?organizacija={{ org.id }}">+ Pievienot uzdevumu</a></p>
       </section>
 
       <section class="block block-wide" aria-labelledby="mijiedarbibas">

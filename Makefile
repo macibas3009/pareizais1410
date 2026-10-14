@@ -1,4 +1,4 @@
-.PHONY: verify-setup test lint-contract install run seed users role ekranu-karte
+.PHONY: verify-setup test lint-contract install install-dev run seed users role ekranu-karte a11y
 
 verify-setup:
 	@python --version
@@ -16,6 +16,11 @@ lint-contract:
 install:
 	pip install -r requirements.txt
 
+# Piekļūstamības pārbaudei (make a11y) un ekrānu kartei (make ekranu-karte)
+install-dev:
+	pip install -r requirements-dev.txt
+	python -m playwright install chromium
+
 run:
 	flask --app app.main:create_app run --host 0.0.0.0 --port 8000 --reload
 
@@ -32,3 +37,7 @@ role:
 # Atjauno ekrānu kartes attēlu no docs/ekranu-karte.html (vajag: pip install playwright && playwright install chromium)
 ekranu-karte:
 	python tools/html_to_png.py docs/ekranu-karte.html docs/ekranu-karte.png
+
+# N1: axe-core + Playwright piekļūstamības pārbaude; rezultāts docs/a11y-rezultati.json (rāda /pieklustamiba)
+a11y:
+	python tests/a11y_check.py

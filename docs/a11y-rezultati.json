@@ -1,0 +1,268 @@
+{
+  "checked_at": "2026-10-14T09:06+00:00",
+  "axe_version": "4.12.1",
+  "standard": "WCAG 2.2 AA (axe tags: wcag2a, wcag2aa, wcag21a, wcag21aa, wcag22aa)",
+  "pages": [
+    {
+      "title": "Pieslēgties",
+      "path": "/login",
+      "violations": [],
+      "incomplete": 1,
+      "focus_not_visible": [],
+      "horizontal_overflow_px": {
+        "320 px": 0,
+        "200 % mērogs": 0
+      }
+    },
+    {
+      "title": "Reģistrēties",
+      "path": "/register",
+      "violations": [],
+      "incomplete": 1,
+      "focus_not_visible": [],
+      "horizontal_overflow_px": {
+        "320 px": 0,
+        "200 % mērogs": 0
+      }
+    },
+    {
+      "title": "Piekļūstamības paziņojums",
+      "path": "/pieklustamiba",
+      "violations": [],
+      "incomplete": 0,
+      "focus_not_visible": [],
+      "horizontal_overflow_px": {
+        "320 px": 0,
+        "200 % mērogs": 0
+      }
+    },
+    {
+      "title": "Vadības panelis (darbinieks)",
+      "path": "/panelis",
+      "violations": [],
+      "incomplete": 1,
+      "focus_not_visible": [],
+      "horizontal_overflow_px": {
+        "320 px": 0,
+        "200 % mērogs": 0
+      }
+    },
+    {
+      "title": "Organizāciju saraksts",
+      "path": "/organizacijas",
+      "violations": [],
+      "incomplete": 0,
+      "focus_not_visible": [],
+      "horizontal_overflow_px": {
+        "320 px": 0,
+        "200 % mērogs": 0
+      }
+    },
+    {
+      "title": "Organizācijas kartīte",
+      "path": "/organizacijas/1",
+      "violations": [],
+      "incomplete": 0,
+      "focus_not_visible": [],
+      "horizontal_overflow_px": {
+        "320 px": 0,
+        "200 % mērogs": 0
+      }
+    },
+    {
+      "title": "Organizācijas forma",
+      "path": "/organizacijas/1/labot",
+      "violations": [],
+      "incomplete": 0,
+      "focus_not_visible": [],
+      "horizontal_overflow_px": {
+        "320 px": 0,
+        "200 % mērogs": 0
+      }
+    },
+    {
+      "title": "Kontaktpersonas kartīte",
+      "path": "/kontakti/1",
+      "violations": [],
+      "incomplete": 0,
+      "focus_not_visible": [],
+      "horizontal_overflow_px": {
+        "320 px": 0,
+        "200 % mērogs": 0
+      }
+    },
+    {
+      "title": "Kontaktpersonas forma",
+      "path": "/organizacijas/1/kontakti/jauns",
+      "violations": [],
+      "incomplete": 0,
+      "focus_not_visible": [],
+      "horizontal_overflow_px": {
+        "320 px": 0,
+        "200 % mērogs": 0
+      }
+    },
+    {
+      "title": "Mijiedarbības forma",
+      "path": "/organizacijas/1/mijiedarbibas/jauna",
+      "violations": [],
+      "incomplete": 1,
+      "focus_not_visible": [],
+      "horizontal_overflow_px": {
+        "320 px": 0,
+        "200 % mērogs": 0
+      }
+    },
+    {
+      "title": "Pieprasījumu saraksts",
+      "path": "/pieprasijumi",
+      "violations": [],
+      "incomplete": 0,
+      "focus_not_visible": [],
+      "horizontal_overflow_px": {
+        "320 px": 0,
+        "200 % mērogs": 0
+      }
+    },
+    {
+      "title": "Pieprasījuma kartīte",
+      "path": "/pieprasijumi/1",
+      "violations": [],
+      "incomplete": 0,
+      "focus_not_visible": [],
+      "horizontal_overflow_px": {
+        "320 px": 0,
+        "200 % mērogs": 0
+      }
+    },
+    {
+      "title": "Pieprasījuma forma",
+      "path": "/organizacijas/1/pieprasijumi/jauns",
+      "violations": [],
+      "incomplete": 0,
+      "focus_not_visible": [],
+      "horizontal_overflow_px": {
+        "320 px": 0,
+        "200 % mērogs": 0
+      }
+    },
+    {
+      "title": "Mani uzdevumi",
+      "path": "/uzdevumi",
+      "violations": [],
+      "incomplete": 1,
+      "focus_not_visible": [],
+      "horizontal_overflow_px": {
+        "320 px": 0,
+        "200 % mērogs": 0
+      }
+    },
+    {
+      "title": "Uzdevuma forma",
+      "path": "/uzdevumi/jauns",
+      "violations": [],
+      "incomplete": 0,
+      "focus_not_visible": [],
+      "horizontal_overflow_px": {
+        "320 px": 0,
+        "200 % mērogs": 0
+      }
+    },
+    {
+      "title": "Kontakti, kas jāpārskata",
+      "path": "/kontakti/japarskata",
+      "violations": [],
+      "incomplete": 0,
+      "focus_not_visible": [],
+      "horizontal_overflow_px": {
+        "320 px": 0,
+        "200 % mērogs": 0
+      }
+    },
+    {
+      "title": "Meklēšanas rezultāti",
+      "path": "/meklet?q=ezer",
+      "violations": [],
+      "incomplete": 0,
+      "focus_not_visible": [],
+      "horizontal_overflow_px": {
+        "320 px": 0,
+        "200 % mērogs": 0
+      }
+    },
+    {
+      "title": "Vadības panelis (vadītājs)",
+      "path": "/panelis",
+      "violations": [],
+      "incomplete": 1,
+      "focus_not_visible": [],
+      "horizontal_overflow_px": {
+        "320 px": 0,
+        "200 % mērogs": 0
+      }
+    },
+    {
+      "title": "Vadītāja pārskats",
+      "path": "/parskats",
+      "violations": [],
+      "incomplete": 1,
+      "focus_not_visible": [],
+      "horizontal_overflow_px": {
+        "320 px": 0,
+        "200 % mērogs": 0
+      }
+    },
+    {
+      "title": "Vadības panelis (administrators)",
+      "path": "/panelis",
+      "violations": [],
+      "incomplete": 1,
+      "focus_not_visible": [],
+      "horizontal_overflow_px": {
+        "320 px": 0,
+        "200 % mērogs": 0
+      }
+    },
+    {
+      "title": "Lietotāji un lomas",
+      "path": "/lietotaji",
+      "violations": [],
+      "incomplete": 0,
+      "focus_not_visible": [],
+      "horizontal_overflow_px": {
+        "320 px": 0,
+        "200 % mērogs": 0
+      }
+    },
+    {
+      "title": "Dzēšanas pieprasījumi",
+      "path": "/dzesanas-pieprasijumi",
+      "violations": [],
+      "incomplete": 0,
+      "focus_not_visible": [],
+      "horizontal_overflow_px": {
+        "320 px": 0,
+        "200 % mērogs": 0
+      }
+    },
+    {
+      "title": "Piekļuves žurnāls",
+      "path": "/zurnals",
+      "violations": [],
+      "incomplete": 0,
+      "focus_not_visible": [],
+      "horizontal_overflow_px": {
+        "320 px": 0,
+        "200 % mērogs": 0
+      }
+    }
+  ],
+  "summary": {
+    "pages": 23,
+    "blocking_violations": 0,
+    "other_violations": 0,
+    "overflow_pages": 0,
+    "focus_problem_pages": 0,
+    "keyboard_main_path_failed": []
+  }
+}

@@ -14,6 +14,7 @@
 | Redzams fokuss (Tab cauri katrai lapai) | **0** problēmu |
 | Protokola pārbaudes (nosaukumi, virsraksti, orientieri, lauku nosaukumi, mērķu izmērs, paziņojumi) | Atrastas **4 problēmas**, visas **izlabotas** (sk. 5. nodaļu) |
 | Ekrānlasītājs (NVDA) | ⬜ **Nav veikts** — jāveic cilvēkam uz Windows |
+| Cilvēka pieņemšanas tests (pele + tastatūra, iedzīvotājs → darbinieks → iedzīvotājs) | ✅ **izdevās**, «viss bija skaidrs un ērts» (4. nodaļa) |
 | **Secinājums** | **Daļēji atbilst.** Automātiski pārbaudāmajā daļā atbilst WCAG 2.2 AA; pilnu atbilstību nevar apliecināt bez ekrānlasītāja testa |
 
 **Svarīgākā mācība:** axe pirmajā palaišanā neatrada nevienu problēmu, bet protokola pārbaudes atrada 4. Automātiskie rīki pārbauda tikai daļu prasību — tas atbilst veidnes brīdinājumam ("tipiski 30–50 %").
@@ -94,14 +95,28 @@ no pieejamības koka (`tests/a11y_protokols.py`). Tas **neaizstāj** NVDA testu.
 - Pogas saka darbību un sekas: «Nosūtīt atbildi: mainīt statusu uz «Atbildēts»».
 - **Jāvērtē cilvēkam:** vai teksti ir pietiekami vienkārši (piem., senioriem); apstiprinājuma lapas "Kas notiks tālāk".
 
-## 4. Kas jādara cilvēkam
+## 4. Cilvēka pieņemšanas tests (2026-10-14)
 
-1. NVDA tests (10 min, Windows + NVDA + Firefox/Chrome) pa ceļu "iesniegt iesniegumu" — aizpildīt D tabulu.
+Veica lietotājs (cilvēks), nevis Claude. Ierakstīts pēc lietotāja apraksta; sistēmas puses dati pārbaudīti datubāzē.
+
+| Solis | Loma | Rezultāts | Pierādījums (`notikumi`) |
+|---|---|---|---|
+| Izveidoja un iesniedza iesniegumu 2026-0011 (Ceļi un bedres) | Iedzīvotājs | ✅ izdevās | 10:19 «Iesniegums reģistrēts» |
+| Apstrādāja: izmantoja MI projektu, mainīja statusu uz «Apstrādē», nosūtīja atbildi | Darbinieks | ✅ izdevās | 10:20 «MI ieteikums (imitacija) izmantots…», 10:20 «Jauns → Apstrādē», 10:22 «Apstrādē → Atbildēts» |
+| Pārbaudīja statusu sadaļā «Mans iesniegums» | Iedzīvotājs | ✅ redzams statuss un atbilde | — |
+
+- **Ievade:** gan pele, gan tastatūra.
+- **Lietotāja vērtējums:** «viss bija skaidrs un ērts».
+- **Ko šis tests neaptver:** ekrānlasītāju (NVDA), 200 % mērogu reālā pārlūkā, kontrasta mērījumu ar pipeti — tie paliek 5. nodaļā.
+
+## 5. Kas vēl jādara cilvēkam
+
+1. NVDA tests (10 min, Windows + NVDA + Firefox/Chrome) pa ceļu "iesniegt iesniegumu" — aizpildīt D tabulu. (Funkcionālais ceļš ar peli un tastatūru jau pārbaudīts — 4. nodaļa.)
 2. Kontrasts uz sākumlapas fotogrāfijas — pārbaudīt ar DevTools krāsu pipeti (atradums #4).
 3. Vizuāli apstiprināt fokusa secību un 200 % mērogu reālā pārlūkā (Ctrl +).
 4. Paziņojumā ierakstīt apstiprinātāju (vārds, amats) — lapa `/pieklustamiba`.
 
-## 5. Atradumu reģistrs
+## 6. Atradumu reģistrs
 
 | # | Lapa | Problēma | WCAG | Smagums | Labots (commit) / Paliek paziņojumā |
 |---|---|---|---|---|---|

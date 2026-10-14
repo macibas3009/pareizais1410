@@ -48,6 +48,8 @@ def create_app(db_path: Path | str | None = None) -> Flask:
             g.db = sqlite3.connect(db_path)
             g.db.row_factory = sqlite3.Row
             g.db.execute("PRAGMA foreign_keys = ON")
+            # SQLite LOWER() strādā tikai ar ASCII; latviešu burtiem vajag Python casefold (US-3 meklēšana)
+            g.db.create_function("lv_lower", 1, lambda v: v.casefold() if isinstance(v, str) else v, deterministic=True)
         return g.db
 
     @app.teardown_appcontext

@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-14T10:00+00:00",
+  "checked_at": "2026-10-14T10:04+00:00",
   "axe_version": "4.12.1",
   "tags": [
     "wcag2a",
@@ -9,8 +9,8 @@
     "wcag22aa"
   ],
   "summary": {
-    "pages": 7,
-    "skipped": 5,
+    "pages": 12,
+    "skipped": 2,
     "blocking": 0,
     "other": 0,
     "overflow": 0,
@@ -110,17 +110,62 @@
     {
       "title": "4 Saraksts",
       "path": "/darbinieks/iesniegumi",
-      "skipped": true
+      "skipped": false,
+      "violations": [],
+      "incomplete": 0,
+      "focus_not_visible": [],
+      "overflow_px": {
+        "320 px": 0,
+        "200 %": 0
+      }
     },
     {
       "title": "4 Saraksts ar filtriem",
       "path": "/darbinieks/iesniegumi?statuss=Jauns&tema=1&q=iela",
-      "skipped": true
+      "skipped": false,
+      "violations": [],
+      "incomplete": 0,
+      "focus_not_visible": [],
+      "overflow_px": {
+        "320 px": 0,
+        "200 %": 0
+      }
     },
     {
       "title": "5 Detaļas",
       "path": "/darbinieks/iesniegumi/2026-0006",
-      "skipped": true
+      "skipped": false,
+      "violations": [],
+      "incomplete": 0,
+      "focus_not_visible": [],
+      "overflow_px": {
+        "320 px": 0,
+        "200 %": 0
+      }
+    },
+    {
+      "title": "5 Detaļas pēc statusa maiņas",
+      "path": "POST statuss",
+      "skipped": false,
+      "violations": [],
+      "incomplete": 0,
+      "focus_not_visible": [],
+      "overflow_px": {
+        "320 px": 0,
+        "200 %": 0
+      }
+    },
+    {
+      "title": "5 Detaļas: MI projekts atbildes laukā",
+      "path": "POST mi-izmantot",
+      "skipped": false,
+      "violations": [],
+      "incomplete": 0,
+      "focus_not_visible": [],
+      "overflow_px": {
+        "320 px": 0,
+        "200 %": 0
+      }
     },
     {
       "title": "6 Pārskats vadītājam",
@@ -137,7 +182,7 @@
     {
       "step": "Loma izvēlēta ar Enter",
       "ok": true,
-      "note": "http://127.0.0.1:38749/iesniegt"
+      "note": "http://127.0.0.1:33763/iesniegt"
     },
     {
       "step": "Pēc kļūdas fokuss nonāk uz kļūdu kopsavilkumu",
@@ -147,12 +192,12 @@
     {
       "step": "Formu var aizpildīt un iesniegt ar tastatūru",
       "ok": true,
-      "note": "http://127.0.0.1:38749/iesniegts/2026-0012"
+      "note": "http://127.0.0.1:33763/iesniegts/2026-0012"
     },
     {
       "step": "No apstiprinājuma uz «Mans iesniegums» ar numuru",
       "ok": true,
-      "note": "http://127.0.0.1:38749/mans-iesniegums?numurs=2026-0012"
+      "note": "http://127.0.0.1:33763/mans-iesniegums?numurs=2026-0012"
     },
     {
       "step": "Nav vietas, kur fokuss «iestrēgst» (var aiziet līdz kājenei)",

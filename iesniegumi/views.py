@@ -8,6 +8,8 @@ from datetime import datetime, timezone
 
 from flask import Flask, abort, redirect, render_template, request, url_for
 
+import ai
+
 NAME_RE = re.compile(r"^[^\W\d_]+(?:[ '\-.][^\W\d_]+)*\.?$")
 EMAIL_RE = re.compile(r"^[^@\s]+@[^@\s]+\.[^@\s]+$")
 NUMURS_RE = re.compile(r"^\d{4}-\d{4}$")
@@ -173,12 +175,150 @@ def register_views(app: Flask) -> None:
             ).fetchone()
         return render_template("mans_iesniegums.html", numurs=numurs, row=row, error=error, last=last), (404 if error and not row else 200)
 
-    # --- Vietturi nākamajiem US -------------------------------------------------------
+    # --- US-3 · iesniegumu saraksts ---------------------------------------------------
+
+    STATUSI = ("Jauns", "Apstrādē", "Atbildēts", "Noraidīts")
 
     @app.get("/darbinieks/iesniegumi")
     def saraksts():
         app.require("darbinieks", "vaditajs")
-        return "US-3", 200
+        statuss = request.args.get("statuss", "")
+        tema = request.args.get("tema", "")
+        meklet = " ".join(request.args.get("q", "").split())
+        where, params = ["1 = 1"], []
+        if statuss in STATUSI:
+            where.append("i.statuss = ?")
+            params.append(statuss)
+        if tema.isdigit():
+            where.append("i.tema_id = ?")
+            params.append(int(tema))
+        if meklet:
+            like = "%" + meklet.casefold().replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_") + "%"
+            where.append("(lv_lower(i.numurs) LIKE ? ESCAPE '\\' OR lv_lower(i.vards) LIKE ? ESCAPE '\\' "
+                         "OR lv_lower(i.vieta) LIKE ? ESCAPE '\\' OR lv_lower(i.apraksts) LIKE ? ESCAPE '\\')")
+            params += [like] * 4
+        rows = db().execute(
+            "SELECT i.numurs, i.izveidots, i.vards, i.statuss, t.nosaukums AS tema FROM iesniegumi i "
+            f"JOIN temas t ON t.id = i.tema_id WHERE {' AND '.join(where)} ORDER BY i.izveidots DESC, i.id DESC",
+            params,
+        ).fetchall()
+        filtered = bool(statuss or tema or meklet)
+        return render_template("saraksts.html", rows=rows, temas=temas(), statusi=STATUSI,
+                               statuss=statuss, tema=tema, q=meklet, filtered=filtered)
+
+    # --- US-4 · detaļas un apstrāde, US-7 · MI ieteikums --------------------------------
+
+    NEXT = {"Jauns": ("Apstrādē",), "Apstrādē": ("Atbildēts", "Noraidīts")}
+    NOTICES = {
+        "statuss": "Statuss nomainīts uz «{statuss}».",
+        "projekts": "Atbildes melnraksts saglabāts. Iedzīvotājam tas nav nosūtīts.",
+        "komentars": "Komentārs pievienots vēsturei.",
+        "mi": "MI projekts ielikts atbildes laukā. Pārbaudiet un rediģējiet to pirms nosūtīšanas.",
+        "mi_tema": "Tēma nomainīta uz MI ieteikto «{tema}».",
+    }
+    mi_cache: dict[tuple[int, str], tuple[dict, str]] = {}
+
+    def mi_for(row) -> tuple[dict, str]:
+        """Ieteikums tiek aprēķināts vienreiz katram aprakstam (Claude API netiek saukts katrā lapas atvēršanā)."""
+        key = (row["id"], row["apraksts"])
+        if key not in mi_cache:
+            mi_cache[key] = ai.ieteikums_ar_avotu(row["apraksts"])
+        return mi_cache[key]
+
+    def detail(row, errors=None, values=None, status_code=200):
+        events = db().execute(
+            "SELECT laiks, loma, veids, apraksts FROM notikumi WHERE iesniegums_id = ? ORDER BY laiks, id", (row["id"],)
+        ).fetchall()
+        mi, mi_avots = mi_for(row)
+        notice_key = request.args.get("pazinojums", "")
+        notice = NOTICES.get(notice_key, "").format(statuss=row["statuss"], tema=row["tema"]) if notice_key else ""
+        return render_template(
+            "detalas.html", row=row, events=events, next_statuses=NEXT.get(row["statuss"], ()), mi=mi, mi_avots=mi_avots,
+            notice=notice, errors=errors or {}, values=values or {}, lomas_nosaukumi={**LOMAS_EVENT},
+        ), status_code
+
+    LOMAS_EVENT = {"iedzivotajs": "Iedzīvotājs", "darbinieks": "Darbinieks", "vaditajs": "Vadītājs", "sistema": "Sistēma"}
+
+    def load(numurs: str):
+        loma = app.require("darbinieks", "vaditajs")
+        row = get_iesniegums(numurs)
+        if row is None:
+            abort(404)
+        return loma, row
+
+    def back(numurs: str, key: str):
+        return redirect(url_for("detalas", numurs=numurs, pazinojums=key) + "#pazinojums", code=303)
+
+    @app.get("/darbinieks/iesniegumi/<numurs>")
+    def detalas(numurs: str):
+        _, row = load(numurs)
+        return detail(row)
+
+    @app.post("/darbinieks/iesniegumi/<numurs>/statuss")
+    def mainit_statusu(numurs: str):
+        loma, row = load(numurs)
+        target = request.form.get("statuss", "")
+        if target not in NEXT.get(row["statuss"], ()):
+            abort(400)
+        atbilde = request.form.get("atbilde", "").strip()
+        if target in ("Atbildēts", "Noraidīts") and not atbilde:
+            msg = ("Ierakstiet atbildi iedzīvotājam, pirms maināt statusu uz «Atbildēts»." if target == "Atbildēts"
+                   else "Ierakstiet noraidījuma pamatojumu, pirms maināt statusu uz «Noraidīts».")
+            return detail(row, errors={"atbilde": msg}, values={"atbilde": atbilde}, status_code=400)
+        conn = db()
+        if target in ("Atbildēts", "Noraidīts"):
+            conn.execute("UPDATE iesniegumi SET statuss = ?, atbilde = ?, atbildes_projekts = NULL, slegts = ? WHERE id = ?",
+                         (target, atbilde, now_iso(), row["id"]))
+        else:
+            conn.execute("UPDATE iesniegumi SET statuss = ? WHERE id = ?", (target, row["id"]))
+        log_event(row["id"], loma, "statuss", f"Statuss: {row['statuss']} → {target}")
+        conn.commit()
+        return back(numurs, "statuss")
+
+    @app.post("/darbinieks/iesniegumi/<numurs>/projekts")
+    def saglabat_projektu(numurs: str):
+        _, row = load(numurs)
+        if row["statuss"] not in NEXT:
+            abort(400)
+        db().execute("UPDATE iesniegumi SET atbildes_projekts = ? WHERE id = ?", (request.form.get("atbilde", "").strip(), row["id"]))
+        db().commit()
+        return back(numurs, "projekts")
+
+    @app.post("/darbinieks/iesniegumi/<numurs>/komentars")
+    def pievienot_komentaru(numurs: str):
+        loma, row = load(numurs)
+        komentars = " ".join(request.form.get("komentars", "").split())
+        if not komentars:
+            return detail(row, errors={"komentars": "Ierakstiet komentāra tekstu."}, status_code=400)
+        log_event(row["id"], loma, "komentars", f"Komentārs: {komentars[:1000]}")
+        db().commit()
+        return back(numurs, "komentars")
+
+    @app.post("/darbinieks/iesniegumi/<numurs>/mi-izmantot")
+    def mi_izmantot(numurs: str):
+        """US-7: projekts nonāk atbildes laukā rediģēšanai; nekas netiek nosūtīts, statuss nemainās."""
+        loma, row = load(numurs)
+        if row["statuss"] not in NEXT:
+            abort(400)
+        mi, avots = mi_for(row)
+        db().execute("UPDATE iesniegumi SET atbildes_projekts = ? WHERE id = ?", (mi["atbildes_projekts"], row["id"]))
+        log_event(row["id"], loma, "mi_izmantots", f"MI ieteikums ({avots}) izmantots: projekts ielikts atbildes laukā")
+        db().commit()
+        return back(numurs, "mi")
+
+    @app.post("/darbinieks/iesniegumi/<numurs>/mi-tema")
+    def mi_tema(numurs: str):
+        loma, row = load(numurs)
+        mi, avots = mi_for(row)
+        tema = db().execute("SELECT id FROM temas WHERE nosaukums = ?", (mi["tema"],)).fetchone()
+        if row["statuss"] not in NEXT or tema is None or mi["tema"] == row["tema"]:
+            abort(400)
+        db().execute("UPDATE iesniegumi SET tema_id = ? WHERE id = ?", (tema["id"], row["id"]))
+        log_event(row["id"], loma, "mi_tema", f"Tēma mainīta pēc MI ieteikuma ({avots}): {row['tema']} → {mi['tema']}")
+        db().commit()
+        return back(numurs, "mi_tema")
+
+    # --- Vietturis nākamajam US -------------------------------------------------------
 
     @app.get("/vaditajs/parskats")
     def parskats():

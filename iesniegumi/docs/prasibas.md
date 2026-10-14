@@ -82,25 +82,25 @@ Statusa apzīmējumi: ✅ izpildīts un notestēts · 🟡 daļēji · ⬜ nav s
 
 | # | Kritērijs | WCAG | Statuss |
 |---|---|---|---|
-| 3.1 | Tabula: numurs, datums, tēma, iesniedzējs, statuss; jaunākie augšā | — | ⬜ |
-| 3.2 | Filtri pēc statusa un tēmas + meklēšana tekstā (GET forma) | — | ⬜ |
-| 3.3 | `<table>` ar `<caption>` (ar skaitu) un `<th scope>` | 1.3.1 | ⬜ |
-| 3.4 | Statuss ar tekstu, ne tikai krāsu | 1.4.1 | ⬜ |
-| 3.5 | Filtru forma ar `<fieldset><legend>` | 1.3.1 | ⬜ |
-| 3.6 | Saites teksts "Iesniegums 2026-0001", ne "Skatīt" | 2.4.4 | ⬜ |
+| 3.1 | Tabula: numurs, datums, tēma, iesniedzējs, statuss; jaunākie augšā | — | ✅ |
+| 3.2 | Filtri pēc statusa un tēmas + meklēšana tekstā (GET forma) | — | ✅ |
+| 3.3 | `<table>` ar `<caption>` (ar skaitu) un `<th scope>` | 1.3.1 | ✅ |
+| 3.4 | Statuss ar tekstu, ne tikai krāsu | 1.4.1 | ✅ |
+| 3.5 | Filtru forma ar `<fieldset><legend>` | 1.3.1 | ✅ |
+| 3.6 | Saites teksts "Iesniegums 2026-0001", ne "Skatīt" | 2.4.4 | ✅ |
 
 ### US-4 · Detaļas un apstrāde (MUST)
 
 | # | Kritērijs | WCAG | Statuss |
 |---|---|---|---|
-| 4.1 | Statusa maiņa tikai pa atļautajiem soļiem: Jauns → Apstrādē → Atbildēts / Noraidīts | — | ⬜ |
-| 4.2 | "Atbildēts" prasa atbildes tekstu; "Noraidīts" prasa pamatojumu | 3.3.1 | ⬜ |
-| 4.3 | Komentāra pievienošana; katra maiņa un komentārs ierakstās `notikumi` | — | ⬜ |
-| 4.4 | Vēsture hronoloģiski | — | ⬜ |
-| 4.5 | Virsrakstu hierarhija h1 → h2 | 1.3.1, 2.4.6 | ⬜ |
-| 4.6 | Pēc darbības paziņojums `role="status"` | 4.1.3 | ⬜ |
-| 4.7 | Pogas ar skaidru tekstu ("Mainīt statusu uz …") | 4.1.2 | ⬜ |
-| 4.8 | Galvene nav fiksēta, fokuss netiek aizsegts | 2.4.11 | ⬜ |
+| 4.1 | Statusa maiņa tikai pa atļautajiem soļiem: Jauns → Apstrādē → Atbildēts / Noraidīts | — | ✅ |
+| 4.2 | "Atbildēts" prasa atbildes tekstu; "Noraidīts" prasa pamatojumu | 3.3.1 | ✅ |
+| 4.3 | Komentāra pievienošana; katra maiņa un komentārs ierakstās `notikumi` | — | ✅ |
+| 4.4 | Vēsture hronoloģiski | — | ✅ |
+| 4.5 | Virsrakstu hierarhija h1 → h2 | 1.3.1, 2.4.6 | ✅ |
+| 4.6 | Pēc darbības paziņojums `role="status"` | 4.1.3 | ✅ |
+| 4.7 | Pogas ar skaidru tekstu ("Mainīt statusu uz …") | 4.1.2 | ✅ |
+| 4.8 | Galvene nav fiksēta, fokuss netiek aizsegts | 2.4.11 | ✅ |
 
 ### US-5 · Pārskats vadītājam (MUST)
 
@@ -124,12 +124,12 @@ Statusa apzīmējumi: ✅ izpildīts un notestēts · 🟡 daļēji · ⬜ nav s
 
 | # | Kritērijs | Avots | Statuss |
 |---|---|---|---|
-| 7.1 | `ai.py`: `ieteikums(apraksts) -> {tema, atbildes_projekts}`; noklusēti atslēgvārdu imitācija bez tīkla; ar `ANTHROPIC_API_KEY` — Claude API ar to pašu līgumu | — | ⬜ |
-| 7.2 | Detaļu lapā bloks "MI ieteikums" (`<section aria-labelledby>`) ar marķējumu "Ģenerēts ar MI, pārbaudiet pirms lietošanas" | MI akta 50. p. gars; WCAG 1.3.1 | ⬜ |
-| 7.3 | Poga "Izmantot projektu" ieliek tekstu atbildes laukā rediģēšanai; nekad nenosūta automātiski | Cilvēka uzraudzība | ⬜ |
-| 7.4 | Izmantošana ierakstās `notikumi` | Žurnāls | ⬜ |
-| 7.5 | Bez mirgojoša ielādes indikatora | WCAG 2.3.1 | ⬜ |
-| 7.6 | Riska klasifikācija aizpildīta pirms būvēšanas | MI akts | ⬜ |
+| 7.1 | `ai.py`: `ieteikums(apraksts) -> {tema, atbildes_projekts}`; noklusēti atslēgvārdu imitācija bez tīkla; ar `ANTHROPIC_API_KEY` — Claude API ar to pašu līgumu | — | ✅ |
+| 7.2 | Detaļu lapā bloks "MI ieteikums" (`<section aria-labelledby>`) ar marķējumu "Ģenerēts ar MI, pārbaudiet pirms lietošanas" | MI akta 50. p. gars; WCAG 1.3.1 | ✅ |
+| 7.3 | Poga "Izmantot projektu" ieliek tekstu atbildes laukā rediģēšanai; nekad nenosūta automātiski | Cilvēka uzraudzība | ✅ |
+| 7.4 | Izmantošana ierakstās `notikumi` | Žurnāls | ✅ |
+| 7.5 | Bez mirgojoša ielādes indikatora | WCAG 2.3.1 | ✅ |
+| 7.6 | Riska klasifikācija aizpildīta pirms būvēšanas | MI akts | ✅ |
 
 ### US-8 · Mans iesniegums (SHOULD)
 

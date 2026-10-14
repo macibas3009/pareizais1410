@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}{% if errors %}Kļūda: {% endif %}Iesniegums {{ row.numurs }}{% endblock %}
+{% block content %}
+    <p><a href="{{ url_for('saraksts') }}">← Atpakaļ uz iesniegumu sarakstu</a></p>
+    <h1>Iesniegums {{ row.numurs }}</h1>
+    <p class="lead"><span class="status status-{{ status_class(row.statuss) }}">{{ row.statuss }}</span> · {{ row.tema }} · iesniegts {{ fmt_date(row.izveidots, true) }}</p>
+
+    <div id="pazinojums" role="status">{% if notice %}<p class="alert ok">{{ notice }}</p>{% endif %}</div>
+
+    <div class="grid-2">
+      <section class="card" aria-labelledby="dati">
+        <h2 id="dati">Iesnieguma dati</h2>
+        <dl class="facts">
+          <dt>Iesniedzējs</dt><dd>{{ row.vards }}</dd>
+          <dt>E-pasts</dt><dd>{{ row.epasts }}</dd>
+          <dt>Vieta</dt><dd>{{ row.vieta }}</dd>
+          <dt>Tēma</dt><dd>{{ row.tema }}</dd>
+        </dl>
+        <h3>Apraksts</h3>
+        <p class="prewrap">{{ row.apraksts }}</p>
+      </section>
+
+      <section class="card" aria-labelledby="apstrade">
+        <h2 id="apstrade">Statuss un atbilde</h2>
+        {% if row.statuss == "Jauns" %}
+        <p>Iesniegums vēl nav apstrādē.</p>
+        <form id="statuss-forma" method="post" action="{{ url_for('mainit_statusu', numurs=row.numurs) }}">
+          <input type="hidden" name="statuss" value="Apstrādē">
+          <button type="submit">Sākt apstrādi: mainīt statusu uz «Apstrādē»</button>
+        </form>
+        {% elif row.statuss == "Apstrādē" %}
+        <form id="atbilde-forma" method="post" action="{{ url_for('mainit_statusu', numurs=row.numurs) }}" novalidate>
+          <div class="field">
+            <label for="atbilde">Atbilde iedzīvotājam vai noraidījuma pamatojums</label>
+            <textarea id="atbilde" name="atbilde" rows="8" aria-describedby="atbilde-hint{{ ' atbilde-kluda' if errors.atbilde }}"
+                      {%- if errors.atbilde %} aria-invalid="true"{% endif %}>{{ values.atbilde if values.atbilde is defined else (row.atbildes_projekts or '') }}</textarea>
+            <p id="atbilde-hint" class="hint">Teksts tiek nosūtīts iedzīvotājam tikai tad, kad nospiežat «Nosūtīt atbildi» vai «Noraidīt».</p>
+            {% if errors.atbilde %}<p id="atbilde-kluda" class="field-error" role="alert">{{ errors.atbilde }}</p>{% endif %}
+          </div>
+          <div class="actions">
+            <button type="submit" name="statuss" value="Atbildēts">Nosūtīt atbildi: mainīt statusu uz «Atbildēts»</button>
+            <button type="submit" name="statuss" value="Noraidīts" class="btn-ghost">Noraidīt: mainīt statusu uz «Noraidīts»</button>
+            <button type="submit" formaction="{{ url_for('saglabat_projektu', numurs=row.numurs) }}" class="btn-ghost">Saglabāt melnrakstu</button>
+          </div>
+        </form>
+        {% else %}
+        <p>Iesniegums ir slēgts ({{ fmt_date(row.slegts) }}).</p>
+        <h3>{{ "Nosūtītā atbilde" if row.statuss == "Atbildēts" else "Noraidījuma pamatojums" }}</h3>
+        <p class="prewrap">{{ row.atbilde }}</p>
+        {% endif %}
+      </section>
+    </div>
+
+    {% if row.statuss in ("Jauns", "Apstrādē") %}
+    <section class="ai-block" aria-labelledby="mi-virsraksts">
+      <h2 id="mi-virsraksts">MI ieteikums</h2>
+      <p class="ai-label">Ģenerēts ar MI, pārbaudiet pirms lietošanas</p>
+      <p class="meta">Avots: {{ "Claude (Anthropic)" if mi_avots == "claude" else "atslēgvārdu imitācija (bez ārēja pakalpojuma)" }}. Ieteikums netiek nosūtīts un nemaina statusu.</p>
+      <dl class="facts">
+        <dt>Ieteiktā tēma</dt>
+        <dd>{{ mi.tema }}{% if mi.tema == row.tema %} <span class="meta">(sakrīt ar pašreizējo)</span>{% endif %}</dd>
+      </dl>
+      {% if mi.tema != row.tema %}
+      <form id="mi-tema" method="post" action="{{ url_for('mi_tema', numurs=row.numurs) }}">
+        <button type="submit" class="btn-ghost btn-small">Mainīt tēmu uz «{{ mi.tema }}»</button>
+      </form>
+      {% endif %}
+      <h3>Atbildes projekts</h3>
+      <p class="prewrap">{{ mi.atbildes_projekts }}</p>
+      <form id="mi-izmantot" method="post" action="{{ url_for('mi_izmantot', numurs=row.numurs) }}">
+        <button type="submit" class="btn-ai">Izmantot projektu atbildes laukā</button>
+      </form>
+      {% if row.statuss == "Jauns" %}<p class="meta">Atbildes lauks parādīsies, kad iesniegums būs apstrādē.</p>{% endif %}
+    </section>
+    {% endif %}
+
+    <div class="grid-2">
+      <section class="card" aria-labelledby="komentars-virsraksts">
+        <h2 id="komentars-virsraksts">Pievienot komentāru</h2>
+        <form method="post" action="{{ url_for('pievienot_komentaru', numurs=row.numurs) }}" novalidate>
+          <div class="field">
+            <label for="komentars">Iekšējs komentārs (iedzīvotājs to neredz)</label>
+            <textarea id="komentars" name="komentars" rows="3"{% if errors.komentars %} aria-describedby="komentars-kluda" aria-invalid="true"{% endif %}></textarea>
+            {% if errors.komentars %}<p id="komentars-kluda" class="field-error" role="alert">{{ errors.komentars }}</p>{% endif %}
+          </div>
+          <button type="submit" class="btn-ghost">Pievienot komentāru</button>
+        </form>
+      </section>
+
+      <section class="card" aria-labelledby="vesture">
+        <h2 id="vesture">Vēsture</h2>
+        <ol class="timeline">
+          {% for e in events %}
+          <li><span class="meta">{{ fmt_date(e.laiks, true) }} · {{ lomas_nosaukumi.get(e.loma, e.loma) }}</span><br>{{ e.apraksts }}</li>
+          {% endfor %}
+        </ol>
+      </section>
+    </div>
+{% endblock %}

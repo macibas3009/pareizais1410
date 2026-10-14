@@ -766,3 +766,65 @@ button.btn-secondary-solid:hover { background: #563283; }
 .status-steps li.current { background: var(--lake-600); color: #fff; }
 .status-form { margin: 1rem 0 0.5rem; }
 .prewrap { white-space: pre-wrap; margin: 0; }
+
+/* ==========================================================================
+   F6 · meklēšana, F7 · pārskats
+   ========================================================================== */
+
+.topbar-search { display: flex; gap: 0.4rem; align-items: center; margin: 0 0 0 auto; }
+.topbar-search input { width: 14rem; padding: 0.45rem 0.7rem; }
+.topbar-search + .topbar-user { margin-left: 1rem; }
+.report-link { margin: -0.5rem 0 1.25rem; }
+.period-filter { margin: 0; }
+
+.chart-grid { display: grid; grid-template-columns: minmax(0, 2fr) minmax(0, 1fr); gap: 1.5rem; align-items: start; }
+.chart { margin: 0; }
+.chart figcaption { margin-top: 0.5rem; font-size: 0.85rem; color: var(--muted); }
+.bar-chart { width: 100%; height: auto; font-family: inherit; }
+.bar-chart .bar { fill: #0b7fa3; }
+.bar-chart .bar-row:hover .bar { fill: #086a89; }
+.bar-chart .hit { fill: transparent; }
+.bar-chart .bar-row:hover .hit { fill: var(--lake-100); }
+.bar-chart .grid { stroke: #e3e8ea; stroke-width: 1; }
+.bar-chart .baseline { stroke: #9fb0b6; }
+.bar-chart .tick { font-size: 12px; fill: var(--muted); }
+.bar-chart .bar-label { font-size: 13px; fill: var(--ink); }
+.bar-chart .bar-value { font-size: 13px; font-weight: 700; fill: var(--ink); }
+td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
+
+@media (max-width: 860px) {
+  .chart-grid { grid-template-columns: 1fr; }
+  .topbar-search { order: 3; width: 100%; margin: 0; }
+  .topbar-search input { flex: 1; width: auto; }
+}
+
+/* Galvene ar meklēšanu: nelauzt zīmolu un vārdu; šaurākā ekrānā meklēšana savā rindā */
+.topbar { flex-wrap: wrap; }
+.topbar-brand span, .topbar-name, .topbar nav a { white-space: nowrap; }
+.topbar-search input { width: 11rem; }
+@media (max-width: 1240px) {
+  .topbar-brand small { display: none; }
+  .topbar-search { order: 3; flex-basis: 100%; margin: 0; }
+  .topbar-search input { flex: 1; width: auto; max-width: 28rem; }
+}
+@media (max-width: 860px) {
+  .topbar nav { flex-wrap: wrap; gap: 0.25rem 0.9rem; flex-basis: 100%; order: 2; }
+  .topbar-user { margin-left: auto; }
+}
+@media (max-width: 480px) {
+  .topbar-brand span { white-space: normal; }
+  .topbar-search input { min-width: 0; }
+  .topbar { padding: 0.6rem 0.75rem; }
+}
+/* N1: 320 px bez horizontālas ritināšanas — režģa elementi nedrīkst izplesties līdz satura platumam */
+.blocks > *, .chart-grid > *, .block { min-width: 0; }
+.facts dd, .facts dt, td, th { overflow-wrap: anywhere; }
+@media (max-width: 860px) {
+  .blocks, .chart-grid { grid-template-columns: minmax(0, 1fr); }
+  .facts { grid-template-columns: minmax(0, 1fr); gap: 0.1rem; }
+  .facts dd { margin-bottom: 0.5rem; }
+}
+@media (max-width: 480px) { .tag { white-space: normal; } }
+/* Ekrāna lasītāja teksti tabulās paliek ritināmajā laukumā, nevis paplašina lapu */
+.table-wrap { position: relative; }
+.visually-hidden { margin: -1px; padding: 0; border: 0; }

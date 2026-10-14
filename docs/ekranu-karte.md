@@ -15,7 +15,7 @@
 |---|---|---|---|
 | Pieslēgties | `/login` | F0 | ✅ |
 | Reģistrēties (+ pieprasītā loma) | `/register` | F0 | ✅ |
-| Vadības panelis: atveras pēc pieslēgšanās, saturs pēc lomas | `/panelis` | F9 | 🟡 |
+| Vadības panelis: atveras pēc pieslēgšanās, saturs pēc lomas | `/panelis` | F9 | ✅ |
 | Konts gaida apstiprinājumu (lietotājs bez lomas) | `/panelis` | F0 | ✅ |
 
 ### Darbinieks un vadītājs
@@ -35,7 +35,7 @@
 | └ Pieprasījuma kartīte (statuss uz priekšu, uzdevumi) | `/pieprasijumi/<id>` | F4 | ✅ |
 | Mani uzdevumi šodien (vadītājam visi) | `/uzdevumi` | F5 | ✅ |
 | Kontakti "Jāpārskata" (pagarināt / dzēst ar apstiprinājumu) | `/kontakti/japarskata` | N2 | ✅ |
-| Vadītāja pārskats (tikai vadītājam) | — | F7 | ⬜ |
+| Vadītāja pārskats (tikai vadītājam; diagramma + tabula) | `/parskats` | F7 | ✅ |
 
 ### Administrators
 
@@ -51,13 +51,13 @@
 | Elements | Prasība | Statuss |
 |---|---|---|
 | Galvene: zīmols → Sākums, navigācija pēc lomas, vārds, **Iziet** | F0, F9 | ✅ |
-| Galvene: meklēšanas lauks → Meklēšanas rezultāti | F6 | ⬜ |
+| Galvene: meklēšanas lauks → Meklēšanas rezultāti (`/meklet`) | F6 | ✅ |
 | Kājene: foto autorība | — | ✅ |
 | Kājene: saite uz Piekļūstamības paziņojumu (`/pieklustamiba`) | F8 | ⬜ |
 | Kļūdas lapa (404, 403) | — | ✅ |
 | MI-2 klasifikācija: tikai dokuments, ekrāna nav | MI-2 | ⬜ |
 
-**Kopā:** gatavi 21 · daļēji 1 · vēl nav 4.
+**Kopā:** gatavi 24 · daļēji 0 · vēl nav 2.
 
 ## Kā atjaunot attēlu
 

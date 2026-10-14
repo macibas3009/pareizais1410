@@ -81,6 +81,9 @@
 
 {% else %}
 {{ hero("Pārskats par visu iestādi" if whole_institution else "Jūsu organizācijas, uzdevumi un termiņi") }}
+{% if whole_institution %}
+    <p class="block-links report-link"><a class="btn" href="/parskats">Atvērt pilno pārskatu</a></p>
+{% endif %}
     <section aria-labelledby="kopsavilkums">
       <h2 id="kopsavilkums" class="visually-hidden">Kopsavilkums</h2>
       <ul class="stats">

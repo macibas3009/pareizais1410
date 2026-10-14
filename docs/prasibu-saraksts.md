@@ -1,6 +1,6 @@
 # CRM mazai iestādei · prasību saraksts
 
-> Versija 1.7 · 2026-10-14 · Statuss: precizēts pēc intervijas ar produkta īpašnieku.
+> Versija 1.8 · 2026-10-14 · Statuss: precizēts pēc intervijas ar produkta īpašnieku.
 > Avots: uzdevums-starteris "CRM mazai iestādei" un konceptuālās arhitektūras shēma.
 > Mācību projekts. Visi dati ir sintētiski.
 
@@ -23,14 +23,14 @@ Statusu atjauno tajā pašā komitā, kurā prasība tiek īstenota.
 | F3 | Mijiedarbību žurnāls | ✅ DONE | zars `crm-3-mijiedarbibas`; `tests/test_interactions.py` |
 | F4 | Pieprasījumi no organizācijām | ✅ DONE | zars `crm-4-pieprasijumi`; `tests/test_requests_tasks.py` |
 | F5 | Uzdevumi un atgādinājumi | ✅ DONE | zars `crm-4-pieprasijumi`; `tests/test_requests_tasks.py` |
-| F6 | Meklēšana | ⬜ NAV SĀKTS | |
-| F7 | Pārskats vadītājam | ⬜ NAV SĀKTS | |
+| F6 | Meklēšana | ✅ DONE | zars `crm-5-meklesana-parskats`; `tests/test_search_report.py` |
+| F7 | Pārskats vadītājam | ✅ DONE | zars `crm-5-meklesana-parskats`; `tests/test_search_report.py` |
 | F8 | Piekļūstamības paziņojums | ⬜ NAV SĀKTS | |
-| F9 | Vadības panelis pēc pieslēgšanās | 🟡 DAĻĒJI (5 no 7) | zari `f9-panelis` … `crm-4-pieprasijumi`; trūkst saites uz F7 un 320 px pārbaudes pārlūkā |
+| F9 | Vadības panelis pēc pieslēgšanās | ✅ DONE | zari `f9-panelis` … `crm-5-meklesana-parskats` |
 | MI-1 | Mijiedarbības kopsavilkums un nākamais solis | ✅ DONE | zars `crm-3-mijiedarbibas`; `app/ai.py`; Claude ceļš nav pārbaudīts ar īstu API atslēgu |
 | MI-2 | Organizāciju prioritizācija: tikai klasifikācija | ⬜ NAV SĀKTS | |
-| N1 | Piekļūstamība | ⬜ NAV SĀKTS | |
-| N2 | Personas dati (VDAR) | 🟡 DAĻĒJI (5 no 6) | zari `crm-2-kontakti`, `crm-3-mijiedarbibas`; trūkst meklēšanas ierobežojuma (F6) |
+| N1 | Piekļūstamība | 🟡 DAĻĒJI | 320 px pārbaudīts automātiski visās 21 lapā (`crm-5-meklesana-parskats`); axe un tastatūras testi — 6. posmā |
+| N2 | Personas dati (VDAR) | ✅ DONE | zari `crm-2-kontakti` … `crm-5-meklesana-parskats` |
 | N3 | Lomas | 🟡 DAĻĒJI | lomu pieprasīšana un apstiprināšana, tiesības F1 un F9; pārējās tiesības nāks ar F2–F7 |
 | N4 | Tehnoloģijas un laiks | 🟡 DAĻĒJI | Flask + Jinja2 + SQLite un sākumdati: zars `n4-flask`; 1,5 h nav ievērots |
 
@@ -229,24 +229,31 @@ Dalībnieki var būt tikai šīs organizācijas kontaktpersonas un darbinieki. D
 
 ### F6 · Meklēšana
 
+**Statuss: ✅ DONE (6 no 6).** Zars `crm-5-meklesana-parskats`. Lapa `/meklet`, lauks galvenē darbiniekam un vadītājam. Testi: `tests/test_search_report.py`.
+
 **Pieņemšanas kritēriji**
-1. Viens meklēšanas lauks galvenē, pieejams visās lapās (`role="search"`, ar `<label>`).
-2. Meklē organizāciju nosaukumos un reģ. nr., kontaktpersonu vārdos un e-pastos, pieprasījumu tematos.
-3. Mijiedarbību teksts netiek meklēts (VDAR minimizācija).
-4. Vismaz 2 rakstzīmes. Meklēšana nav jutīga pret lielajiem un mazajiem burtiem, un garumzīmes ir jāievada.
-5. Rezultāti ir tabulā ar `<caption>` ("Meklēšanas rezultāti: N atrasti") un `<th scope>`, sagrupēti pēc veida.
-6. Darbinieks redz visus rezultātus (sk. 3. nodaļu). Kontaktpersonas kartītes atvēršana no rezultātiem tiek ierakstīta žurnālā.
+
+| # | Kritērijs | Statuss |
+|---|---|---|
+| 1 | Viens meklēšanas lauks galvenē, pieejams visās lapās (`role="search"`, ar `<label>`) | ✅ DONE |
+| 2 | Meklē organizāciju nosaukumos un reģ. nr., kontaktpersonu vārdos un e-pastos, pieprasījumu tematos | ✅ DONE |
+| 3 | Mijiedarbību teksts netiek meklēts (VDAR minimizācija) | ✅ DONE |
+| 4 | Vismaz 2 rakstzīmes. Meklēšana nav jutīga pret lielajiem un mazajiem burtiem, un garumzīmes ir jāievada | ✅ DONE |
+| 5 | Rezultāti ir tabulā ar `<caption>` ("Meklēšanas rezultāti: N atrasti") un `<th scope>`, sagrupēti pēc veida | ✅ DONE |
+| 6 | Darbinieks redz visus rezultātus (sk. 3. nodaļu). Kontaktpersonas kartītes atvēršana no rezultātiem tiek ierakstīta žurnālā | ✅ DONE |
 
 ### F7 · Pārskats vadītājam
 
+**Statuss: ✅ DONE (4 no 4).** Zars `crm-5-meklesana-parskats`. Lapa `/parskats`. Diagramma: servera pusē zīmēts SVG (bez JS), krāsa `#0b7fa3` pārbaudīta ar validatoru, `<title>` uznirstošais teksts katram stabiņam. Testi: `tests/test_search_report.py`.
+
 **Pieņemšanas kritēriji**
-1. Periodu var izvēlēties: 7 / 30 / 90 dienas, noklusēti 30.
-2. Pārskatā ir:
-   - aktivitāte pa darbiniekiem: mijiedarbību skaits periodā;
-   - kavētie pieprasījumi: saraksts un skaits;
-   - aktīvākās organizācijas: top 5 pēc mijiedarbību skaita periodā.
-3. Katrai diagrammai blakus ir **tā pati informācija tabulā**. Diagrammai ir teksta apraksts (`alt` vai `figcaption`).
-4. Pārskats ir pieejams tikai vadītājam. Citām lomām tas atgriež 403.
+
+| # | Kritērijs | Statuss |
+|---|---|---|
+| 1 | Periodu var izvēlēties: 7 / 30 / 90 dienas, noklusēti 30 | ✅ DONE |
+| 2 | Pārskatā ir: aktivitāte pa darbiniekiem: mijiedarbību skaits periodā; kavētie pieprasījumi: saraksts un skaits; aktīvākās organizācijas: top 5 pēc mijiedarbību skaita periodā | ✅ DONE |
+| 3 | Katrai diagrammai blakus ir **tā pati informācija tabulā**. Diagrammai ir teksta apraksts (`alt` vai `figcaption`) | ✅ DONE |
+| 4 | Pārskats ir pieejams tikai vadītājam. Citām lomām tas atgriež 403 | ✅ DONE |
 
 ### F8 · Piekļūstamības paziņojums
 
@@ -276,7 +283,7 @@ noklikšķina uz zīmola vai saites "Sākums". Saturs ir atkarīgs no lomas.
 **Vadītājam** ir tie paši bloki par **visu iestādi**, nevis tikai par savām organizācijām, kā arī saite "Atvērt pilno pārskatu" uz F7.
 **Administratoram** panelī ir: lietotāji, kas gaida lomas piešķiršanu, atvērtie dzēšanas pieprasījumi un saite uz piekļuves žurnālu.
 
-**Statuss: 🟡 DAĻĒJI (5 no 7).** Sākts zarā `f9-panelis`, papildināts līdz `crm-4-pieprasijumi`. Testi: `tests/test_dashboard.py`, `tests/test_requests_tasks.py`.
+**Statuss: ✅ DONE (7 no 7).** Sākts zarā `f9-panelis`, pabeigts zarā `crm-5-meklesana-parskats`. Testi: `tests/test_dashboard.py`, `tests/test_requests_tasks.py`.
 Trūkstošās daļas ir atkarīgas no sarakstiem un pārskata, kas vēl nav uztaisīti (F3, F4, F5, F7).
 
 **Pieņemšanas kritēriji**
@@ -287,9 +294,9 @@ Trūkstošās daļas ir atkarīgas no sarakstiem un pārskata, kas vēl nav uzta
 | 2 | Katram blokam ir virsraksts (`h2`). Saraksti ir tabulas ar `<caption>` vai saraksti (`ul`). Katrā blokā ir saite "Skatīt visus" uz pilno sarakstu | ✅ DONE: "Skatīt visus uzdevumus", "Skatīt visus pieprasījumus", "Skatīt visas organizācijas" |
 | 3 | Skaitļi ir teksts ar paskaidrojumu (piem., "3 kavēti pieprasījumi"), nevis tikai krāsa vai ikona. Katrs skaitlis ir saite uz atfiltrētu sarakstu | ✅ DONE: visas kartes ir saites uz atfiltrētiem sarakstiem |
 | 4 | Ja blokā nav datu, tiek parādīts teksts, piem., "Šodien uzdevumu nav" | ✅ DONE |
-| 5 | Darbinieks redz tikai savu organizāciju datus. Vadītājs redz visas iestādes datus (N3) | 🟡 DAĻĒJI: darbinieka un vadītāja tvērums ir; administratoram lomu apstiprināšana, dzēšanas pieprasījumi un žurnāls; trūkst vadītāja saites uz F7 |
+| 5 | Darbinieks redz tikai savu organizāciju datus. Vadītājs redz visas iestādes datus (N3) | ✅ DONE: vadītājam arī saite "Atvērt pilno pārskatu" (F7); administratoram lomu apstiprināšana, dzēšanas pieprasījumi un žurnāls |
 | 6 | Paneļa atvēršana netiek ierakstīta piekļuves žurnālā. Žurnālā tiek ierakstīta kartītes atvēršana no paneļa saitēm (N2) | ✅ DONE |
-| 7 | Panelis atbilst N1: 320 px platumā bloki izkārtojas vienā kolonnā, un tas strādā bez JavaScript | 🟡 DAĻĒJI: bez JS ir notestēts; 320 px izkārtojums ir CSS, bet nav pārbaudīts pārlūkā |
+| 7 | Panelis atbilst N1: 320 px platumā bloki izkārtojas vienā kolonnā, un tas strādā bez JavaScript | ✅ DONE: bez JS notestēts; 320 px pārbaudīts ar Playwright (nav horizontālas ritināšanas) |
 
 **Papildus īstenots:** uzdevumu var atzīmēt kā izpildītu tieši no paneļa (POST forma). Darbinieks to var tikai saviem uzdevumiem, vadītājs jebkuram.
 Testa lietotāji (sākumdati, `make seed`): `darbinieks@example.com`, `darbinieks2@example.com`, `vaditajs@example.com`, `admin@example.com`. Parole ir `app/seed.py` vai vides mainīgajā `SEED_PASSWORD`.
@@ -346,15 +353,15 @@ Testa lietotāji (sākumdati, `make seed`): `darbinieks@example.com`, `darbiniek
 
 ### N2 · Personas dati (VDAR)
 
-**Statuss: 🟡 DAĻĒJI (4 no 6).** Zars `crm-2-kontakti`. Testi: `tests/test_contacts.py`, `tests/test_organizations.py`, `tests/test_roles_flow.py`.
+**Statuss: ✅ DONE (6 no 6).** Zari `crm-2-kontakti` … `crm-5-meklesana-parskats`. Testi: `tests/test_contacts.py`, `tests/test_interactions.py`, `tests/test_search_report.py`.
 
 | # | Kritērijs | Statuss |
 |---|---|---|
-| 1 | **Minimizācija:** tikai F2 lauki, bez brīva teksta laukiem par personu. Meklēšana nemeklē mijiedarbību tekstā | 🟡 DAĻĒJI: forma ✅; meklēšana būs F6 |
+| 1 | **Minimizācija:** tikai F2 lauki, bez brīva teksta laukiem par personu. Meklēšana nemeklē mijiedarbību tekstā | ✅ DONE: forma bez brīva teksta par personu; meklēšana nemeklē mijiedarbībās un nerāda kontaktinformāciju |
 | 2 | **Glabāšanas termiņš:** 3 gadi pēc pēdējās mijiedarbības (F2) | ✅ DONE (pārrēķins pēc mijiedarbības ar F3) |
 | 3 | **Pēc termiņa beigām** kontakts nonāk sarakstā "Jāpārskata". Atbildīgais darbinieks vai vadītājs to pagarina (ar pamatojumu, kas tiek ierakstīts žurnālā) vai dzēš. Automātiskas dzēšanas nav | ✅ DONE: `/kontakti/japarskata`; pirms dzēšanas apstiprinājuma lapa |
 | 4 | **Piekļuves žurnāls:** katra organizācijas vai kontaktpersonas kartītes atvēršana tiek ierakstīta (kas, ko, kad, darbība). Žurnālu var skatīt tikai administrators | ✅ DONE: `/zurnals` |
-| 5 | **Dzēšana pēc pieprasījuma** (veic administrators): ieraksts dzēsts neatgriezeniski; mijiedarbībās "Dzēsta kontaktpersona"; žurnālā fakts bez personas datiem | 🟡 DAĻĒJI: darbinieks reģistrē pieprasījumu kontakta kartītē, administrators izpilda vai noraida lapā `/dzesanas-pieprasijumi`; mijiedarbību anonimizācija nāks ar F3 |
+| 5 | **Dzēšana pēc pieprasījuma** (veic administrators): ieraksts dzēsts neatgriezeniski; mijiedarbībās "Dzēsta kontaktpersona"; žurnālā fakts bez personas datiem | ✅ DONE: darbinieks reģistrē pieprasījumu kontakta kartītē, administrators izpilda (ar apstiprinājumu) vai noraida; mijiedarbībās "Dzēsta kontaktpersona" |
 | 6 | Lietotnes žurnālā (`logging`) netiek rakstīti personas dati un mijiedarbību teksti | ✅ DONE |
 
 ### N3 · Lomas

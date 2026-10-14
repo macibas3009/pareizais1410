@@ -64,7 +64,8 @@ def test_create_contact_with_retention_and_basis(client, db_path):
 def test_form_has_only_minimal_fields(client, db_path):
     login(client, "darbinieks@example.com")
     html = client.get(f"/organizacijas/{org(db_path, 'SIA Ezerkrasta Būve')}/kontakti/jauns", headers=HTML).text
-    names = set(re.findall(r'<input[^>]* name="([^"]+)"', html))
+    form = html.split('<form method="post" action="/organizacijas/')[1].split("</form>")[0]
+    names = set(re.findall(r'<input[^>]* name="([^"]+)"', form))
     assert names == {"full_name", "position", "email", "phone", "basis_date"}  # nav piezīmju lauka (N2 minimizācija)
     assert "<textarea" not in html
 

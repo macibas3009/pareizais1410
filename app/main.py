@@ -14,7 +14,7 @@ from typing import Any
 from flask import Flask, abort, g, jsonify, redirect, render_template, request
 from werkzeug.exceptions import HTTPException
 
-from app import accounts, ai, audit, contacts, dashboard, db, interactions, org_requests, organizations, tasks, users
+from app import accounts, ai, audit, contacts, dashboard, db, interactions, org_requests, organizations, report, search, tasks, users
 
 VERSION = "0.1.0"
 API_PREFIXES = ("/auth/", "/health")
@@ -666,6 +666,22 @@ def create_app(db_path: Path | None = None, cookie_secure: bool | None = None) -
         if values["request_id"]:
             return redirect(f"/pieprasijumi/{values['request_id']}", code=303)
         return redirect("/uzdevumi?izveidots=1", code=303)
+
+    # --- F6 · meklēšana, F7 · pārskats ----------------------------------------------
+
+    @app.get("/meklet")
+    def search_page():
+        user = require(*CRM_ROLES)
+        query = request.args.get("q", "")
+        results = search.run(conn(), query)
+        return render_template("meklet.html", user=user, query=query, results=results, today=date.today(),
+                               min_length=search.MIN_LENGTH)
+
+    @app.get("/parskats")
+    def report_page():
+        user = require("vaditajs")
+        period = report.period_from(request.args.get("periods", ""))
+        return render_template("parskats.html", user=user, today=date.today(), **report.build(conn(), date.today(), period))
 
     # --- JSON API (docs/openapi.yaml) -----------------------------------------
 

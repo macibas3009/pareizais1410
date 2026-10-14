@@ -100,8 +100,10 @@ h2 { font-size: 1.25rem; color: var(--lake-900); margin: 0 0 0.75rem; }
   display: flex; align-items: flex-end; color: #fff;
   background: var(--lake-900) url("usmas-ezers.jpg") center 58% / cover no-repeat;
 }
-.hero::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(10,30,40,.8), rgba(10,30,40,.35) 60%, rgba(10,30,40,.1)); }
-.hero-inner { position: relative; padding: 1.75rem 2rem; max-width: 40rem; }
+/* 1.4.3: teksta zonā (līdz ~60 % platuma) pārklājums ≥ 0.62 → sliktākajā gadījumā (balts pikselis fotogrāfijā)
+   fons ≈ rgb(108,120,126), kontrasts ar baltu ≈ 4.6:1. Aprēķins: docs/pieejamibas-atskaite.md, atradums #4 */
+.hero::before { content: ""; position: absolute; inset: 0; background: linear-gradient(90deg, rgba(10,30,40,.85), rgba(10,30,40,.62) 60%, rgba(10,30,40,.2)); }
+.hero-inner { position: relative; padding: 1.75rem 2rem; max-width: 34rem; text-shadow: 0 1px 8px rgba(0,0,0,.45); }
 .hero h1 { color: #fff; margin: 0 0 0.4rem; }
 .hero p { margin: 0; }
 
@@ -214,6 +216,7 @@ td.num, th.num { text-align: right; font-variant-numeric: tabular-nums; }
   .facts { grid-template-columns: minmax(0, 1fr); }
   .facts dd { margin-bottom: 0.5rem; }
   .hero-inner { padding: 1.25rem; }
+  .hero::before { background: rgba(10,30,40,.66); } /* teksts aizņem visu platumu → vienmērīgs pārklājums, ≥ 4.5:1 */
 }
 
 .big-number { font-size: 1.3rem; }

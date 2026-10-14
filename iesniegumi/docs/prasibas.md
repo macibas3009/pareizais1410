@@ -144,15 +144,15 @@ Statusa apzīmējumi: ✅ izpildīts un notestēts · 🟡 daļēji · ⬜ nav s
 
 | # | Kritērijs | Statuss |
 |---|---|---|
-| 9.1 | `tests/a11y_check.py` pārbauda visas lapas, arī formu ar kļūdām → `a11y-report.md` | ⬜ |
-| 9.2 | 0 critical/serious | ⬜ |
-| 9.3 | Nenovēršamie atradumi dokumentēti paziņojumā | ⬜ |
+| 9.1 | `tests/a11y_check.py` pārbauda visas lapas, arī formu ar kļūdām → `a11y-report.md` | ✅ |
+| 9.2 | 0 critical/serious | ✅ |
+| 9.3 | Nenovēršamie atradumi dokumentēti paziņojumā | ✅ |
 
 ### US-14 · Reflow 320 px un 200 % (COULD, izvēlēts)
 
 | # | Kritērijs | WCAG | Statuss |
 |---|---|---|---|
-| 14.1 | 320 px un 640 CSS px (200 %) platumā nav horizontālas ritināšanas, nekas nepazūd | 1.4.4, 1.4.10 | ⬜ |
+| 14.1 | 320 px un 640 CSS px (200 %) platumā nav horizontālas ritināšanas, nekas nepazūd | 1.4.4, 1.4.10 | ✅ |
 
 ### Ārpus apjoma
 

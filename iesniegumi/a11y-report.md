@@ -1,6 +1,6 @@
 # Pieejamības automātiskā testa atskaite (`tests/a11y_check.py`)
 
-Pārbaudīts: 2026-10-14T10:07+00:00 · axe-core 4.12.1 · WCAG 2.0/2.1/2.2 A un AA · Chromium (Playwright)
+Pārbaudīts: 2026-10-14T10:08+00:00 · axe-core 4.12.1 · WCAG 2.0/2.1/2.2 A un AA · Chromium (Playwright)
 
 ## Kopsavilkums
 
@@ -37,10 +37,10 @@ Pārbaudīts: 2026-10-14T10:07+00:00 · axe-core 4.12.1 · WCAG 2.0/2.1/2.2 A un
 | Pārbaude | Rezultāts | Piezīme |
 |---|---|---|
 | Pirmais Tab atver «Pāriet uz saturu» | OK | Pāriet uz saturu |
-| Loma izvēlēta ar Enter | OK | http://127.0.0.1:35851/iesniegt |
+| Loma izvēlēta ar Enter | OK | http://127.0.0.1:35789/iesniegt |
 | Pēc kļūdas fokuss nonāk uz kļūdu kopsavilkumu | OK | fokuss: #kludas |
-| Formu var aizpildīt un iesniegt ar tastatūru | OK | http://127.0.0.1:35851/iesniegts/2026-0012 |
-| No apstiprinājuma uz «Mans iesniegums» ar numuru | OK | http://127.0.0.1:35851/mans-iesniegums?numurs=2026-0012 |
+| Formu var aizpildīt un iesniegt ar tastatūru | OK | http://127.0.0.1:35789/iesniegts/2026-0012 |
+| No apstiprinājuma uz «Mans iesniegums» ar numuru | OK | http://127.0.0.1:35789/mans-iesniegums?numurs=2026-0012 |
 | Nav vietas, kur fokuss «iestrēgst» (var aiziet līdz kājenei) | OK |  |
 
 Automātiskie rīki atrod tikai daļu problēmu. Ekrānlasītāja pārbaude (NVDA) jāveic cilvēkam — sk. docs/pieejamibas-atskaite.md.

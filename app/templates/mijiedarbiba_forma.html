@@ -69,6 +69,12 @@
         <div class="alert ai-notice" role="status">
           <strong>Ģenerēts ar MI</strong>{{ " (Claude)" if values.ai_source == "claude" else " (imitācija)" }}.
           Pārbaudiet un, ja vajag, izlabojiet kopsavilkumu un nākamo soli. Saglabājot jūs to apstiprināt.
+          {% if ai_copy or ai_no_step %}
+          <ul class="ai-warnings">
+            {% if ai_copy %}<li><strong>Imitācija nespēja saīsināt šīs piezīmes</strong> — kopsavilkums ir gandrīz to kopija (izmesti tikai pildvārdi). Lūdzu, uzrakstiet to īsāk paši.{% if not claude_enabled %} Īstu kopsavilkumu var izveidot, pieslēdzot Claude (sk. README).{% endif %}</li>{% endif %}
+            {% if ai_no_step %}<li><strong>Nākamais solis piezīmēs nav atrasts</strong> — ielikts vispārīgs ieteikums. Precizējiet vai izdzēsiet to.</li>{% endif %}
+          </ul>
+          {% endif %}
         </div>
         {% endif %}
 

@@ -489,13 +489,14 @@ def create_app(db_path: Path | None = None, cookie_secure: bool | None = None) -
 
     # --- F3 · mijiedarbības, MI-1 · kopsavilkums --------------------------------
 
-    def interaction_form(user, org, values, details=(), status=200, ai_notice=None):
+    def interaction_form(user, org, values, details=(), status=200, ai_notice=None, ai_copy=False, ai_no_step=False):
         errors = {d["field"]: interactions.MESSAGES[(d["field"], d["issue"])] for d in details}
         org_contacts, staff = interactions.options(conn(), org["id"])
         return render_template(
             "mijiedarbiba_forma.html", user=user, org=org, values=values, errors=errors,
             labels=interactions.FIELD_LABELS, kinds=interactions.KINDS, org_contacts=org_contacts, staff=staff,
             today=date.today(), claude_enabled=ai.claude_enabled(), ai_notice=ai_notice,
+            ai_copy=ai_copy, ai_no_step=ai_no_step,
         ), status
 
     def visible_org(org_id: int):
@@ -523,7 +524,12 @@ def create_app(db_path: Path | None = None, cookie_secure: bool | None = None) -
             result = ai.kopsavilkums(values["notes"])
             values.update(summary=result["kopsavilkums"], next_step=result["nakamais_solis"], ai_source=result["avots"])
             audit.log(conn(), user["id"], "ai_generate", "organization", org_id)
-            return interaction_form(user, org, values, ai_notice="generated")
+            # Godīgums par imitāciju: vai tā tiešām saīsināja piezīmes un atrada nākamo soli
+            return interaction_form(
+                user, org, values, ai_notice="generated",
+                ai_copy=result["avots"] == "imitacija" and ai.parak_lidzigs(values["notes"], result["kopsavilkums"]),
+                ai_no_step=result["nakamais_solis"] == ai.DEFAULT_NEXT_STEP,
+            )
 
         org_contacts, staff = interactions.options(conn(), org_id)
         details = interactions.validate(values, {c["id"] for c in org_contacts}, {s["id"] for s in staff}, date.today())

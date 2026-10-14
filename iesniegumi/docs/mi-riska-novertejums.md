@@ -83,8 +83,27 @@ tieši tam, kā nedarīt. Vērtīgāk ir parādīt klasifikācijas procesu un p�
 
 | Pasākums | Kā pārbaudīts | Rezultāts |
 |---|---|---|
-| Marķējums "Ģenerēts ar MI, pārbaudiet pirms lietošanas" | `tests/test_iesn_mi.py` | Aizpilda pēc US-7 |
-| Projekts nonāk laukā, netiek nosūtīts; statuss nemainās | `tests/test_iesn_mi.py` | Aizpilda pēc US-7 |
-| `notikumi` ieraksts par izmantošanu | `tests/test_iesn_mi.py` | Aizpilda pēc US-7 |
-| Imitācija bez tīkla; līgums `{tema, atbildes_projekts}` | `tests/test_iesn_mi.py` | Aizpilda pēc US-7 |
-| 5 "grūti" testa iesniegumi (veidnes 6. sadaļa) | `tests/test_iesn_mi.py` | Aizpilda pēc US-7 |
+| Marķējums "Ģenerēts ar MI, pārbaudiet pirms lietošanas" + avots (Claude / imitācija) | `test_ai_block_labelled_and_section` | ✅ |
+| Bloks `<section aria-labelledby>`, bez mirgojoša indikatora | `test_ai_block_labelled_and_section`; axe 0 pārkāpumu | ✅ |
+| Projekts nonāk atbildes laukā; statuss, atbilde un tēma **nemainās**; nekas netiek nosūtīts | `test_use_projekts_fills_field_but_never_sends` | ✅ |
+| Tēma mainās tikai ar atsevišķu pogu un tiek žurnalēta | `test_mi_topic_change_is_explicit_and_logged` | ✅ |
+| `notikumi`: "MI ieteikums (imitacija) izmantots…", "Tēma mainīta pēc MI ieteikuma…" | testi; redzams detaļu vēsturē | ✅ |
+| Līgums `{tema, atbildes_projekts}`; imitācija bez tīkla; Claude kļūdas gadījumā → imitācija | `test_contract_and_imitation_without_network`, `test_claude_failure_falls_back` | ✅ |
+| Slēgtiem iesniegumiem MI bloka nav | `test_no_ai_block_on_closed` | ✅ |
+| Apraksts netiek rakstīts žurnālā (`logging`) | koda pārskats `ai.py` (žurnālā tikai kļūdas veids) | ✅ |
+| Claude API ar īstu atslēgu | — | ⬜ nav pārbaudīts (atslēgas nav) |
+
+### 5 "grūti" testa iesniegumi (veidnes 6. sadaļa), imitācija
+
+| Gadījums | Teksts | Pareizā tēma | Imitācija | Vērtējums |
+|---|---|---|---|---|
+| Divdomīgs | «Pie bērnudārza ir tumšs, jo nedeg lampa.» | Ielu apgaismojums | Ielu apgaismojums | ✅ |
+| Vairākas problēmas | «Bedre ceļā un blakus pārpildīts atkritumu konteiners, kas netiek izvests.» | Abas (Ceļi / Atkritumi) | Atkritumi | 🟡 viena problēma pazūd |
+| Sarkasms | «Paldies, ka mūsu ielā tagad ir 'ezers' — bedre tik liela, ka var makšķerēt.» | Ceļi un bedres | Ceļi un bedres | ✅ (atslēgvārds "bedre"); atbildes tonis neņem vērā sarkasmu |
+| Bez atslēgvārdiem | «Kaimiņš katru nakti skaļi klausās mūziku.» | Cits | Cits | ✅ |
+| Sociālā + bērnudārzs | «Zaudēju darbu, nevaru samaksāt par bērnudārzu, vai ir kāds pabalsts?» | **Sociālā palīdzība** | **Bērnudārza rinda** | ❌ **kļūda** |
+
+**Secinājums no testiem:** pēdējā kļūda ir tieši tā, no kuras brīdina veidne: ja tēma "Sociālā palīdzība" tiktu nepareizi nomainīta,
+cilvēks krīzes situācijā varētu nonākt nepareizā rindā. Tāpēc dizainā **tēma nekad netiek mainīta automātiski**, un ieteikums
+to tikai piedāvā ar atsevišķu pogu. Klasifikācija paliek **minimāls risks**, bet ieteikums: sociālās palīdzības tēmai
+MI ieteikumu rādīt ar papildu brīdinājumu vai neizmantot (jautājums juristam, 2. nodaļa). Testi: `tests/test_iesn_mi.py::HARD_CASES`.

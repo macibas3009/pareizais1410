@@ -3,6 +3,15 @@
 > Versija 1.0 · 2026-10-14 · Avots: [BACKLOG.md](BACKLOG.md) (kursa backlogs), [PIEEJAMIBAS-PRASIBAS.md](PIEEJAMIBAS-PRASIBAS.md),
 > [MI-RISKA-KLASIFIKACIJA.md](MI-RISKA-KLASIFIKACIJA.md). Mācību projekts; Ezermalas novada pašvaldība ir izdomāta, dati sintētiski.
 
+## Izpildes kopsavilkums (2026-10-14)
+
+| US | Statuss | Testi |
+|---|---|---|
+| S0, US-1, US-2, US-3, US-4, US-5, US-6, US-7, US-8, US-9, US-14 | ✅ visi kritēriji | `make test` (41 tests), `make a11y` (14 lapas, 0 pārkāpumu) |
+| US-10, US-11, US-12, US-13 | Ārpus apjoma (US-10 klasificēts) | — |
+| US-15 | **Neimplementēts** (backlogs), klasificēts: augsts risks | — |
+| Manuālais NVDA tests | ⬜ jāveic cilvēkam | [pieejamibas-atskaite.md](pieejamibas-atskaite.md) |
+
 ## 1. Mērķis un konteksts
 
 Novada pašvaldība e-pasta kastes vietā vēlas sistēmu iedzīvotāju iesniegumiem: bedres, apgaismojums,
@@ -118,7 +127,7 @@ Statusa apzīmējumi: ✅ izpildīts un notestēts · 🟡 daļēji · ⬜ nav s
 |---|---|---|---|
 | 6.1 | Lapa `/pieklustamiba` pēc veidnes (MK 445, ES 2018/1523) | — | ✅ |
 | 6.2 | Saite kājenē katrā lapā vienā vietā | 3.2.3, 3.2.6 | ✅ |
-| 6.3 | Saturs aizpildīts ar reāliem testu atradumiem (pēc testēšanas) | — | ⬜ |
+| 6.3 | Saturs aizpildīts ar reāliem testu atradumiem (pēc testēšanas) | — | ✅ |
 
 ### US-7 · MI ieteikums darbiniekam (SHOULD)
 

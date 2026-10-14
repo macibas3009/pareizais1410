@@ -1,5 +1,5 @@
 {
-  "checked_at": "2026-10-14T10:05+00:00",
+  "checked_at": "2026-10-14T10:07+00:00",
   "axe_version": "4.12.1",
   "tags": [
     "wcag2a",
@@ -196,7 +196,7 @@
     {
       "step": "Loma izvēlēta ar Enter",
       "ok": true,
-      "note": "http://127.0.0.1:45837/iesniegt"
+      "note": "http://127.0.0.1:35851/iesniegt"
     },
     {
       "step": "Pēc kļūdas fokuss nonāk uz kļūdu kopsavilkumu",
@@ -206,12 +206,12 @@
     {
       "step": "Formu var aizpildīt un iesniegt ar tastatūru",
       "ok": true,
-      "note": "http://127.0.0.1:45837/iesniegts/2026-0012"
+      "note": "http://127.0.0.1:35851/iesniegts/2026-0012"
     },
     {
       "step": "No apstiprinājuma uz «Mans iesniegums» ar numuru",
       "ok": true,
-      "note": "http://127.0.0.1:45837/mans-iesniegums?numurs=2026-0012"
+      "note": "http://127.0.0.1:35851/mans-iesniegums?numurs=2026-0012"
     },
     {
       "step": "Nav vietas, kur fokuss «iestrēgst» (var aiziet līdz kājenei)",

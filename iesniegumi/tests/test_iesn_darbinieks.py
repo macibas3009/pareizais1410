@@ -60,7 +60,7 @@ def test_status_flow_and_events(app, darbinieks):
     res = darbinieks.post(f"/darbinieks/iesniegumi/{n}/statuss", data={"statuss": "Apstrādē"})
     assert res.status_code == 303 and "pazinojums=statuss" in res.headers["Location"]
     html = darbinieks.get(res.headers["Location"].split("#")[0]).text
-    assert 'role="status"><p class="alert ok">Statuss nomainīts uz «Apstrādē».' in html  # 4.1.3
+    assert 'role="status" tabindex="-1"><p class="alert ok">Statuss nomainīts uz «Apstrādē».' in html  # 4.1.3
     res = darbinieks.post(f"/darbinieks/iesniegumi/{n}/statuss", data={"statuss": "Atbildēts", "atbilde": "Bedre salabota."})
     assert res.status_code == 303
     row = q(app, "SELECT statuss, atbilde, slegts FROM iesniegumi WHERE numurs = ?", n)[0]
@@ -106,3 +106,20 @@ def test_history_chronological(app, darbinieks):
 def test_no_fixed_header(app):
     css = open(app.root_path + "/static/style.css", encoding="utf-8").read()
     assert "position: fixed" not in css and "position: sticky" not in css  # 2.4.11
+
+
+# --- Pieejamības labojumi pēc testēšanas (atradumi #1–#3) ---------------------------
+
+
+def test_notice_in_title_and_focus_after_status_change(app, darbinieks):
+    n = numurs_ar(app, "Jauns")
+    loc = darbinieks.post(f"/darbinieks/iesniegumi/{n}/statuss", data={"statuss": "Apstrādē"}).headers["Location"]
+    html = darbinieks.get(loc.split("#")[0]).text
+    assert f"<title>Statuss nomainīts uz «Apstrādē»: Iesniegums {n}" in html
+    assert 'id="pazinojums" role="status" tabindex="-1"' in html
+    assert 'document.getElementById("pazinojums").focus()' in html
+
+
+def test_titles_are_descriptive(darbinieks):
+    html = darbinieks.get("/darbinieks/iesniegumi").text
+    assert "<title>Iesniegumu saraksts · Ezermalas novada pašvaldība</title>" in html

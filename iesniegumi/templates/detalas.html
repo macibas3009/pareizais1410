@@ -1,11 +1,11 @@
 {% extends "base.html" %}
-{% block title %}{% if errors %}Kļūda: {% endif %}Iesniegums {{ row.numurs }}{% endblock %}
+{% block title %}{% if errors %}Kļūda: {% elif notice %}{{ notice.split('.')[0] }}: {% endif %}Iesniegums {{ row.numurs }}{% endblock %}
 {% block content %}
     <p><a href="{{ url_for('saraksts') }}">← Atpakaļ uz iesniegumu sarakstu</a></p>
     <h1>Iesniegums {{ row.numurs }}</h1>
     <p class="lead"><span class="status status-{{ status_class(row.statuss) }}">{{ row.statuss }}</span> · {{ row.tema }} · iesniegts {{ fmt_date(row.izveidots, true) }}</p>
 
-    <div id="pazinojums" role="status">{% if notice %}<p class="alert ok">{{ notice }}</p>{% endif %}</div>
+    <div id="pazinojums" role="status" tabindex="-1">{% if notice %}<p class="alert ok">{{ notice }}</p>{% endif %}</div>
 
     <div class="grid-2">
       <section class="card" aria-labelledby="dati">
@@ -96,4 +96,14 @@
         </ol>
       </section>
     </div>
+{% endblock %}
+
+{% block scripts %}
+{% if notice %}
+<script>
+  // Tikai uzlabojums (4.1.3): pēc pārlādes fokuss uz paziņojumu, lai ekrānlasītājs to nolasa.
+  // Bez JS paziņojums ir lapas nosaukumā un lapas augšā.
+  document.getElementById("pazinojums").focus();
+</script>
+{% endif %}
 {% endblock %}

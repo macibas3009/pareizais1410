@@ -7,14 +7,14 @@ from __future__ import annotations
 
 import logging
 import os
-from datetime import date, datetime, timezone
+from datetime import date
 from pathlib import Path
 from typing import Any
 
 from flask import Flask, abort, g, jsonify, redirect, render_template, request
 from werkzeug.exceptions import HTTPException
 
-from app import accounts, ai, audit, contacts, dashboard, db, interactions, organizations, users
+from app import accounts, ai, audit, contacts, dashboard, db, interactions, org_requests, organizations, tasks, users
 
 VERSION = "0.1.0"
 API_PREFIXES = ("/auth/", "/health")
@@ -208,9 +208,10 @@ def create_app(db_path: Path | None = None, cookie_secure: bool | None = None) -
             return redirect("/login", code=303)
         if user["role"] not in ("darbinieks", "vaditajs"):
             return api_error(403, "FORBIDDEN", "Not allowed")
-        if not dashboard.complete_task(conn(), task_id, user, datetime.now(timezone.utc).isoformat()):
+        if not tasks.complete(conn(), task_id, user):
             return api_error(404, "NOT_FOUND", "Task not found")
-        return redirect("/panelis", code=303)
+        back = request.form.get("atpakal", "")
+        return redirect(back if back in ("/uzdevumi", "/panelis") or back.startswith("/pieprasijumi/") else "/panelis", code=303)
 
     # --- Lomu pārbaude (N3) ---------------------------------------------------
 
@@ -529,6 +530,142 @@ def create_app(db_path: Path | None = None, cookie_secure: bool | None = None) -
             return interaction_form(user, org, values, details, status=400)
         interactions.create(conn(), user, org_id, values, date.today())
         return redirect(f"/organizacijas/{org_id}?mijiedarbiba=1#mijiedarbibas", code=303)
+
+    # --- F4 · pieprasījumi --------------------------------------------------------
+
+    def request_form(user, org, row=None, values=None, details=(), status=200):
+        errors = {d["field"]: org_requests.MESSAGES[(d["field"], d["issue"])] for d in details}
+        return render_template("pieprasijums_forma.html", user=user, org=org, row=row, values=values or {},
+                               errors=errors, labels=org_requests.FIELD_LABELS, today=date.today()), status
+
+    def editable_request(user, request_id: int):
+        row = org_requests.get(conn(), request_id)
+        if row is None:
+            abort(404)
+        if not org_requests.can_edit(user, row):
+            abort(403)
+        return row
+
+    @app.get("/pieprasijumi")
+    def requests_page():
+        user = require(*CRM_ROLES)
+        status = request.args.get("statuss", "")
+        overdue = request.args.get("kaveti") == "1"
+        mine = request.args.get("mani") == "1"
+        return render_template(
+            "pieprasijumi.html", user=user, today=date.today(), status=status, overdue=overdue, mine=mine,
+            statuses=org_requests.STATUSES,
+            rows=org_requests.list_filtered(conn(), user, date.today(), status, overdue, mine),
+        )
+
+    @app.get("/organizacijas/<int:org_id>/pieprasijumi/jauns")
+    def request_new(org_id: int):
+        user = require(*CRM_ROLES)
+        today = date.today()
+        values = {"received": today.isoformat(), "due": org_requests.add_month(today).isoformat()}
+        return request_form(user, editable_org(user, org_id), values=values)
+
+    @app.post("/organizacijas/<int:org_id>/pieprasijumi/jauns")
+    def request_create(org_id: int):
+        user = require(*CRM_ROLES)
+        org = editable_org(user, org_id)
+        values = org_requests.read_form(request.form)
+        details = org_requests.validate(values, date.today())
+        if details:
+            return request_form(user, org, values=values, details=details, status=400)
+        request_id = org_requests.create(conn(), user, org_id, values)
+        return redirect(f"/pieprasijumi/{request_id}?saglabats=1", code=303)
+
+    @app.get("/pieprasijumi/<int:request_id>")
+    def request_card(request_id: int):
+        user = require(*CRM_ROLES)
+        row = org_requests.get(conn(), request_id)
+        if row is None:
+            abort(404)
+        return render_template(
+            "pieprasijums.html", user=user, row=row, today=date.today(), can_edit=org_requests.can_edit(user, row),
+            next_status=org_requests.NEXT_STATUS.get(row["status"]), next_action=org_requests.NEXT_ACTION.get(row["status"]),
+            overdue=org_requests.is_overdue(row, date.today()), request_tasks=tasks.for_request(conn(), request_id),
+            saved="saglabats" in request.args,
+        )
+
+    @app.get("/pieprasijumi/<int:request_id>/labot")
+    def request_edit(request_id: int):
+        user = require(*CRM_ROLES)
+        row = editable_request(user, request_id)
+        values = dict(row)
+        values["description"] = values["description"] or ""
+        return request_form(user, organizations.get(conn(), row["organization_id"]), row, values)
+
+    @app.post("/pieprasijumi/<int:request_id>/labot")
+    def request_update(request_id: int):
+        user = require(*CRM_ROLES)
+        row = editable_request(user, request_id)
+        values = org_requests.read_form(request.form)
+        details = org_requests.validate(values, date.today())
+        if details:
+            return request_form(user, organizations.get(conn(), row["organization_id"]), row, values, details, 400)
+        org_requests.update(conn(), user, request_id, values)
+        return redirect(f"/pieprasijumi/{request_id}?saglabats=1", code=303)
+
+    @app.post("/pieprasijumi/<int:request_id>/statuss")
+    def request_advance(request_id: int):
+        user = require(*CRM_ROLES)
+        row = editable_request(user, request_id)
+        if not org_requests.advance(conn(), user, row, request.form.get("status", "")):
+            abort(400)
+        return redirect(f"/pieprasijumi/{request_id}", code=303)
+
+    # --- F5 · uzdevumi -----------------------------------------------------------
+
+    @app.get("/uzdevumi")
+    def tasks_page():
+        user = require(*CRM_ROLES)
+        raw = request.args.get("izpilditajs", "")
+        assignee = int(raw) if raw.isdigit() and user["role"] == "vaditajs" else None
+        today = date.today()
+        return render_template(
+            "uzdevumi.html", user=user, today=today, assignee=assignee, staff=users.staff(conn()),
+            today_rows=tasks.due_today(conn(), user, today, assignee),
+            upcoming_rows=tasks.upcoming(conn(), user, today, assignee),
+            done_rows=tasks.recently_done(conn(), user, assignee), created="izveidots" in request.args,
+        )
+
+    def task_form(user, values, details=(), status=200):
+        errors = {d["field"]: tasks.MESSAGES[(d["field"], d["issue"])] for d in details}
+        if "link" in errors and not values.get("request_id"):
+            errors["organization_id"] = errors.pop("link")  # kļūdu kopsavilkuma saite ved uz izvēles lauku
+        org = organizations.get(conn(), values["organization_id"]) if values.get("organization_id") else None
+        req = org_requests.get(conn(), values["request_id"]) if values.get("request_id") else None
+        return render_template(
+            "uzdevums_forma.html", user=user, values=values, errors=errors, labels=tasks.FIELD_LABELS,
+            org=org, req=req, today=date.today(),
+            staff_options=[(s["id"], s["full_name"] + (" (es)" if s["id"] == user["id"] else "")) for s in users.staff(conn())],
+            org_options=[(o["id"], o["name"]) for o in organizations.list_all(conn())],
+        ), status
+
+    @app.get("/uzdevumi/jauns")
+    def task_new():
+        user = require(*CRM_ROLES)
+        values = tasks.read_form({
+            "organization_id": request.args.get("organizacija", ""),
+            "request_id": request.args.get("pieprasijums", ""),
+            "assignee_id": str(user["id"]),
+            "due": date.today().isoformat(),
+        })
+        return task_form(user, values)
+
+    @app.post("/uzdevumi/jauns")
+    def task_create():
+        user = require(*CRM_ROLES)
+        values = tasks.read_form(request.form)
+        details = tasks.validate(conn(), values, {s["id"] for s in users.staff(conn())})
+        if details:
+            return task_form(user, values, details, status=400)
+        tasks.create(conn(), user, values)
+        if values["request_id"]:
+            return redirect(f"/pieprasijumi/{values['request_id']}", code=303)
+        return redirect("/uzdevumi?izveidots=1", code=303)
 
     # --- JSON API (docs/openapi.yaml) -----------------------------------------
 

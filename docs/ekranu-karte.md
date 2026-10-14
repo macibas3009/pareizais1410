@@ -29,10 +29,11 @@
 | &nbsp;&nbsp;&nbsp;└ Kontaktpersonas kartīte (atvēršana žurnālā) | `/kontakti/<id>` | F2, N2 | ✅ |
 | &nbsp;&nbsp;&nbsp;└ Kontaktpersonas forma | `/organizacijas/<id>/kontakti/jauns`, `/kontakti/<id>/labot` | F2 | ✅ |
 | &nbsp;&nbsp;&nbsp;└ Mijiedarbības forma + MI kopsavilkums | `/organizacijas/<id>/mijiedarbibas/jauna` | F3, MI-1 | ✅ |
-| &nbsp;&nbsp;&nbsp;└ Pieprasījuma forma | — | F4 | ⬜ |
-| &nbsp;&nbsp;&nbsp;└ Uzdevuma forma | — | F5 | ⬜ |
-| Pieprasījumu saraksts (statuss, kavēti) | — | F4 | ⬜ |
-| Mani uzdevumi šodien | — | F5 | ⬜ |
+| &nbsp;&nbsp;&nbsp;└ Pieprasījuma forma | `/organizacijas/<id>/pieprasijumi/jauns`, `/pieprasijumi/<id>/labot` | F4 | ✅ |
+| &nbsp;&nbsp;&nbsp;└ Uzdevuma forma | `/uzdevumi/jauns` | F5 | ✅ |
+| Pieprasījumu saraksts (statuss, kavēti, manas) | `/pieprasijumi` | F4 | ✅ |
+| └ Pieprasījuma kartīte (statuss uz priekšu, uzdevumi) | `/pieprasijumi/<id>` | F4 | ✅ |
+| Mani uzdevumi šodien (vadītājam visi) | `/uzdevumi` | F5 | ✅ |
 | Kontakti "Jāpārskata" (pagarināt / dzēst ar apstiprinājumu) | `/kontakti/japarskata` | N2 | ✅ |
 | Vadītāja pārskats (tikai vadītājam) | — | F7 | ⬜ |
 
@@ -56,7 +57,7 @@
 | Kļūdas lapa (404, 403) | — | ✅ |
 | MI-2 klasifikācija: tikai dokuments, ekrāna nav | MI-2 | ⬜ |
 
-**Kopā:** gatavi 16 · daļēji 1 · vēl nav 8.
+**Kopā:** gatavi 21 · daļēji 1 · vēl nav 4.
 
 ## Kā atjaunot attēlu
 

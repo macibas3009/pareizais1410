@@ -748,3 +748,21 @@ button.btn-secondary-solid:hover { background: #563283; }
 .participants { display: block; }
 
 @media (max-width: 860px) { .checks-cols { grid-template-columns: 1fr; } }
+
+/* ==========================================================================
+   F4 · pieprasījumi, F5 · uzdevumi
+   ========================================================================== */
+
+.tag-icon { width: 0.85em; height: 0.85em; margin-right: 0.3em; vertical-align: -0.1em; }
+.filter-check { margin: 0 0 0.6rem; }
+.status-steps { display: flex; gap: 0; list-style: none; margin: 0 0 1rem; padding: 0; counter-reset: step; }
+.status-steps li {
+  flex: 1; position: relative; padding: 0.45rem 0.6rem; text-align: center; font-size: 0.85rem; font-weight: 600;
+  background: #eef1f2; color: var(--muted); border-right: 2px solid #fff;
+}
+.status-steps li:first-child { border-radius: 8px 0 0 8px; }
+.status-steps li:last-child { border-radius: 0 8px 8px 0; border-right: 0; }
+.status-steps li.past { background: var(--lake-100); color: var(--lake-700); }
+.status-steps li.current { background: var(--lake-600); color: #fff; }
+.status-form { margin: 1rem 0 0.5rem; }
+.prewrap { white-space: pre-wrap; margin: 0; }

@@ -99,18 +99,6 @@ def recent_interactions(conn: sqlite3.Connection, scope: Scope) -> list[sqlite3.
     ).fetchall()
 
 
-def complete_task(conn: sqlite3.Connection, task_id: int, user: sqlite3.Row, now: str) -> bool:
-    """Atzīmē uzdevumu kā izpildītu. Darbinieks var tikai savus, vadītājs jebkuru."""
-    row = conn.execute("SELECT assignee_id FROM tasks WHERE id = ? AND done_at IS NULL", (task_id,)).fetchone()
-    if row is None:
-        return False
-    if user["role"] != "vaditajs" and row["assignee_id"] != user["id"]:
-        return False
-    conn.execute("UPDATE tasks SET done_at = ? WHERE id = ?", (now, task_id))
-    conn.commit()
-    return True
-
-
 # --- Formatēšana ---------------------------------------------------------------
 
 

@@ -1,0 +1,72 @@
+{% extends "base.html" %}
+{% import "_ui.html" as ui %}
+{% block title %}Uzdevumi{% endblock %}
+
+{% macro task_list(rows, empty) %}
+        {% if rows %}
+        <ul class="task-list">
+          {% for t in rows %}
+          <li class="task">
+            <div>
+              {{ ui.due_tag(t.due, today, done=t.done_at is not none, show_date=false, task=true) }}
+              <span class="task-title">{{ t.description }}</span>
+              <span class="meta">
+                {{ fmt_date(t.due) }}
+                {%- if t.org_id %} · <a href="{{ '/pieprasijumi/' ~ t.request_id if t.request_id else '/organizacijas/' ~ t.org_id }}">{{ t.request or t.organization }}</a>{% endif %}
+                {%- if user.role == "vaditajs" %} · {{ t.assignee }}{% endif %}
+                {%- if t.assignee_id == user.id and t.created_by_name != user.full_name %} · uzdeva {{ t.created_by_name }}{% endif %}
+              </span>
+            </div>
+            {% if not t.done_at %}
+            <form method="post" action="/uzdevumi/{{ t.id }}/izpildits">
+              <input type="hidden" name="atpakal" value="/uzdevumi">
+              <button type="submit" class="btn-small">Izpildīts<span class="visually-hidden">: {{ t.description }}</span></button>
+            </form>
+            {% endif %}
+          </li>
+          {% endfor %}
+        </ul>
+        {% else %}
+        <p class="empty">{{ empty }}</p>
+        {% endif %}
+{% endmacro %}
+
+{% block content %}
+    <div class="page-head page-head-row">
+      <div>
+        <h1>{{ "Uzdevumi" if user.role == "vaditajs" else "Mani uzdevumi" }}</h1>
+        <p class="sub">Atgādinājumi ir tikai sistēmā: šeit un vadības panelī.</p>
+      </div>
+      <a class="btn" href="/uzdevumi/jauns">Pievienot uzdevumu</a>
+    </div>
+
+    {% if created %}<div class="alert ok" role="status">Uzdevums izveidots.</div>{% endif %}
+
+    {% if user.role == "vaditajs" %}
+    <form method="get" action="/uzdevumi" class="filters" aria-label="Filtrēt uzdevumus">
+      <div class="field">
+        <label for="izpilditajs">Izpildītājs</label>
+        <select id="izpilditajs" name="izpilditajs">
+          <option value="">Visi darbinieki</option>
+          {% for s in staff %}<option value="{{ s.id }}"{% if assignee == s.id %} selected{% endif %}>{{ s.full_name }}</option>{% endfor %}
+        </select>
+      </div>
+      <button type="submit" class="btn-small">Filtrēt</button>
+    </form>
+    {% endif %}
+
+    <div class="blocks">
+      <section class="block block-wide" aria-labelledby="sodien">
+        <h2 id="sodien">Šodien un nokavētie ({{ today_rows|length }})</h2>
+{{ task_list(today_rows, "Šodien uzdevumu nav.") }}
+      </section>
+      <section class="block" aria-labelledby="nakamie">
+        <h2 id="nakamie">Nākamie ({{ upcoming_rows|length }})</h2>
+{{ task_list(upcoming_rows, "Nākamo uzdevumu nav.") }}
+      </section>
+      <section class="block" aria-labelledby="izpilditie">
+        <h2 id="izpilditie">Nesen izpildītie</h2>
+{{ task_list(done_rows, "Izpildītu uzdevumu vēl nav.") }}
+      </section>
+    </div>
+{% endblock %}

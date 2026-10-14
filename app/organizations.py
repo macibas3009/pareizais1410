@@ -69,7 +69,7 @@ def card(conn: sqlite3.Connection, org_id: int) -> dict:
         ).fetchall(),
         "interactions": interactions.for_organization(conn, org_id),
         "requests": conn.execute(
-            "SELECT subject, received, due, status FROM requests WHERE organization_id = ? "
+            "SELECT id, subject, received, due, status FROM requests WHERE organization_id = ? "
             "ORDER BY status = 'Atbildēts', due",
             (org_id,),
         ).fetchall(),

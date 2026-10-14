@@ -1,0 +1,35 @@
+{% extends "base.html" %}
+{% import "_forms.html" as f %}
+{% block title %}{% if errors %}Kļūda: {% endif %}Jauns uzdevums{% endblock %}
+{% block content %}
+    <nav class="breadcrumbs" aria-label="Atrašanās vieta">
+      <a href="/uzdevumi">Uzdevumi</a> <span aria-hidden="true">›</span> <span aria-current="page">Jauns uzdevums</span>
+    </nav>
+
+    <div class="page-head">
+      <h1>Jauns uzdevums</h1>
+      <p class="sub">Sev vai kolēģim. Uzdevums būs redzams izpildītāja panelī un sarakstā "Mani uzdevumi".</p>
+    </div>
+
+    <section class="block form-block">
+{{ f.error_summary(errors, labels) }}
+      <form method="post" action="/uzdevumi/jauns" novalidate>
+{{ f.input("description", labels.description, errors, values, autocomplete="off", placeholder="piem., Nosūtīt semināra programmu") }}
+{{ f.select("assignee_id", labels.assignee_id, errors, values, staff_options) }}
+{{ f.input("due", labels.due, errors, values, type="date") }}
+        {% if req %}
+        <div class="field">
+          <span class="label">{{ labels.link }}</span>
+          <p class="readonly">Pieprasījums: <a href="/pieprasijumi/{{ req.id }}">{{ req.subject }}</a> ({{ req.organization }})</p>
+          <input type="hidden" name="request_id" value="{{ req.id }}">
+        </div>
+        {% else %}
+{{ f.select("organization_id", labels.organization_id, errors, values, org_options) }}
+        {% endif %}
+        <div class="form-actions">
+          <button type="submit">Izveidot uzdevumu</button>
+          <a class="btn-link" href="{{ '/pieprasijumi/' ~ req.id if req else '/uzdevumi' }}">Atcelt</a>
+        </div>
+      </form>
+    </section>
+{% endblock %}

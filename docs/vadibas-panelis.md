@@ -185,6 +185,5 @@ Jaunam darbiniekam sākumā nav organizāciju, tāpēc viņa panelī būs nulles
 
 | Trūkst | Kāpēc | Kad būs |
 |---|---|---|
-| Saites "Skatīt visus" un no kartēm "atvērti pieprasījumi", "uzdevumi šodien" | Sarakstu lapas vēl nav | F4, F5 |
 | Vadītājam saite "Atvērt pilno pārskatu" | Pārskata vēl nav | F7 |
 | 320 px izkārtojums | Uzrakstīts, bet nav pārbaudīts pārlūkā | N1 testi |

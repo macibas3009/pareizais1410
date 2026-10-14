@@ -706,3 +706,45 @@ a.btn-danger:hover { background: var(--danger-bg); text-decoration: none; }
 .confirm .form-actions form { margin: 0; }
 button.btn-danger-solid { width: auto; margin: 0; background: var(--danger); }
 button.btn-danger-solid:hover { background: #8f1c13; }
+
+/* ==========================================================================
+   F3 · mijiedarbības, MI-1
+   ========================================================================== */
+
+.form-wide { max-width: 820px; }
+textarea {
+  width: 100%;
+  padding: 0.65rem 0.8rem;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  font: inherit;
+  color: inherit;
+  resize: vertical;
+}
+textarea:focus { outline: none; border-color: var(--lake-500); box-shadow: 0 0 0 3px rgba(31, 138, 166, 0.2); }
+textarea[aria-invalid="true"] { border-color: var(--danger); }
+
+.radios-row { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+.radios-row legend { width: 100%; }
+.radios-row .radio { margin: 0; padding: 0.55rem 0.9rem; }
+
+.checks { border: 0; padding: 0; margin: 0 0 1.15rem; }
+.checks legend { padding: 0; margin-bottom: 0.4rem; font-size: 0.9rem; font-weight: 600; }
+.checks-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem 2rem; }
+.group-label { margin: 0 0 0.3rem; font-size: 0.8rem; font-weight: 700; color: var(--muted); text-transform: uppercase; letter-spacing: 0.04em; }
+.check { display: flex; gap: 0.5rem; align-items: baseline; margin: 0 0 0.35rem; font-weight: 400; font-size: 0.95rem; cursor: pointer; }
+.check input { width: auto; accent-color: var(--lake-600); }
+.checks[aria-invalid="true"] .checks-cols { outline: 1px solid var(--danger); outline-offset: 6px; border-radius: 4px; }
+
+.ai-box { margin: 0.5rem 0 1.25rem; padding: 1rem 1.1rem; border: 1px dashed #b9a6d6; border-radius: 10px; background: #faf7fd; }
+.ai-box h2 { margin: 0 0 0.6rem; font-size: 1rem; color: #4a2c77; }
+.ai-box .hint { display: block; margin: 0.4rem 0 0.75rem; }
+.id { display: inline-block; font-size: 0.72rem; font-weight: 700; color: var(--lake-700); background: var(--lake-100); border-radius: 5px; padding: 1px 6px; vertical-align: 2px; }
+.id.ai { color: #6b3fa0; background: #efe7f8; }
+button.btn-secondary-solid { width: auto; margin: 0; background: #6b3fa0; }
+button.btn-secondary-solid:hover { background: #563283; }
+.ai-notice { background: #efe7f8; color: #3d2366; }
+.tag.ai-tag { background: #efe7f8; color: #4a2c77; }
+.participants { display: block; }
+
+@media (max-width: 860px) { .checks-cols { grid-template-columns: 1fr; } }

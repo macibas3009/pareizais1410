@@ -92,13 +92,17 @@
 
       <section class="block block-wide" aria-labelledby="mijiedarbibas">
         <h2 id="mijiedarbibas">Mijiedarbību hronoloģija ({{ interactions|length }})</h2>
+        {% if interaction_saved %}<div class="alert ok" role="status">Mijiedarbība saglabāta.</div>{% endif %}
+        <p><a class="btn-link" href="/organizacijas/{{ org.id }}/mijiedarbibas/jauna">+ Pievienot mijiedarbību</a></p>
         {% if interactions %}
         <ol class="timeline">
           {% for i in interactions %}
           <li>
-            <span class="meta">{{ fmt_date(i.date) }} · {{ i.kind }} · {{ i.author }}</span>
+            <span class="meta">{{ fmt_date(i.date) }} · {{ i.kind }} · ierakstīja {{ i.author }}</span>
+            {% if i.participants %}<span class="meta participants">Dalībnieki: {{ i.participants }}</span>{% endif %}
             <p>{{ i.summary }}</p>
             {% if i.next_step %}<p class="meta"><strong>Nākamais solis:</strong> {{ i.next_step }}</p>{% endif %}
+            {% if i.ai_source %}<p><span class="tag ai-tag">Ģenerēts ar MI · apstiprināja {{ i.approved_by }}</span></p>{% endif %}
           </li>
           {% endfor %}
         </ol>

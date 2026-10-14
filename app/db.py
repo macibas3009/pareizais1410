@@ -52,7 +52,17 @@ CREATE TABLE IF NOT EXISTS interactions (
     date            TEXT    NOT NULL,
     summary         TEXT    NOT NULL,
     next_step       TEXT,
-    created_by      INTEGER NOT NULL REFERENCES users(id)
+    created_by      INTEGER NOT NULL REFERENCES users(id),
+    ai_source       TEXT    CHECK (ai_source IN ('claude', 'imitacija')),  -- MI-1: no kurienes kopsavilkums
+    approved_by     INTEGER REFERENCES users(id)                          -- MI-1: kurš apstiprināja
+);
+
+-- F3 · dalībnieki. Dzēšot kontaktpersonu, contact_id kļūst NULL → "Dzēsta kontaktpersona" (N2)
+CREATE TABLE IF NOT EXISTS interaction_participants (
+    interaction_id INTEGER NOT NULL REFERENCES interactions(id) ON DELETE CASCADE,
+    kind           TEXT    NOT NULL CHECK (kind IN ('contact', 'staff')),
+    contact_id     INTEGER REFERENCES contacts(id) ON DELETE SET NULL,
+    user_id        INTEGER REFERENCES users(id)
 );
 
 CREATE TABLE IF NOT EXISTS requests (
@@ -110,11 +120,15 @@ CREATE TABLE IF NOT EXISTS access_log (
 
 
 def _migrate(conn: sqlite3.Connection) -> None:
-    """Agrākām datubāzēm trūkst kolonnu `role` (CR-4) un `requested_role` (F0 #6)."""
+    """Agrākām datubāzēm trūkst kolonnu `role` (CR-4), `requested_role` (F0 #6) un MI-1 lauku (F3)."""
     columns = {row["name"] for row in conn.execute("PRAGMA table_info(users)")}
     for column in ("role", "requested_role"):
         if column not in columns:
             conn.execute(f"ALTER TABLE users ADD COLUMN {column} TEXT")
+    columns = {row["name"] for row in conn.execute("PRAGMA table_info(interactions)")}
+    for column, kind in (("ai_source", "TEXT"), ("approved_by", "INTEGER")):  # F3/MI-1
+        if column not in columns:
+            conn.execute(f"ALTER TABLE interactions ADD COLUMN {column} {kind}")
     conn.commit()
 
 

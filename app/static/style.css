@@ -847,3 +847,5 @@ input:focus-within, select:focus-visible { outline: none; border-color: var(--la
 /* N1: gari vārdi (e-pasti) lūst šaurā ekrānā */
 .statement p, .block p { overflow-wrap: anywhere; }
 @media (max-width: 1320px) { .topbar-search + .topbar-user { margin-left: auto; } }
+.ai-warnings { margin: 0.5rem 0 0; padding-left: 1.2rem; }
+.ai-warnings li { margin-top: 0.3rem; }

@@ -210,3 +210,32 @@ def test_claude_result_used_when_available(monkeypatch):
 def test_dashboard_interactions_link_to_card(client, db_path):
     login(client)
     assert f'href="/organizacijas/{org_id(db_path)}#mijiedarbibas"' in client.get("/panelis", headers=HTML).text
+
+
+# --- MI-1 imitācijas godīgums ----------------------------------------------------
+
+CHATTY = "saņemts zvans un viņš teica bla bla bla, es bla bla, un beigās viņš nesaprata, bet es paskaidroju, saruna beidzās laimīgi."
+
+
+def test_imitation_removes_fillers():
+    result = ai.kopsavilkums(CHATTY)
+    assert "bla" not in result["kopsavilkums"].lower()
+    assert result["kopsavilkums"] == "Saņemts zvans, un beigās viņš nesaprata, bet es paskaidroju, saruna beidzās laimīgi."
+
+
+def test_copy_detection():
+    assert ai.parak_lidzigs(CHATTY, ai.kopsavilkums(CHATTY)["kopsavilkums"]) is True
+    assert ai.parak_lidzigs(NOTES, ai.kopsavilkums(NOTES)["kopsavilkums"]) is False
+
+
+def test_form_warns_when_imitation_only_copies(client, db_path):
+    login(client)
+    res = client.post(f"/organizacijas/{org_id(db_path)}/mijiedarbibas/jauna", data={"action": "ai", "notes": CHATTY}, headers=HTML)
+    assert "Imitācija nespēja saīsināt šīs piezīmes" in res.text
+    assert "Nākamais solis piezīmēs nav atrasts" in res.text
+
+
+def test_form_has_no_warning_for_good_notes(client, db_path):
+    login(client)
+    res = client.post(f"/organizacijas/{org_id(db_path)}/mijiedarbibas/jauna", data={"action": "ai", "notes": NOTES}, headers=HTML)
+    assert "nespēja saīsināt" not in res.text and "nav atrasts" not in res.text

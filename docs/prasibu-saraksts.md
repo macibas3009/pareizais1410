@@ -329,6 +329,7 @@ Testa lietotāji (sākumdati, `make seed`): `darbinieks@example.com`, `darbiniek
 | Cilvēka kontrole | ✅ Kopsavilkums tiek ielikts formā rediģēšanai; saglabājas tikai pēc "Apstiprināt un saglabāt". Brīvās piezīmes netiek saglabātas |
 | Žurnāls | ✅ `ai_generate` (kurš, kad) un `ai_approve` (kurš apstiprināja); avots mijiedarbības ierakstā; teksts netiek žurnalēts |
 | Kļūdas | ✅ Noildze 10 s, API kļūda vai atteikums → automātiski imitācija, avots redzams marķējumā; lietotājs neredz 500 |
+| Imitācijas godīgums | ✅ Izmet pildvārdus ("bla bla", "nu"); ja kopsavilkums ≥ 80 % sakrīt ar piezīmēm vai nākamais solis nav atrasts, formā ir brīdinājums (lietotāja atsauksme 2026-10-14) |
 | Pārbaude | 🟡 Claude ceļš testēts ar aizstājēju; ar īstu API atslēgu nav pārbaudīts |
 
 ### MI-2 · Organizāciju prioritizācija "pēc sadarbības potenciāla"

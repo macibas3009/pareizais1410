@@ -1,0 +1,610 @@
+{
+  "url": "https://www.skiroviegli.lv/",
+  "checked_at": "2026-10-15T11:05+00:00",
+  "states": [
+    {
+      "name": "1 Sākumlapa",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/color-contrast?application=axeAPI",
+          "wcag": [
+            "1.4.3"
+          ],
+          "nodes": 9,
+          "targets": [
+            "a[data-bs-target=\"#accessibilityModal\"]",
+            "a[data-bs-target=\"#infoForOperatorsModal\"]",
+            "#description > p"
+          ],
+          "html": [
+            "<a class=\"nav-link\" aria-current=\"page\" href=\"#\" data-bs-toggle=\"modal\" data-bs-target=\"#accessibilityModal\">Piekļūstamība</a>",
+            "<a class=\"nav-link\" aria-current=\"page\" href=\"#\" data-bs-toggle=\"modal\" data-bs-target=\"#infoForOperatorsModal\">Informācija operatoriem</a>"
+          ]
+        },
+        {
+          "id": "html-has-lang",
+          "impact": "serious",
+          "help": "<html> element must have a lang attribute",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/html-has-lang?application=axeAPI",
+          "wcag": [
+            "3.1.1"
+          ],
+          "nodes": 1,
+          "targets": [
+            "html"
+          ],
+          "html": [
+            "<html xmlns:layout=\"http://www.ultraq.net.nz/web/thymeleaf/layout\" style=\"height: 100%;\">"
+          ]
+        },
+        {
+          "id": "image-alt",
+          "impact": "critical",
+          "help": "Images must have alternative text",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/image-alt?application=axeAPI",
+          "wcag": [
+            "1.1.1"
+          ],
+          "nodes": 114,
+          "targets": [
+            ".leaflet-marker-icon.leaflet-interactive.leaflet-zoom-animated:nth-child(2) > figure > img",
+            ".leaflet-marker-icon.leaflet-interactive.leaflet-zoom-animated:nth-child(3) > figure > img",
+            ".leaflet-marker-icon.leaflet-interactive.leaflet-zoom-animated:nth-child(4) > figure > img"
+          ],
+          "html": [
+            "<img src=\"https://www.skiroviegli.lv/marker-gray.svg\" style=\"width: 39px; height: 50px; position: absolute; top:-42px; left:-15px\">",
+            "<img src=\"https://www.skiroviegli.lv/marker-gray.svg\" style=\"width: 39px; height: 50px; position: absolute; top:-42px; left:-15px\">"
+          ]
+        }
+      ],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 121
+        },
+        {
+          "id": "target-size",
+          "nodes": 6
+        }
+      ],
+      "keyboard": [
+        {
+          "el": "a.nav-link",
+          "text": "Piekļūstamība",
+          "visible": true
+        },
+        {
+          "el": "a.nav-link",
+          "text": "Informācija operatoriem",
+          "visible": true
+        },
+        {
+          "el": "select.goog-te-combo",
+          "text": "Atlasīt valodu abhāzu ačinu afāru afrikā",
+          "visible": true
+        },
+        {
+          "el": "a.VIpgJd-ZVi9od-l4eHX-hSRGPd",
+          "text": "Tulkotājs",
+          "visible": true
+        },
+        {
+          "el": "button",
+          "text": "Visa Latvija",
+          "visible": true
+        },
+        {
+          "el": "button",
+          "text": "Pieņemšanas vietas tips",
+          "visible": true
+        },
+        {
+          "el": "button",
+          "text": "Visi atkritumu veidi",
+          "visible": true
+        },
+        {
+          "el": "div#leaflet.leaflet-container",
+          "text": "2 2 3 17 5 15 12 48 26 10 4 13 3 28 4 26",
+          "visible": true
+        },
+        {
+          "el": "img.leaflet-marker-icon",
+          "text": "",
+          "visible": true
+        },
+        {
+          "el": "div.leaflet-marker-icon",
+          "text": "2",
+          "visible": true
+        },
+        {
+          "el": "div.leaflet-marker-icon",
+          "text": "2",
+          "visible": true
+        },
+        {
+          "el": "div.leaflet-marker-icon",
+          "text": "3",
+          "visible": true
+        },
+        {
+          "el": "div.leaflet-marker-icon",
+          "text": "17",
+          "visible": true
+        },
+        {
+          "el": "div.leaflet-marker-icon",
+          "text": "5",
+          "visible": true
+        },
+        {
+          "el": "div.leaflet-marker-icon",
+          "text": "15",
+          "visible": true
+        },
+        {
+          "el": "div.leaflet-marker-icon",
+          "text": "12",
+          "visible": true
+        },
+        {
+          "el": "div.leaflet-marker-icon",
+          "text": "48",
+          "visible": true
+        },
+        {
+          "el": "div.leaflet-marker-icon",
+          "text": "26",
+          "visible": true
+        },
+        {
+          "el": "div.leaflet-marker-icon",
+          "text": "10",
+          "visible": true
+        },
+        {
+          "el": "div.leaflet-marker-icon",
+          "text": "4",
+          "visible": true
+        },
+        {
+          "el": "div.leaflet-marker-icon",
+          "text": "13",
+          "visible": true
+        },
+        {
+          "el": "div.leaflet-marker-icon",
+          "text": "3",
+          "visible": true
+        },
+        {
+          "el": "div.leaflet-marker-icon",
+          "text": "28",
+          "visible": true
+        },
+        {
+          "el": "div.leaflet-marker-icon",
+          "text": "4",
+          "visible": true
+        },
+        {
+          "el": "div.leaflet-marker-icon",
+          "text": "26",
+          "visible": true
+        }
+      ],
+      "overflow_320": 45,
+      "overflow_640": 0
+    },
+    {
+      "name": "2 Piekļūstamības paziņojums (dialogs)",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/color-contrast?application=axeAPI",
+          "wcag": [
+            "1.4.3"
+          ],
+          "nodes": 13,
+          "targets": [
+            "a[data-bs-target=\"#accessibilityModal\"]",
+            "a[data-bs-target=\"#infoForOperatorsModal\"]",
+            "#description > p"
+          ],
+          "html": [
+            "<a class=\"nav-link\" aria-current=\"page\" href=\"#\" data-bs-toggle=\"modal\" data-bs-target=\"#accessibilityModal\">Piekļūstamība</a>",
+            "<a class=\"nav-link\" aria-current=\"page\" href=\"#\" data-bs-toggle=\"modal\" data-bs-target=\"#infoForOperatorsModal\">Informācija operatoriem</a>"
+          ]
+        },
+        {
+          "id": "html-has-lang",
+          "impact": "serious",
+          "help": "<html> element must have a lang attribute",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/html-has-lang?application=axeAPI",
+          "wcag": [
+            "3.1.1"
+          ],
+          "nodes": 1,
+          "targets": [
+            "html"
+          ],
+          "html": [
+            "<html xmlns:layout=\"http://www.ultraq.net.nz/web/thymeleaf/layout\" style=\"height: 100%;\">"
+          ]
+        },
+        {
+          "id": "image-alt",
+          "impact": "critical",
+          "help": "Images must have alternative text",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/image-alt?application=axeAPI",
+          "wcag": [
+            "1.1.1"
+          ],
+          "nodes": 114,
+          "targets": [
+            ".leaflet-marker-icon.leaflet-interactive.leaflet-zoom-animated:nth-child(2) > figure > img",
+            ".leaflet-marker-icon.leaflet-interactive.leaflet-zoom-animated:nth-child(3) > figure > img",
+            ".leaflet-marker-icon.leaflet-interactive.leaflet-zoom-animated:nth-child(4) > figure > img"
+          ],
+          "html": [
+            "<img src=\"https://www.skiroviegli.lv/marker-gray.svg\" style=\"width: 39px; height: 50px; position: absolute; top:-42px; left:-15px\">",
+            "<img src=\"https://www.skiroviegli.lv/marker-gray.svg\" style=\"width: 39px; height: 50px; position: absolute; top:-42px; left:-15px\">"
+          ]
+        }
+      ],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 121
+        },
+        {
+          "id": "target-size",
+          "nodes": 6
+        }
+      ],
+      "focus_on_open": "<div class=\"modal show\" tabindex=\"-1\" id=\"accessibilityModal\" aria-modal=\"true\" role=\"dialog\" style=\"display: block;\">\n ",
+      "keyboard": [
+        {
+          "el": "button.btn-close",
+          "text": "Close",
+          "visible": true
+        },
+        {
+          "el": "a",
+          "text": "https://skiroviegli.lv",
+          "visible": true
+        },
+        {
+          "el": "a.fs-6",
+          "text": "Cik piekļūstama ir šī tīmekļvietne?",
+          "visible": true
+        },
+        {
+          "el": "a",
+          "text": "Piekļūstamības izvērtēšanas protokols",
+          "visible": true
+        },
+        {
+          "el": "a.fw-bold",
+          "text": "Atsauksmēm un saziņai",
+          "visible": true
+        },
+        null,
+        {
+          "el": "button.btn-close",
+          "text": "Close",
+          "visible": true
+        },
+        {
+          "el": "a",
+          "text": "https://skiroviegli.lv",
+          "visible": true
+        },
+        {
+          "el": "a.fs-6",
+          "text": "Cik piekļūstama ir šī tīmekļvietne?",
+          "visible": true
+        },
+        {
+          "el": "a",
+          "text": "Piekļūstamības izvērtēšanas protokols",
+          "visible": true
+        },
+        {
+          "el": "a.fw-bold",
+          "text": "Atsauksmēm un saziņai",
+          "visible": true
+        },
+        null
+      ],
+      "overflow_320": 45,
+      "overflow_640": 0
+    },
+    {
+      "name": "3 Informācija operatoriem (dialogs)",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/color-contrast?application=axeAPI",
+          "wcag": [
+            "1.4.3"
+          ],
+          "nodes": 15,
+          "targets": [
+            "a[data-bs-target=\"#accessibilityModal\"]",
+            "a[data-bs-target=\"#infoForOperatorsModal\"]",
+            "#description > p"
+          ],
+          "html": [
+            "<a class=\"nav-link\" aria-current=\"page\" href=\"#\" data-bs-toggle=\"modal\" data-bs-target=\"#accessibilityModal\">Piekļūstamība</a>",
+            "<a class=\"nav-link\" aria-current=\"page\" href=\"#\" data-bs-toggle=\"modal\" data-bs-target=\"#infoForOperatorsModal\">Informācija operatoriem</a>"
+          ]
+        },
+        {
+          "id": "html-has-lang",
+          "impact": "serious",
+          "help": "<html> element must have a lang attribute",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/html-has-lang?application=axeAPI",
+          "wcag": [
+            "3.1.1"
+          ],
+          "nodes": 1,
+          "targets": [
+            "html"
+          ],
+          "html": [
+            "<html xmlns:layout=\"http://www.ultraq.net.nz/web/thymeleaf/layout\" style=\"height: 100%;\">"
+          ]
+        },
+        {
+          "id": "image-alt",
+          "impact": "critical",
+          "help": "Images must have alternative text",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/image-alt?application=axeAPI",
+          "wcag": [
+            "1.1.1"
+          ],
+          "nodes": 114,
+          "targets": [
+            ".leaflet-marker-icon.leaflet-interactive.leaflet-zoom-animated:nth-child(2) > figure > img",
+            ".leaflet-marker-icon.leaflet-interactive.leaflet-zoom-animated:nth-child(3) > figure > img",
+            ".leaflet-marker-icon.leaflet-interactive.leaflet-zoom-animated:nth-child(4) > figure > img"
+          ],
+          "html": [
+            "<img src=\"https://www.skiroviegli.lv/marker-gray.svg\" style=\"width: 39px; height: 50px; position: absolute; top:-42px; left:-15px\">",
+            "<img src=\"https://www.skiroviegli.lv/marker-gray.svg\" style=\"width: 39px; height: 50px; position: absolute; top:-42px; left:-15px\">"
+          ]
+        }
+      ],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 121
+        },
+        {
+          "id": "target-size",
+          "nodes": 6
+        }
+      ],
+      "focus_on_open": "<div class=\"modal show\" tabindex=\"-1\" id=\"infoForOperatorsModal\" aria-modal=\"true\" role=\"dialog\" style=\"display: block;\"",
+      "keyboard": [
+        {
+          "el": "button.btn-close",
+          "text": "Close",
+          "visible": true
+        },
+        {
+          "el": "a",
+          "text": "www.skiroviegli.lv",
+          "visible": true
+        },
+        {
+          "el": "a",
+          "text": "Atkritumu pieņemšanas vietu aktualizēšan",
+          "visible": true
+        },
+        {
+          "el": "a",
+          "text": "www.skiroviegli.lv",
+          "visible": true
+        },
+        null,
+        {
+          "el": "button.btn-close",
+          "text": "Close",
+          "visible": true
+        },
+        {
+          "el": "a",
+          "text": "www.skiroviegli.lv",
+          "visible": true
+        },
+        {
+          "el": "a",
+          "text": "Atkritumu pieņemšanas vietu aktualizēšan",
+          "visible": true
+        },
+        {
+          "el": "a",
+          "text": "www.skiroviegli.lv",
+          "visible": true
+        },
+        null,
+        {
+          "el": "button.btn-close",
+          "text": "Close",
+          "visible": true
+        },
+        {
+          "el": "a",
+          "text": "www.skiroviegli.lv",
+          "visible": true
+        }
+      ],
+      "overflow_320": 45,
+      "overflow_640": 0
+    },
+    {
+      "name": "4 Karte: pašvaldību filtrs atvērts",
+      "violations": [
+        {
+          "id": "html-has-lang",
+          "impact": "serious",
+          "help": "<html> element must have a lang attribute",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/html-has-lang?application=axeAPI",
+          "wcag": [
+            "3.1.1"
+          ],
+          "nodes": 1,
+          "targets": [
+            "html"
+          ],
+          "html": [
+            "<html xmlns:layout=\"http://www.ultraq.net.nz/web/thymeleaf/layout\" style=\"height: 100%;\">"
+          ]
+        },
+        {
+          "id": "image-alt",
+          "impact": "critical",
+          "help": "Images must have alternative text",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/image-alt?application=axeAPI",
+          "wcag": [
+            "1.1.1"
+          ],
+          "nodes": 114,
+          "targets": [
+            ".leaflet-marker-icon.leaflet-interactive.leaflet-zoom-animated:nth-child(2) > figure > img",
+            ".leaflet-marker-icon.leaflet-interactive.leaflet-zoom-animated:nth-child(3) > figure > img",
+            ".leaflet-marker-icon.leaflet-interactive.leaflet-zoom-animated:nth-child(4) > figure > img"
+          ],
+          "html": [
+            "<img src=\"https://www.skiroviegli.lv/marker-gray.svg\" style=\"width: 39px; height: 50px; position: absolute; top:-42px; left:-15px\">",
+            "<img src=\"https://www.skiroviegli.lv/marker-gray.svg\" style=\"width: 39px; height: 50px; position: absolute; top:-42px; left:-15px\">"
+          ]
+        },
+        {
+          "id": "label",
+          "impact": "critical",
+          "help": "Form elements must have labels",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/label?application=axeAPI",
+          "wcag": [
+            "4.1.2"
+          ],
+          "nodes": 1,
+          "targets": [
+            "#ms-list-1 > .ms-options > .ms-search > input[placeholder=\"\"][value=\"\"][type=\"text\"]"
+          ],
+          "html": [
+            "<input type=\"text\" value=\"\" placeholder=\"\">"
+          ]
+        }
+      ],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 1
+        },
+        {
+          "id": "target-size",
+          "nodes": 6
+        }
+      ],
+      "overflow_320": 45,
+      "overflow_640": 0
+    },
+    {
+      "name": "5 Sākumlapa 320 px platumā",
+      "violations": [
+        {
+          "id": "color-contrast",
+          "impact": "serious",
+          "help": "Elements must meet minimum color contrast ratio thresholds",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/color-contrast?application=axeAPI",
+          "wcag": [
+            "1.4.3"
+          ],
+          "nodes": 9,
+          "targets": [
+            "a[data-bs-target=\"#accessibilityModal\"]",
+            "a[data-bs-target=\"#infoForOperatorsModal\"]",
+            "#description > p"
+          ],
+          "html": [
+            "<a class=\"nav-link\" aria-current=\"page\" href=\"#\" data-bs-toggle=\"modal\" data-bs-target=\"#accessibilityModal\">Piekļūstamība</a>",
+            "<a class=\"nav-link\" aria-current=\"page\" href=\"#\" data-bs-toggle=\"modal\" data-bs-target=\"#infoForOperatorsModal\">Informācija operatoriem</a>"
+          ]
+        },
+        {
+          "id": "html-has-lang",
+          "impact": "serious",
+          "help": "<html> element must have a lang attribute",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/html-has-lang?application=axeAPI",
+          "wcag": [
+            "3.1.1"
+          ],
+          "nodes": 1,
+          "targets": [
+            "html"
+          ],
+          "html": [
+            "<html xmlns:layout=\"http://www.ultraq.net.nz/web/thymeleaf/layout\" style=\"height: 100%;\">"
+          ]
+        },
+        {
+          "id": "image-alt",
+          "impact": "critical",
+          "help": "Images must have alternative text",
+          "helpUrl": "https://dequeuniversity.com/rules/axe/4.12/image-alt?application=axeAPI",
+          "wcag": [
+            "1.1.1"
+          ],
+          "nodes": 113,
+          "targets": [
+            ".leaflet-marker-icon.leaflet-interactive.leaflet-zoom-animated:nth-child(1) > figure > img",
+            ".leaflet-marker-icon.leaflet-interactive.leaflet-zoom-animated:nth-child(2) > figure > img",
+            ".leaflet-marker-icon.leaflet-interactive.leaflet-zoom-animated:nth-child(3) > figure > img"
+          ],
+          "html": [
+            "<img src=\"https://www.skiroviegli.lv/marker-gray.svg\" style=\"width: 39px; height: 50px; position: absolute; top:-42px; left:-15px\">",
+            "<img src=\"https://www.skiroviegli.lv/marker-gray.svg\" style=\"width: 39px; height: 50px; position: absolute; top:-42px; left:-15px\">"
+          ]
+        }
+      ],
+      "incomplete": [
+        {
+          "id": "color-contrast",
+          "nodes": 41
+        },
+        {
+          "id": "target-size",
+          "nodes": 1
+        }
+      ],
+      "overflow_320": 45
+    }
+  ],
+  "axe_version": "4.12.1",
+  "lang": null,
+  "title": "Šķiro viegli",
+  "landmarks": {
+    "header": 0,
+    "nav": 0,
+    "main": 0,
+    "footer": 0
+  },
+  "headings": [
+    "H1: TAS IR VIEGLĀK, NEKĀ ŠĶIET",
+    "H1: TAGAD DAUDZ VAIRĀK PUBLISKO DALĪTĀS SAVĀKŠANAS VIETU TAVĀ AP",
+    "H1: LEAFLET-SIDEBAR",
+    "H1: UZZINI, KĀDAS LIETAS TU VARI NODOT ATKRITUMU ŠĶIROŠANAS VIET"
+  ],
+  "skip_link": false
+}
